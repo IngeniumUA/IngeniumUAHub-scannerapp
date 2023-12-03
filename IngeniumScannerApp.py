@@ -1,23 +1,53 @@
-from kivy.app import App
-from kivy.uix.button import Button
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.camera import Camera
-import camera4kivy
+from kivy.properties import ObjectProperty
+from kivy.clock import mainthread
+from kivy.utils import platform
 
-class Layout(App):
+from kivymd.app import MDApp
+from kivymd.uix.screen import MDScreen
+
+from camera4kivy import Preview
+from PIL import Image
+
+from pyzbar.pyzbar import decode
+
+resultlist = ["All-In, wout.de.smit@hotmail.be, valid", "Al-In, wout.de.smit@hotmail.be, used"]
+
+
+class ScanScreen(MDScreen):
+
+    def on_kv_post(self, obj):
+        self.ids.preview.connect_camera(enable_analyze_pixels=True, default_zoom=0.0)
+
+    @mainthread
+    def got_result(self, result):
+        self.ids.ti.text = str(result)
+        if result in resultlist:
+            self.ids.ti.background_color = 0, 1, 0, 1
+        else:
+            self.ids.ti.background_color = 1, 0, 0, 1
+
+
+class ScanAnalyze(Preview):
+    extracted_data = ObjectProperty(None)
+
+    def analyze_pixels_callback(self, pixels, image_size, image_pos, scale, mirror):
+        pimage = Image.frombytes(mode='RGBA', size=image_size, data=pixels)
+        list_of_all_barcodes = decode(pimage)
+
+        if list_of_all_barcodes:
+            if self.extracted_data:
+                self.extracted_data(list_of_all_barcodes[0].data.decode('utf-8'))
+            else:
+                print("Not found")
+
+
+class QRScan(MDApp):
     def build(self):
-        layout = BoxLayout(padding=100)
-
-        btn = Button(text="QR-Scanner", background_color=[0, 0, 1, 1])
-        btn.bind(on_press=Camera(play=True, index=1, resolution=(640, 480)))
-
-        layout.add_widget(btn)
-        return layout
-
-    #def openscanner(self, instance):
-     #   return Camera(play=True, index=1, resolution=(640, 480))
+        if platform == 'android':
+            from android.permissions import request_permissions, Permission
+            request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO])
+        return ScanScreen()
 
 
-if __name__ == "__main__":
-    app = Layout()
-    app.run()
+if __name__ == '__main__':
+    QRScan().run()

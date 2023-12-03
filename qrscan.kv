@@ -1,0 +1,20 @@
+
+<ScanScreen>:
+	BoxLayout:
+		orientation: 'vertical'
+		ScanAnalyze:
+			id:preview
+			aspect_ratio: '16:9'
+			extracted_data:root.got_result
+
+		MDLabel:
+			size_hint_y: None
+			height:'130dp'
+			id:ti
+			background_color: 0, 0, 1, 1
+            canvas.before:
+                Color:
+                    rgba: self.background_color
+                Rectangle:
+                    size: self.size
+                    pos: self.pos

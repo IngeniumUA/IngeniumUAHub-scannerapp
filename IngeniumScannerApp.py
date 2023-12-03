@@ -4,13 +4,23 @@ from kivy.utils import platform
 
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.screenmanager import MDScreenManager
 
 from camera4kivy import Preview
 from PIL import Image
 
 from pyzbar.pyzbar import decode
 
-resultlist = ["All-In, wout.de.smit@hotmail.be, valid", "Al-In, wout.de.smit@hotmail.be, used"]
+import requests
+
+
+resultlist = ["All-In, wout.de.smit@hotmail.be", "All-In, wout.de.smit@hotmail.com"]
+prevresult = ""
+prevevent = ""
+
+
+class LoginScreen(MDScreen):
+    pass
 
 
 class ScanScreen(MDScreen):
@@ -21,10 +31,13 @@ class ScanScreen(MDScreen):
     @mainthread
     def got_result(self, result):
         self.ids.ti.text = str(result)
-        if result in resultlist:
+        global prevresult, prevevent
+        if self.ids.event.text + ", " + result in resultlist and (result != prevresult or self.ids.event.text != prevevent):
             self.ids.ti.background_color = 0, 1, 0, 1
-        else:
+        elif result != prevresult or self.ids.event.text != prevevent:
             self.ids.ti.background_color = 1, 0, 0, 1
+        prevresult = result
+        prevevent = self.ids.event.text
 
 
 class ScanAnalyze(Preview):
@@ -46,7 +59,11 @@ class QRScan(MDApp):
         if platform == 'android':
             from android.permissions import request_permissions, Permission
             request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO])
-        return ScanScreen()
+
+        sm = MDScreenManager()
+        sm.add_widget(LoginScreen(name='login'))
+        sm.add_widget(ScanScreen(name='scan'))
+        return sm
 
 
 if __name__ == '__main__':

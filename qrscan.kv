@@ -1,11 +1,25 @@
-
 <ScanScreen>:
-	BoxLayout:
-		orientation: 'vertical'
+	GridLayout:
+	    cols: 1
+
 		ScanAnalyze:
+		    size_hint_y: 15
 			id:preview
 			aspect_ratio: '16:9'
-			extracted_data:root.got_result
+			extracted_data: root.got_result
+
+        GridLayout:
+            cols: 2
+            MDLabel:
+                size_hint_y: None
+			    height:'30dp'
+			    text: "Event "
+
+			TextInput:
+			    size_hint_y: None
+			    height:'30dp'
+                id: event
+                multiline: False
 
 		MDLabel:
 			size_hint_y: None
@@ -18,3 +32,47 @@
                 Rectangle:
                     size: self.size
                     pos: self.pos
+        Button:
+            size_hint_y: None
+			height:'60dp'
+            text: "Go Back"
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "login"
+
+<LoginScreen>
+    GridLayout:
+        cols:1
+
+        GridLayout:
+            cols: 2
+            MDLabel:
+			    height:'10dp'
+			    text: "Email "
+			    text_size: self.size
+			    valign: 'bottom'
+
+
+            MDLabel:
+			    height:'10dp'
+			    text: "Password "
+			    text_size: self.size
+			    valign: 'bottom'
+
+        GridLayout:
+            cols: 2
+            TextInput:
+                id: mail
+                multiline: False
+
+            TextInput:
+                id: passw
+                multiline: False
+                password: True
+
+        Button:
+            size_hint: 1, 0.2
+            text: "Submit"
+            on_release:
+                root.manager.transition.direction = "left"
+                root.manager.current = "scan" if mail.text != "" and passw.text != "" else "login"

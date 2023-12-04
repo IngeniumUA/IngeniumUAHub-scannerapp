@@ -3,7 +3,7 @@
 	    cols: 1
 
 		ScanAnalyze:
-		    size_hint_y: 15
+		    size_hint_y: 10
 			id:preview
 			aspect_ratio: '16:9'
 			extracted_data: root.got_result
@@ -39,6 +39,20 @@
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "login"
+        GridLayout:
+            cols: 2
+            Button:
+                size_hint_y: None
+			    height:'60dp'
+                text: "Reset Tokens"
+                on_release:
+                    root.resettokens()
+            Button:
+                size_hint_y: None
+			    height:'60dp'
+                text: "Reset Resets"
+                on_release:
+                    root.resetresets()
 
 <LoginScreen>
     GridLayout:
@@ -47,32 +61,45 @@
         GridLayout:
             cols: 2
             MDLabel:
-			    height:'10dp'
+			    size_hint_y: None
+			    height:'30dp'
 			    text: "Email "
-			    text_size: self.size
-			    valign: 'bottom'
+			    halign: 'right'
 
-
-            MDLabel:
-			    height:'10dp'
-			    text: "Password "
-			    text_size: self.size
-			    valign: 'bottom'
-
-        GridLayout:
-            cols: 2
             TextInput:
+                size_hint_y: None
+			    height:'30dp'
                 id: mail
                 multiline: False
 
-            TextInput:
+
+        GridLayout:
+            cols: 2
+            MDLabel:
+			    size_hint_y: None
+			    height:'30dp'
+			    text: "Password "
+			    halign: 'right'
+
+			TextInput:
+			    size_hint_y: None
+			    height:'30dp'
                 id: passw
                 multiline: False
                 password: True
 
+
+
         Button:
-            size_hint: 1, 0.2
+            id: confirmbutton
+            size_hint: 1, 10
             text: "Submit"
             on_release:
-                root.manager.transition.direction = "left"
-                root.manager.current = "scan" if mail.text != "" and passw.text != "" else "login"
+                root.login()
+                root.buttonpress()
+
+        MDLabel:
+            id: validitylabel
+			size_hint_y: None
+			height:'30dp'
+			halign: 'right'

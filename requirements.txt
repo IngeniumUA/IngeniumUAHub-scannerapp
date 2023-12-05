@@ -5,4 +5,5 @@ camera4kivy==0.3.3
 pyzbar==0.1.9
 requests~=2.31.0
 pillow~=10.1.0
+py-androidbuild==0.9
 python-for-android~=2023.9.16

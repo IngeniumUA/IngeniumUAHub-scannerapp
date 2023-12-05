@@ -3,3 +3,5 @@ kivy==2.2.1
 kivymd==1.1.1
 camera4kivy==0.3.3
 pyzbar==0.1.9
+requests~=2.31.0
+pillow~=10.1.0

@@ -26,6 +26,9 @@ class IngeniumAPIReplica:
                          "UUID3": {"event": "All-In", "Validity": "Used"},
                          "UUID4": {"event": "Schachtenkoningcantus", "Validity": "Valid"}}
 
+    def update(self,UUID):
+        self.evendtdb[UUID]["Validity"] = "Used"
+
     def login(self, user_email, user_id):
         if user_email in self.logindb:
             if self.logindb[user_email] == user_id:
@@ -111,10 +114,12 @@ class ScanScreen(MDScreen):
                 and (result != prevresult or self.ids.event.text != prevevent):
             sm.transition.direction = "left"
             sm.current = "valid"
+            API.update(result)
         elif API.get_validity(Token, result, self.ids.event.text) == "InValid" \
                 and (result != prevresult or self.ids.event.text != prevevent):
             sm.transition.direction = "left"
             sm.current = "invalid"
+            API.update(result)
         elif API.get_validity(Token, result, self.ids.event.text) == "Used" \
                 and (result != prevresult or self.ids.event.text != prevevent):
             sm.transition.direction = "left"

@@ -88,6 +88,7 @@ class LoginScreen(MDScreen):
         sm.current = "scan" if ScannerAlowed else "login"
         pass
 
+
 class ScanScreen(MDScreen):
 
     def on_kv_post(self, obj):
@@ -97,29 +98,31 @@ class ScanScreen(MDScreen):
     def got_result(self, result):
         # self.ids.ti.text = str(result)
         global prevresult, prevevent, Token, Reset, API, sm
-        if API.get_validity(Token, result, self.ids.event.text) == "APITokenError" \
-                and (result != prevresult or self.ids.event.text != prevevent):
-            self.ids.ti.text = "Resetting token"
-            self.ids.ti.background_color = 0, 0, 1, 1
+        if API.get_validity(Token, result, self.ids.event.text) == "APITokenError":
+            result = 0
             Token = API.reset_token(Reset)
             if Token == "resetError":
+                sm.transition.direction = "right"
                 sm.current = "login"
+            else:
+                sm.transition.direction = "left"
+                sm.current = "token"
         elif API.get_validity(Token, result, self.ids.event.text) == "Valid" \
                 and (result != prevresult or self.ids.event.text != prevevent):
-            self.ids.ti.background_color = 0, 1, 0, 1
-            self.ids.ti.text = "Valid"
+            sm.transition.direction = "left"
+            sm.current = "valid"
         elif API.get_validity(Token, result, self.ids.event.text) == "InValid" \
                 and (result != prevresult or self.ids.event.text != prevevent):
-            self.ids.ti.background_color = 253/255, 127/255, 57/255, 1
-            self.ids.ti.text = "InValid"
+            sm.transition.direction = "left"
+            sm.current = "invalid"
         elif API.get_validity(Token, result, self.ids.event.text) == "Used" \
                 and (result != prevresult or self.ids.event.text != prevevent):
-            self.ids.ti.background_color = 1, 0, 0, 1
-            self.ids.ti.text = "Used"
+            sm.transition.direction = "left"
+            sm.current = "used"
         elif API.get_validity(Token, result, self.ids.event.text) == ("eventError" or "UUIDError") \
                 and (result != prevresult or self.ids.event.text != prevevent):
-            self.ids.ti.background_color = 1, 0, 0, 1
-            self.ids.ti.text = "Didn't pay"
+            sm.transition.direction = "left"
+            sm.current = "payless"
         prevresult = result
         prevevent = self.ids.event.text
 
@@ -146,6 +149,26 @@ class ScanAnalyze(Preview):
                 print("Not found")
 
 
+class TokenScreen(MDScreen):
+    pass
+
+
+class ValidScreen(MDScreen):
+    pass
+
+
+class InValidScreen(MDScreen):
+    pass
+
+
+class UsedScreen(MDScreen):
+    pass
+
+
+class PaylessScreen(MDScreen):
+    pass
+
+
 class QRScan(MDApp):
     def build(self):
         if platform == 'android':
@@ -156,6 +179,11 @@ class QRScan(MDApp):
         sm = MDScreenManager()
         sm.add_widget(LoginScreen(name='login'))
         sm.add_widget(ScanScreen(name='scan'))
+        sm.add_widget(TokenScreen(name='token'))
+        sm.add_widget(ValidScreen(name='valid'))
+        sm.add_widget(InValidScreen(name='invalid'))
+        sm.add_widget(UsedScreen(name='used'))
+        sm.add_widget(PaylessScreen(name='payless'))
         return sm
 
 

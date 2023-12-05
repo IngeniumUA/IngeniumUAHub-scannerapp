@@ -21,17 +21,6 @@
                 id: event
                 multiline: False
 
-		MDLabel:
-			size_hint_y: None
-			height:'130dp'
-			id:ti
-			background_color: 0, 0, 1, 1
-            canvas.before:
-                Color:
-                    rgba: self.background_color
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
         Button:
             size_hint_y: None
 			height:'60dp'
@@ -72,7 +61,6 @@
                 id: mail
                 multiline: False
 
-
         GridLayout:
             cols: 2
             MDLabel:
@@ -88,8 +76,6 @@
                 multiline: False
                 password: True
 
-
-
         Button:
             id: confirmbutton
             size_hint: 1, 10
@@ -103,3 +89,108 @@
 			size_hint_y: None
 			height:'30dp'
 			halign: 'right'
+
+<TokenScreen>
+    GridLayout:
+        cols:1
+        MDLabel:
+            halign: "center"
+            text: "Refreshing Token"
+			size_hint_y: 0.8
+			background_color: 0, 0, 1, 1
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 1, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            size_hint_y: 0.2
+            text: "Go Back"
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "scan"
+
+<ValidScreen>
+    GridLayout:
+        cols:1
+        MDLabel:
+            halign: "center"
+            text: "Valid"
+			size_hint_y: 0.8
+			background_color: 0, 1, 0, 1
+            canvas.before:
+                Color:
+                    rgba: 0, 1, 0, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            size_hint_y: 0.2
+            text: "Go Back"
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "scan"
+
+<InValidScreen>
+    GridLayout:
+        cols:1
+        MDLabel:
+            halign: "center"
+            text: "Invalid"
+			size_hint_y: 0.8
+			background_color: 253/255, 127/255, 57/255, 1
+            canvas.before:
+                Color:
+                    rgba: 253/255, 127/255, 57/255, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            size_hint_y: 0.2
+            text: "Go Back"
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "scan"
+
+<UsedScreen>
+    GridLayout:
+        cols:1
+        MDLabel:
+            halign: "center"
+            text: "Used"
+			size_hint_y: 0.8
+			background_color: 1, 0, 0, 1
+            canvas.before:
+                Color:
+                    rgba: 1, 0, 0, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            size_hint_y: 0.2
+            text: "Go Back"
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "scan"
+
+<PaylessScreen>
+    GridLayout:
+        cols:1
+        MDLabel:
+            halign: "center"
+            text: "Didn't Pay"
+			size_hint_y: 0.8
+			background_color: 1, 0, 0, 1
+            canvas.before:
+                Color:
+                    rgba: 1, 0, 0, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            size_hint_y: 0.2
+            text: "Go Back"
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "scan"

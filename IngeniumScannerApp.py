@@ -73,12 +73,12 @@ class IngeniumAPIReplica:
 class LoginScreen(MDScreen):
     def login(self):
         global Token, Reset, API
-        Token, Reset = API.login(self.ids.mail.text, self.ids.passw.text)
+        Token, Reset = API.login(self.ids.mail.text.lower(), self.ids.passw.text)
         self.ids.validitylabel.text = "data invalid"
         if Token != "LoginError":
-            self.ids.validitylabel.text = "data valid"
+            self.ids.validitylabel.text = "Logging in"
         else:
-            self.ids.validitylabel.text = "data invalid"
+            self.ids.validitylabel.text = "Email or Password incorrect"
     pass
 
     def buttonpress(self):

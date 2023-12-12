@@ -3,22 +3,26 @@
 	    cols: 1
 
         GridLayout:
-            cols: 2
+            cols:2
             MDLabel:
                 size_hint_y: None
 			    height:'30dp'
+			    size_hint_x: 0.3
+                pos_hint: {"x":0, "y":0.95}
 			    text: "Event "
+			    halign: 'right'
 
-			TextInput:
+		    TextInput:
 			    size_hint_y: None
 			    height:'30dp'
+			    size_hint_x: 0.55
+		        pos_hint: {"x":0.3, "y":0.95}
                 id: event
                 multiline: False
 
 		ScanAnalyze:
 		    size_hint_y: 10
 			id:preview
-			aspect_ratio: '16:9'
 			extracted_data: root.got_result
 
         Button:
@@ -44,51 +48,59 @@
                     root.resetresets()
 
 <LoginScreen>
-    GridLayout:
-        cols:1
+    MDLabel:
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.7}
+		text: "Email "
+		halign: 'right'
 
-        GridLayout:
-            cols: 2
-            MDLabel:
-			    size_hint_y: None
-			    height:'30dp'
-			    text: "Email "
-			    halign: 'right'
+    TextInput:
+        size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.55
+		pos_hint: {"x":0.3, "y":0.7}
+        id: mail
+        multiline: False
 
-            TextInput:
-                size_hint_y: None
-			    height:'30dp'
-                id: mail
-                multiline: False
 
-        GridLayout:
-            cols: 2
-            MDLabel:
-			    size_hint_y: None
-			    height:'30dp'
-			    text: "Password "
-			    halign: 'right'
+    MDLabel:
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.65}
+		text: "Password "
+		halign: 'right'
 
-			TextInput:
-			    size_hint_y: None
-			    height:'30dp'
-                id: passw
-                multiline: False
-                password: True
+	TextInput:
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.55
+        pos_hint: {"x":0.3, "y":0.65}
+        id: passw
+        multiline: False
+        password: True
 
-        Button:
-            id: confirmbutton
-            size_hint: 1, 10
-            text: "Submit"
-            on_release:
-                root.login()
-                root.buttonpress()
+    MDLabel:
+        id: validitylabel
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.75
+        pos_hint: {"x":0.125, "y":0.6}
+		halign: 'center'
+		color: 1,0,0,1
 
-        MDLabel:
-            id: validitylabel
-			size_hint_y: None
-			height:'30dp'
-			halign: 'right'
+    Button:
+        id: confirmbutton
+        size_hint: .5, .08
+        pos_hint: {"x":0.25, "y":0.5}
+        text: "Submit"
+        on_release:
+            root.login()
+            root.buttonpress()
+
+
 
 <TokenScreen>
     GridLayout:

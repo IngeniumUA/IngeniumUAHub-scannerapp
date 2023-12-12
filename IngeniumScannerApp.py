@@ -100,12 +100,7 @@ class ScanScreen(MDScreen):
     @mainthread
     def got_result(self, result):
         # self.ids.ti.text = str(result)
-        global Token, Reset, API, sm
-        if "prevevent" in locals() and "prevresult" in locals():
-            pass
-        else:
-            prevevent = ""
-            prevresult = ""
+        global prevevent, prevresult, Token, Reset, API, sm
 
         if API.get_validity(Token, result, self.ids.event.text) == "APITokenError":
             result = 0
@@ -203,5 +198,7 @@ if __name__ == '__main__':
     Reset = 0
     API = IngeniumAPIReplica(True)
     sm = 0
+    prevevent = ""
+    prevresult = ""
 
     QRScan().run()

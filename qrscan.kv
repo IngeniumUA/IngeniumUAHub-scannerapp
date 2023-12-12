@@ -2,12 +2,6 @@
 	GridLayout:
 	    cols: 1
 
-		ScanAnalyze:
-		    size_hint_y: 10
-			id:preview
-			aspect_ratio: '16:9'
-			extracted_data: root.got_result
-
         GridLayout:
             cols: 2
             MDLabel:
@@ -20,6 +14,12 @@
 			    height:'30dp'
                 id: event
                 multiline: False
+
+		ScanAnalyze:
+		    size_hint_y: 10
+			id:preview
+			aspect_ratio: '16:9'
+			extracted_data: root.got_result
 
         Button:
             size_hint_y: None

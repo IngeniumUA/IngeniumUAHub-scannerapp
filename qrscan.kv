@@ -1,63 +1,66 @@
 <ScanScreen>:
-	GridLayout:
-	    cols: 1
-	    spacing: 2
+    MDLabel:
+        size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.92}
+		text: "Event "
+		font_name: 'D-DIN.otf'
+		halign: 'right'
 
-        GridLayout:
-            cols:2
-            spacing: 2
-            MDLabel:
-                size_hint_y: None
-			    height:'30dp'
-			    size_hint_x: 0.3
-                pos_hint: {"x":0, "y":0.95}
-			    text: "Event "
-			    halign: 'right'
+	TextInput:
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.55
+        pos_hint: {"x":0.3, "y":0.92}
+        id: event
+        multiline: False
+        font_name: 'D-DIN.otf'
 
-		    TextInput:
-			    size_hint_y: None
-			    height:'30dp'
-			    size_hint_x: 0.55
-		        pos_hint: {"x":0.3, "y":0.95}
-                id: event
-                multiline: False
+    ScanAnalyze:
+        size_hint_y: 0.7
+        size_hint_x: 0.98
+        pos_hint: {"x":0.01, "y":0.2}
+        id:preview
+        extracted_data: root.got_result
 
-		ScanAnalyze:
-		    size_hint_y: 10
-			id:preview
-			extracted_data: root.got_result
+    Button:
+        size_hint_y: 0.08
+        size_hint_x: 0.98
+        pos_hint: {"x":0.01, "y":0.1}
+        text: "Back"
+        font_name: 'D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'buttonnormal.png'
+        background_down: 'buttondown.png'
+        on_release:
+            root.manager.transition.direction = "right"
+            root.manager.current = "login"
 
-        Button:
-            size_hint_y: None
-			height:'60dp'
-            text: "Back"
-            color: 1,1,1,1
-            background_normal: 'buttonnormal.png'
-            background_down: 'buttondown.png'
-            on_release:
-                root.manager.transition.direction = "right"
-                root.manager.current = "login"
-        GridLayout:
-            cols: 2
-            spacing: 2
-            Button:
-                size_hint_y: None
-			    height:'60dp'
-                text: "Reset Tokens"
-                color: 1,1,1,1
-                background_normal: 'buttonnormal.png'
-                background_down: 'buttondown.png'
-                on_release:
-                    root.resettokens()
-            Button:
-                size_hint_y: None
-			    height:'60dp'
-                text: "Reset Resets"
-                color: 1,1,1,1
-                background_normal: 'buttonnormal.png'
-                background_down: 'buttondown.png'
-                on_release:
-                    root.resetresets()
+    Button:
+        size_hint_y: 0.08
+        size_hint_x: 0.48
+        pos_hint: {"x":0.01, "y":0.01}
+        text: "Reset Tokens"
+        font_name: 'D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'buttonnormal.png'
+        background_down: 'buttondown.png'
+        on_release:
+            root.resettokens()
+    Button:
+        size_hint_y: 0.08
+        size_hint_x: 0.48
+        pos_hint: {"x":0.51, "y":0.01}
+        text: "Reset Resets"
+        font_name: 'D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'buttonnormal.png'
+        background_down: 'buttondown.png'
+        on_release:
+            root.resetresets()
+
+
 
 <LoginScreen>
     MDLabel:
@@ -66,6 +69,7 @@
 		size_hint_x: 0.3
         pos_hint: {"x":0, "y":0.7}
 		text: "Email "
+		font_name: 'D-DIN.otf'
 		halign: 'right'
 
     TextInput:
@@ -75,6 +79,7 @@
 		pos_hint: {"x":0.3, "y":0.7}
         id: mail
         multiline: False
+        font_name: 'D-DIN.otf'
 
 
     MDLabel:
@@ -83,6 +88,7 @@
 		size_hint_x: 0.3
         pos_hint: {"x":0, "y":0.65}
 		text: "Password "
+		font_name: 'D-DIN.otf'
 		halign: 'right'
 
 	TextInput:
@@ -93,6 +99,7 @@
         id: passw
         multiline: False
         password: True
+        font_name: 'D-DIN.otf'
 
     MDLabel:
         id: validitylabel
@@ -103,12 +110,14 @@
 		halign: 'left'
 		color: 1,0,0,1
 		font_size: 17
+		font_name: 'D-DIN.otf'
 
     Button:
         id: confirmbutton
         size_hint: .5, .08
         pos_hint: {"x":0.25, "y":0.5}
         text: "Submit"
+        font_name: 'D-DIN.otf'
         color: 1,1,1,1
         background_normal: 'buttonnormal.png'
         background_down: 'buttondown.png'
@@ -124,6 +133,7 @@
         MDLabel:
             halign: "center"
             text: "Refreshing Token"
+            font_name: 'D-DIN.otf'
 			size_hint_y: 0.8
 			background_color: 0, 0, 1, 1
             canvas.before:
@@ -135,6 +145,7 @@
         Button:
             size_hint_y: 0.2
             text: "Back"
+            font_name: 'D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'buttonnormal.png'
             background_down: 'buttondown.png'
@@ -148,6 +159,7 @@
         MDLabel:
             halign: "center"
             text: "Valid"
+            font_name: 'D-DIN.otf'
 			size_hint_y: 0.8
 			background_color: 0, 1, 0, 1
             canvas.before:
@@ -159,6 +171,7 @@
         Button:
             size_hint_y: 0.2
             text: "Back"
+            font_name: 'D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'buttonnormal.png'
             background_down: 'buttondown.png'
@@ -172,6 +185,7 @@
         MDLabel:
             halign: "center"
             text: "Invalid"
+            font_name: 'D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'buttonnormal.png'
             background_down: 'buttondown.png'
@@ -186,6 +200,7 @@
         Button:
             size_hint_y: 0.2
             text: "Back"
+            font_name: 'D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'buttonnormal.png'
             background_down: 'buttondown.png'
@@ -199,6 +214,7 @@
         MDLabel:
             halign: "center"
             text: "Used"
+            font_name: 'D-DIN.otf'
 			size_hint_y: 0.8
 			background_color: 1, 0, 0, 1
             canvas.before:
@@ -210,6 +226,7 @@
         Button:
             size_hint_y: 0.2
             text: "Back"
+            font_name: 'D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'buttonnormal.png'
             background_down: 'buttondown.png'
@@ -223,6 +240,7 @@
         MDLabel:
             halign: "center"
             text: "Didn't Pay"
+            font_name: 'D-DIN.otf'
 			size_hint_y: 0.8
 			background_color: 1, 0, 0, 1
             canvas.before:
@@ -234,6 +252,7 @@
         Button:
             size_hint_y: 0.2
             text: "Back"
+            font_name: 'D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'buttonnormal.png'
             background_down: 'buttondown.png'

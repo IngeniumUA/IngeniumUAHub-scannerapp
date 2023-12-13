@@ -16,4 +16,4 @@ uuid = "UUID4"
 # create qr-code
 ##############################
 testqr = qrcode.make(uuid)
-testqr.save("testqr.png")
+testqr.save(uuid+".png")

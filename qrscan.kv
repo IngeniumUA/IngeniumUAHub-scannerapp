@@ -1,9 +1,11 @@
 <ScanScreen>:
 	GridLayout:
 	    cols: 1
+	    spacing: 2
 
         GridLayout:
             cols:2
+            spacing: 2
             MDLabel:
                 size_hint_y: None
 			    height:'30dp'
@@ -28,22 +30,32 @@
         Button:
             size_hint_y: None
 			height:'60dp'
-            text: "Go Back"
+            text: "Back"
+            color: 1,1,1,1
+            background_normal: 'buttonnormal.png'
+            background_down: 'buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "login"
         GridLayout:
             cols: 2
+            spacing: 2
             Button:
                 size_hint_y: None
 			    height:'60dp'
                 text: "Reset Tokens"
+                color: 1,1,1,1
+                background_normal: 'buttonnormal.png'
+                background_down: 'buttondown.png'
                 on_release:
                     root.resettokens()
             Button:
                 size_hint_y: None
 			    height:'60dp'
                 text: "Reset Resets"
+                color: 1,1,1,1
+                background_normal: 'buttonnormal.png'
+                background_down: 'buttondown.png'
                 on_release:
                     root.resetresets()
 
@@ -86,16 +98,20 @@
         id: validitylabel
 		size_hint_y: None
 		height:'30dp'
-		size_hint_x: 0.75
-        pos_hint: {"x":0.125, "y":0.6}
-		halign: 'center'
+		size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.61}
+		halign: 'left'
 		color: 1,0,0,1
+		font_size: 17
 
     Button:
         id: confirmbutton
         size_hint: .5, .08
         pos_hint: {"x":0.25, "y":0.5}
         text: "Submit"
+        color: 1,1,1,1
+        background_normal: 'buttonnormal.png'
+        background_down: 'buttondown.png'
         on_release:
             root.login()
             root.buttonpress()
@@ -118,7 +134,10 @@
                     pos: self.pos
         Button:
             size_hint_y: 0.2
-            text: "Go Back"
+            text: "Back"
+            color: 1,1,1,1
+            background_normal: 'buttonnormal.png'
+            background_down: 'buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "scan"
@@ -139,7 +158,10 @@
                     pos: self.pos
         Button:
             size_hint_y: 0.2
-            text: "Go Back"
+            text: "Back"
+            color: 1,1,1,1
+            background_normal: 'buttonnormal.png'
+            background_down: 'buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "scan"
@@ -150,6 +172,9 @@
         MDLabel:
             halign: "center"
             text: "Invalid"
+            color: 1,1,1,1
+            background_normal: 'buttonnormal.png'
+            background_down: 'buttondown.png'
 			size_hint_y: 0.8
 			background_color: 253/255, 127/255, 57/255, 1
             canvas.before:
@@ -160,7 +185,10 @@
                     pos: self.pos
         Button:
             size_hint_y: 0.2
-            text: "Go Back"
+            text: "Back"
+            color: 1,1,1,1
+            background_normal: 'buttonnormal.png'
+            background_down: 'buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "scan"
@@ -181,7 +209,10 @@
                     pos: self.pos
         Button:
             size_hint_y: 0.2
-            text: "Go Back"
+            text: "Back"
+            color: 1,1,1,1
+            background_normal: 'buttonnormal.png'
+            background_down: 'buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "scan"
@@ -202,7 +233,10 @@
                     pos: self.pos
         Button:
             size_hint_y: 0.2
-            text: "Go Back"
+            text: "Back"
+            color: 1,1,1,1
+            background_normal: 'buttonnormal.png'
+            background_down: 'buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "scan"

@@ -1,6 +1,7 @@
 from kivy.properties import ObjectProperty
 from kivy.clock import mainthread
 from kivy.utils import platform
+from kivy.config import Config
 
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
@@ -13,6 +14,9 @@ from pyzbar.pyzbar import decode
 
 import random
 import requests
+
+
+Config.set('graphics', 'resizable', True)
 
 
 class IngeniumAPIReplica:
@@ -76,7 +80,7 @@ class LoginScreen(MDScreen):
         Token, Reset = API.login(self.ids.mail.text.lower(), self.ids.passw.text)
         self.ids.validitylabel.text = "data invalid"
         if Token != "LoginError":
-            self.ids.validitylabel.text = "Logging in"
+            self.ids.validitylabel.text = ""
         else:
             self.ids.validitylabel.text = "Email or Password incorrect"
     pass
@@ -103,7 +107,7 @@ class ScanScreen(MDScreen):
         global prevevent, prevresult, Token, Reset, API, sm
 
         if API.get_validity(Token, result, self.ids.event.text) == "APITokenError":
-            result = 0
+            result = ""
             Token = API.reset_token(Reset)
             if Token == "resetError":
                 sm.transition.direction = "right"

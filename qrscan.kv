@@ -156,18 +156,9 @@
 <ValidScreen>
     GridLayout:
         cols:1
-        MDLabel:
-            halign: "center"
-            text: "Valid"
-            font_name: 'D-DIN.otf'
+        Image:
+            source: 'checkmark.png'
 			size_hint_y: 0.8
-			background_color: 0, 1, 0, 1
-            canvas.before:
-                Color:
-                    rgba: 0, 1, 0, 1
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
         Button:
             size_hint_y: 0.2
             text: "Back"
@@ -182,21 +173,9 @@
 <InValidScreen>
     GridLayout:
         cols:1
-        MDLabel:
-            halign: "center"
-            text: "Invalid"
-            font_name: 'D-DIN.otf'
-            color: 1,1,1,1
-            background_normal: 'buttonnormal.png'
-            background_down: 'buttondown.png'
+        Image:
+            source: 'dashmark.png'
 			size_hint_y: 0.8
-			background_color: 253/255, 127/255, 57/255, 1
-            canvas.before:
-                Color:
-                    rgba: 253/255, 127/255, 57/255, 1
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
         Button:
             size_hint_y: 0.2
             text: "Back"
@@ -211,18 +190,9 @@
 <UsedScreen>
     GridLayout:
         cols:1
-        MDLabel:
-            halign: "center"
-            text: "Used"
-            font_name: 'D-DIN.otf'
+        Image:
+            source: 'xmark.png'
 			size_hint_y: 0.8
-			background_color: 1, 0, 0, 1
-            canvas.before:
-                Color:
-                    rgba: 1, 0, 0, 1
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
         Button:
             size_hint_y: 0.2
             text: "Back"
@@ -237,18 +207,9 @@
 <PaylessScreen>
     GridLayout:
         cols:1
-        MDLabel:
-            halign: "center"
-            text: "Didn't Pay"
-            font_name: 'D-DIN.otf'
+        Image:
+            source: 'xmark.png'
 			size_hint_y: 0.8
-			background_color: 1, 0, 0, 1
-            canvas.before:
-                Color:
-                    rgba: 1, 0, 0, 1
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
         Button:
             size_hint_y: 0.2
             text: "Back"

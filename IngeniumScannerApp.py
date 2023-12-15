@@ -24,7 +24,7 @@ class IngeniumAPI:
         self.URL = "http://127.0.0.1:8000"
 
     def update(self, APIToken, UUID):
-        requests.post(self.URL + '/api/v1/staff/transaction/update', data={'access_token': APIToken, 'checkout_id': UUID})
+        requests.post(self.URL + '/api/v1/staff/transaction/update', data={'access_token': APIToken, 'item_id': UUID})
 
     def login(self, user_email, user_id):
         login = requests.post(self.URL + "/api/v1/auth/token", data={'username': user_email, 'password': user_id})

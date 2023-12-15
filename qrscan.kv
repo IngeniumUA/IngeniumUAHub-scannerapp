@@ -18,16 +18,16 @@
         font_name: 'D-DIN.otf'
 
     ScanAnalyze:
-        size_hint_y: 0.7
+        size_hint_y: 0.8
         size_hint_x: 0.98
-        pos_hint: {"x":0.01, "y":0.2}
+        pos_hint: {"x":0.01, "y":0.1}
         id:preview
         extracted_data: root.got_result
 
     Button:
         size_hint_y: 0.08
         size_hint_x: 0.98
-        pos_hint: {"x":0.01, "y":0.1}
+        pos_hint: {"x":0.01, "y":0}
         text: "Back"
         font_name: 'D-DIN.otf'
         color: 1,1,1,1
@@ -36,29 +36,6 @@
         on_release:
             root.manager.transition.direction = "right"
             root.manager.current = "login"
-
-    Button:
-        size_hint_y: 0.08
-        size_hint_x: 0.48
-        pos_hint: {"x":0.01, "y":0.01}
-        text: "Reset Tokens"
-        font_name: 'D-DIN.otf'
-        color: 1,1,1,1
-        background_normal: 'buttonnormal.png'
-        background_down: 'buttondown.png'
-        on_release:
-            root.resettokens()
-    Button:
-        size_hint_y: 0.08
-        size_hint_x: 0.48
-        pos_hint: {"x":0.51, "y":0.01}
-        text: "Reset Resets"
-        font_name: 'D-DIN.otf'
-        color: 1,1,1,1
-        background_normal: 'buttonnormal.png'
-        background_down: 'buttondown.png'
-        on_release:
-            root.resetresets()
 
 
 

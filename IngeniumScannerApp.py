@@ -12,66 +12,54 @@ from PIL import Image
 
 from pyzbar.pyzbar import decode
 
-import random
 import requests
 
 
 Config.set('graphics', 'resizable', True)
 
 
-class IngeniumAPIReplica:
+class IngeniumAPI:
     def __init__(self, instance):
         self.instance = instance
-        self.AcceptableTokens = []
-        self.AcceptableResets = []
-        self.logindb = {"wout.de.smit@hotmail.be": "RobbieIsMyB", "wout.de.smit@gmail.com": "ILoveSpaghett"}
-        self.evendtdb = {"UUID1": {"event": "All-In", "Validity": "Valid"},
-                         "UUID2": {"event": "All-In", "Validity": "InValid"},
-                         "UUID3": {"event": "All-In", "Validity": "Used"},
-                         "UUID4": {"event": "Schachtenkoningcantus", "Validity": "Valid"}}
+        self.URL = "http://127.0.0.1:8000"
 
-    def update(self,UUID):
-        self.evendtdb[UUID]["Validity"] = "Used"
+    def update(self, APIToken, UUID):
+        requests.post(self.URL + '/api/v1/staff/transaction/update', data={'access_token': APIToken, 'checkout_id': UUID})
 
     def login(self, user_email, user_id):
-        if user_email in self.logindb:
-            if self.logindb[user_email] == user_id:
-                APItoken = random.randint(100000, 999999)
-                APIReset = random.randint(100000, 999999)
-                self.AcceptableTokens.append(APItoken)
-                self.AcceptableResets.append(APIReset)
-                return APItoken, APIReset
-            else:
-                return "LoginError", 0
+        login = requests.post(self.URL + "/api/v1/auth/token", data={'username': user_email, 'password': user_id})
+        if login.status_code == 200:
+            APIToken = login.json()['access_token']
+            APIReset = login.json()['refresh_token']
+            return APIToken, APIReset
         else:
             return "LoginError", 0
 
     def get_validity(self, APIToken, UUID, event):
-        if APIToken in self.AcceptableTokens:
-            if UUID in self.evendtdb:
-                if self.evendtdb[UUID]["event"] == event:
-                    validity = self.evendtdb[UUID]["Validity"]
-                    return validity
-                else:
-                    return "eventError"
+        checkout = requests.get(self.URL + "/api/v1/staff/transaction", params={'access_token': APIToken, "limit": 50, "offset": 0, 'checkout_id': UUID})
+        if checkout.status_code == 200:
+            if checkout.json() != []:
+                i = 0
+                while i <= len(checkout.json()):
+                    if checkout.json()[i][1]["interaction"]["item_name"].lower() == event:
+                        item_id = checkout.json()[i][1]["interaction"]["id"]
+                        validity = checkout.json()[i][1]["valid_policy"]
+                        return validity, item_id
+                    else:
+                        i += 1
+                return "eventError"
             else:
                 return "UUIDError"
         else:
             return "APITokenError"
 
     def reset_token(self, APIReset):
-        if APIReset in self.AcceptableResets:
-            APItoken = random.randint(100000, 999999)
-            self.AcceptableTokens.append(APItoken)
-            return APItoken
+        reset = requests.post(self.URL + "/api/v1/auth/refresh", data={'refresh_token': APIReset})
+        if reset.status_code == 200:
+            APIToken = reset.json()['access_token']
+            return APIToken
         else:
             return "resetError"
-
-    def resettokens(self):
-        self.AcceptableTokens = []
-
-    def resetresets(self):
-        self.AcceptableResets = []
 
 
 class LoginScreen(MDScreen):
@@ -106,7 +94,8 @@ class ScanScreen(MDScreen):
         # self.ids.ti.text = str(result)
         global prevevent, prevresult, Token, Reset, API, sm
 
-        if API.get_validity(Token, result, self.ids.event.text) == "APITokenError":
+        validity, item_id = API.get_validity(Token, result, self.ids.event.text.lower())
+        if validity == "APITokenError":
             result = ""
             Token = API.reset_token(Reset)
             if Token == "resetError":
@@ -115,34 +104,26 @@ class ScanScreen(MDScreen):
             else:
                 sm.transition.direction = "left"
                 sm.current = "token"
-        elif API.get_validity(Token, result, self.ids.event.text) == "Valid" \
-                and (result != prevresult or self.ids.event.text != prevevent):
+        elif validity == "Valid" \
+                and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "valid"
-            API.update(result)
-        elif API.get_validity(Token, result, self.ids.event.text) == "InValid" \
-                and (result != prevresult or self.ids.event.text != prevevent):
+            API.update(Token, item_id)
+        elif validity == "InValid" \
+                and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "invalid"
-            API.update(result)
-        elif API.get_validity(Token, result, self.ids.event.text) == "Used" \
-                and (result != prevresult or self.ids.event.text != prevevent):
+            API.update(Token, item_id)
+        elif validity == "Used" \
+                and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "used"
-        elif API.get_validity(Token, result, self.ids.event.text) == ("eventError" or "UUIDError") \
-                and (result != prevresult or self.ids.event.text != prevevent):
+        elif validity == ("eventError" or "UUIDError") \
+                and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "payless"
         prevresult = result
-        prevevent = self.ids.event.text
-
-    def resettokens(self):
-        global API
-        API.resettokens()
-
-    def resetresets(self):
-        global API
-        API.resetresets()
+        prevevent = self.ids.event.text.lower()
 
 
 class ScanAnalyze(Preview):
@@ -200,7 +181,7 @@ class QRScan(MDApp):
 if __name__ == '__main__':
     Token = 0
     Reset = 0
-    API = IngeniumAPIReplica(True)
+    API = IngeniumAPI(True)
     sm = 0
     prevevent = ""
     prevresult = ""

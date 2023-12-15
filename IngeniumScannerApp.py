@@ -18,54 +18,52 @@ import requests
 Config.set('graphics', 'resizable', True)
 
 
-class IngeniumAPI:
-    def __init__(self, instance):
-        self.instance = instance
-        self.URL = "http://127.0.0.1:8000"
+def update(APIToken, UUID):
+    requests.post("http://127.0.0.1:8000" + '/api/v1/staff/transaction/update', data={'access_token': APIToken, 'item_id': UUID})
 
-    def update(self, APIToken, UUID):
-        requests.post(self.URL + '/api/v1/staff/transaction/update', data={'access_token': APIToken, 'item_id': UUID})
 
-    def login(self, user_email, user_id):
-        login = requests.post(self.URL + "/api/v1/auth/token", data={'username': user_email, 'password': user_id})
-        if login.status_code == 200:
-            APIToken = login.json()['access_token']
-            APIReset = login.json()['refresh_token']
-            return APIToken, APIReset
+def login(user_email, user_id):
+    login = requests.post("http://127.0.0.1:8000" + "/api/v1/auth/token", data={'username': user_email, 'password': user_id})
+    if login.status_code == 200:
+        APIToken = login.json()['access_token']
+        APIReset = login.json()['refresh_token']
+        return APIToken, APIReset
+    else:
+        return "LoginError", 0
+
+
+def get_validity(APIToken, UUID, event):
+    checkout = requests.get("http://127.0.0.1:8000" + "/api/v1/staff/transaction", params={'access_token': APIToken, "limit": 50, "offset": 0, 'checkout_id': UUID})
+    if checkout.status_code == 200:
+        if checkout.json() != []:
+            i = 0
+            while i <= len(checkout.json()):
+                if checkout.json()[i][1]["interaction"]["item_name"].lower() == event:
+                    item_id = checkout.json()[i][1]["interaction"]["id"]
+                    validity = checkout.json()[i][1]["valid_policy"]
+                    return validity, item_id
+                else:
+                    i += 1
+            return "eventError"
         else:
-            return "LoginError", 0
+            return "UUIDError"
+    else:
+        return "APITokenError"
 
-    def get_validity(self, APIToken, UUID, event):
-        checkout = requests.get(self.URL + "/api/v1/staff/transaction", params={'access_token': APIToken, "limit": 50, "offset": 0, 'checkout_id': UUID})
-        if checkout.status_code == 200:
-            if checkout.json() != []:
-                i = 0
-                while i <= len(checkout.json()):
-                    if checkout.json()[i][1]["interaction"]["item_name"].lower() == event:
-                        item_id = checkout.json()[i][1]["interaction"]["id"]
-                        validity = checkout.json()[i][1]["valid_policy"]
-                        return validity, item_id
-                    else:
-                        i += 1
-                return "eventError"
-            else:
-                return "UUIDError"
-        else:
-            return "APITokenError"
 
-    def reset_token(self, APIReset):
-        reset = requests.post(self.URL + "/api/v1/auth/refresh", data={'refresh_token': APIReset})
-        if reset.status_code == 200:
-            APIToken = reset.json()['access_token']
-            return APIToken
-        else:
-            return "resetError"
+def reset_token(APIReset):
+    reset = requests.post("http://127.0.0.1:8000" + "/api/v1/auth/refresh", data={'refresh_token': APIReset})
+    if reset.status_code == 200:
+        APIToken = reset.json()['access_token']
+        return APIToken
+    else:
+        return "resetError"
 
 
 class LoginScreen(MDScreen):
     def login(self):
-        global Token, Reset, API
-        Token, Reset = API.login(self.ids.mail.text.lower(), self.ids.passw.text)
+        global Token, Reset
+        Token, Reset = login(self.ids.mail.text.lower(), self.ids.passw.text)
         self.ids.validitylabel.text = "data invalid"
         if Token != "LoginError":
             self.ids.validitylabel.text = ""
@@ -92,34 +90,30 @@ class ScanScreen(MDScreen):
     @mainthread
     def got_result(self, result):
         # self.ids.ti.text = str(result)
-        global prevevent, prevresult, Token, Reset, API, sm
+        global prevevent, prevresult, Token, Reset, sm
 
-        validity, item_id = API.get_validity(Token, result, self.ids.event.text.lower())
+        validity, item_id = get_validity(Token, result, self.ids.event.text.lower())
         if validity == "APITokenError":
             result = ""
-            Token = API.reset_token(Reset)
+            Token = reset_token(Reset)
             if Token == "resetError":
                 sm.transition.direction = "right"
                 sm.current = "login"
             else:
                 sm.transition.direction = "left"
                 sm.current = "token"
-        elif validity == "Valid" \
-                and (result != prevresult or self.ids.event.text.lower() != prevevent):
+        elif validity == "Valid" and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "valid"
-            API.update(Token, item_id)
-        elif validity == "InValid" \
-                and (result != prevresult or self.ids.event.text.lower() != prevevent):
+            update(Token, item_id)
+        elif validity == "InValid" and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "invalid"
-            API.update(Token, item_id)
-        elif validity == "Used" \
-                and (result != prevresult or self.ids.event.text.lower() != prevevent):
+            update(Token, item_id)
+        elif validity == "Used" and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "used"
-        elif validity == ("eventError" or "UUIDError") \
-                and (result != prevresult or self.ids.event.text.lower() != prevevent):
+        elif validity == ("eventError" or "UUIDError") and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "payless"
         prevresult = result
@@ -181,7 +175,6 @@ class QRScan(MDApp):
 if __name__ == '__main__':
     Token = 0
     Reset = 0
-    API = IngeniumAPI(True)
     sm = 0
     prevevent = ""
     prevresult = ""

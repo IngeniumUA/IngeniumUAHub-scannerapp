@@ -37,18 +37,18 @@ def get_validity(APIToken, UUID, event):
     if checkout.status_code == 200:
         if checkout.json() != []:
             i = 0
-            while i <= len(checkout.json()):
-                if checkout.json()[i][1]["interaction"]["item_name"].lower() == event:
-                    item_id = checkout.json()[i][1]["interaction"]["id"]
-                    validity = checkout.json()[i][1]["valid_policy"]
+            while i < len(checkout.json()):
+                if checkout.json()[i]["interaction"]["item_name"].lower() == event:
+                    item_id = checkout.json()[i]["interaction"]["id"]
+                    validity = checkout.json()[i]["valid_policy"]
                     return validity, item_id
                 else:
                     i += 1
-            return "eventError"
+            return "eventError", 0
         else:
-            return "UUIDError"
+            return "UUIDError", 0
     else:
-        return "APITokenError"
+        return "APITokenError", 0
 
 
 def reset_token(APIReset):
@@ -64,7 +64,6 @@ class LoginScreen(MDScreen):
     def login(self):
         global Token, Reset
         Token, Reset = login(self.ids.mail.text.lower(), self.ids.passw.text)
-        self.ids.validitylabel.text = "data invalid"
         if Token != "LoginError":
             self.ids.validitylabel.text = ""
         else:
@@ -116,6 +115,8 @@ class ScanScreen(MDScreen):
         elif validity == ("eventError" or "UUIDError") and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "payless"
+        else:
+            print("ERROR - validity unknown")
         prevresult = result
         prevevent = self.ids.event.text.lower()
 

@@ -1,5 +1,3 @@
-import ast
-
 import requests
 from pydantic import BaseModel
 
@@ -22,14 +20,20 @@ def authenticate(username: str, password: str) -> PyToken:
 
 
 def get_transactions(token: PyToken,
-                    checkout_id: str | None = None, user_id: str | None = None, item_id: str | None = None,
+                     checkout_id: str | None = None, user_id: str | None = None, item_id: str | None = None,
                      status: str | None = None, validity: str | int | None = None,
                      limit: int = 50, offset: int = 0, ordering: str | None = None) -> list[PyStaffTransaction]:
     """
     Get list of PyTransaction models by filter parameters, limit and offset, first degree ordering allowed
 
+     Examples
+    --------
+    >>> get_transactions(token, limit=50, offset=0, ordering='date_created', status='SUCCESSFUL', validity=1)
+    [PyStaffTransaction(), ..]
+
      Parameters
     ----------
+    :param ordering:
     :param token:
     :param checkout_id:
     :param user_id:
@@ -51,7 +55,10 @@ def get_transactions(token: PyToken,
         if value or value == 0:  # offset=0 is matches on None, solving edge case
             query_params += "&" + str(arg) + "=" + str(value)
 
-    response = requests.get(url=api_url + "staff/transaction" + query_params, headers={"authorization": "Bearer " + token.access_token})
+    response = requests.get(url=api_url + "staff/transaction" + query_params,
+                            headers={"authorization": "Bearer " + token.access_token})
     if response.status_code == 200:
         response_body: list[dict] = response.json()  # Already correctly parsed as list of dictionaries
         return list(PyStaffTransaction(**value) for value in response_body)
+    else:
+        print(response.json())

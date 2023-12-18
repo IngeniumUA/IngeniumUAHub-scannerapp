@@ -34,21 +34,19 @@ def login(user_email, user_id):
 
 def get_validity(APIToken, UUID, event):
     checkout = requests.get("http://127.0.0.1:8000" + "/api/v1/staff/transaction", params={'access_token': APIToken, "limit": 50, "offset": 0, 'checkout_id': UUID})
-    if checkout.status_code == 200:
-        if checkout.json() != []:
-            i = 0
-            while i < len(checkout.json()):
-                if checkout.json()[i]["interaction"]["item_name"].lower() == event:
-                    item_id = checkout.json()[i]["interaction"]["id"]
-                    validity = checkout.json()[i]["valid_policy"]
-                    return validity, item_id
-                else:
-                    i += 1
-            return "eventError", 0
-        else:
-            return "UUIDError", 0
-    else:
+    if checkout.status_code != 200:
         return "APITokenError", 0
+    if checkout.json() == []:
+        return "UUIDError", 0
+    i = 0
+    while i < len(checkout.json()):
+        if checkout.json()[i]["interaction"]["item_name"].lower() == event:
+            item_id = checkout.json()[i]["interaction"]["id"]
+            validity = checkout.json()[i]["valid_policy"]
+            return validity, item_id
+        else:
+            i += 1
+    return "eventError", 0
 
 
 def reset_token(APIReset):
@@ -101,15 +99,15 @@ class ScanScreen(MDScreen):
             else:
                 sm.transition.direction = "left"
                 sm.current = "token"
-        elif validity == "Valid" and (result != prevresult or self.ids.event.text.lower() != prevevent):
+        elif validity == "valid" and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "valid"
             update(Token, item_id)
-        elif validity == "InValid" and (result != prevresult or self.ids.event.text.lower() != prevevent):
+        elif validity == "invalid" and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "invalid"
             update(Token, item_id)
-        elif validity == "Used" and (result != prevresult or self.ids.event.text.lower() != prevevent):
+        elif validity == "consumed" and (result != prevresult or self.ids.event.text.lower() != prevevent):
             sm.transition.direction = "left"
             sm.current = "used"
         elif validity == ("eventError" or "UUIDError") and (result != prevresult or self.ids.event.text.lower() != prevevent):

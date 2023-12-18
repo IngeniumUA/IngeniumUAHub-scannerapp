@@ -41,7 +41,7 @@ def get_transactions(token: PyToken,
 
     Returns
     -------
-    :return: list[
+    :return: list[PyStaffTransaction]
     """
     query_params = "?"
     func_args = locals()

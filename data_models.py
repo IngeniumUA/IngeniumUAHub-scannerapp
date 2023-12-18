@@ -48,6 +48,13 @@ class CheckoutStatusEnum(Enum):
     PROCESSING = "PROCESSING"  # Not quite succeeded but we won't cancel the checkout anymore
 
 
+class ValidityEnum(Enum):
+    valid = 'valid'
+    invalid = 'invalid'
+    manually_verified = 'manually_verified'
+    consumed = 'consumed'
+
+
 class PyStaffInteraction(BaseModel):
     id: int
     user_id: str
@@ -70,6 +77,8 @@ class PyStaffTransaction(BaseModel):
 
     status: CheckoutStatusEnum
     checkout_id: str
+
+    validity: ValidityEnum
 
     date_created: datetime.datetime
     date_completed: datetime.datetime | None

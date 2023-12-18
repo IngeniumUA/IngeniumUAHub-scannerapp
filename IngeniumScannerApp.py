@@ -14,6 +14,8 @@ from pyzbar.pyzbar import decode
 
 import requests
 
+from data_models import PyStaffTransaction
+from hub_api import get_transactions
 
 Config.set('graphics', 'resizable', True)
 
@@ -33,6 +35,20 @@ def login(user_email, user_id):
 
 
 def get_validity(APIToken, UUID, event):
+    """
+
+    :param APIToken:
+    :param UUID:
+    :param event:
+    :return:
+    """
+    transactions: list[PyStaffTransaction] = get_transactions(token=APIToken, checkout_id=str(UUID))
+    # With get_transactions we fetch a list of PyStaffTransactions
+    # For each item in the list: ( example as "for v in transactions:" )
+    #   A unique id has been provided in v.interaction.id
+    #   Check the validity with v.validity == 'valid' .. or v.validity == 'invalid'
+    #   Display product name v.product['name']
+
     checkout = requests.get("http://127.0.0.1:8000" + "/api/v1/staff/transaction", params={'access_token': APIToken, "limit": 50, "offset": 0, 'checkout_id': UUID})
     if checkout.status_code != 200:
         return "APITokenError", 0

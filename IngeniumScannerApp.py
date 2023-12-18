@@ -19,7 +19,7 @@ Config.set('graphics', 'resizable', True)
 
 
 def update(APIToken, UUID):
-    requests.post("http://127.0.0.1:8000" + '/api/v1/staff/transaction/update', data={'access_token': APIToken, 'item_id': UUID})
+    requests.put("http://127.0.0.1:8000" + '/api/v1/staff/transaction/update', data={'access_token': APIToken, 'item_id': UUID})
 
 
 def login(user_email, user_id):

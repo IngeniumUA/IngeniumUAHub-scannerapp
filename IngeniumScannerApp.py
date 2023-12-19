@@ -45,7 +45,7 @@ def get_validity(api_token, uuid, event):
         return "UUIDError", 0
     for transaction in transactions:
         if transaction.interaction.item_name.lower() == event:
-            return transaction.validity, transaction.interaction.item_id
+            return transaction.validity.value, transaction.interaction.item_id
     return "eventError", 0
 
 
@@ -79,10 +79,12 @@ class ScanScreen(MDScreen):
     def got_result(self, result):
         # self.ids.ti.text = str(result)
         global prev_event, prev_result, token, sm
-
+        if result == prev_result and self.ids.event.text.lower() == prev_event:
+            return
         validity, item_id = get_validity(token, result, self.ids.event.text.lower())
         if validity == "APITokenError":
             result = ""
+            prev_result = ""
             token = refresh_token(token)
             if token is None:
                 sm.transition.direction = "right"
@@ -90,19 +92,18 @@ class ScanScreen(MDScreen):
             else:
                 sm.transition.direction = "left"
                 sm.current = "token"
-        elif validity == "valid" and (result != prev_result or self.ids.event.text.lower() != prev_event):
+        elif validity == "valid":
             sm.transition.direction = "left"
             sm.current = "valid"
             update(token, item_id)
-        elif validity == "invalid" and (result != prev_result or self.ids.event.text.lower() != prev_event):
+        elif validity == "invalid":
             sm.transition.direction = "left"
             sm.current = "invalid"
             update(token, item_id)
-        elif validity == "consumed" and (result != prev_result or self.ids.event.text.lower() != prev_event):
+        elif validity == "consumed":
             sm.transition.direction = "left"
             sm.current = "used"
-        elif (validity == ("eventError" or "UUIDError") 
-              and (result != prev_result or self.ids.event.text.lower() != prev_event)):
+        elif validity == ("eventError" or "UUIDError"):
             sm.transition.direction = "left"
             sm.current = "payless"
         else:

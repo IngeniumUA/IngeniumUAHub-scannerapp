@@ -75,6 +75,9 @@ class ScanScreen(MDScreen):
     def on_kv_post(self, obj):
         self.ids.preview.connect_camera(enable_analyze_pixels=True, default_zoom=0.0)
 
+    def stopping(self):
+        self.ids.preview.disconnect_camera()
+
     @mainthread
     def got_result(self, result):
         # self.ids.ti.text = str(result)
@@ -147,6 +150,10 @@ class PaylessScreen(MDScreen):
 
 
 class QRScan(MDApp):
+
+    def on_stop(self):
+        ScanScreen.stopping(ScanScreen())
+
     def build(self):
         if platform == 'android':
             from pythonforandroid.recipes.android.src.android.permissions import request_permissions, Permission

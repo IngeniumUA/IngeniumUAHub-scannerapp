@@ -19,6 +19,14 @@ def authenticate(username: str, password: str) -> PyToken:
         return PyToken(**response.json())
 
 
+def refresh_token(token: PyToken) -> PyToken:
+    response = requests.post(
+        api_url + "auth/refresh",
+        {token})
+    if response.status_code == 200:  # OK
+        return PyToken(**response.json())
+
+
 def get_transactions(token: PyToken,
                      checkout_id: str | None = None, user_id: str | None = None, item: str | None = None,
                      status: str | None = None, validity: str | int | None = None,

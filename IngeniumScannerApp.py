@@ -20,20 +20,19 @@ from hub_api import get_transactions, authenticate, refresh_token, PyToken
 Config.set('graphics', 'resizable', True)
 
 
-def update(token, uuid):
-    requests.put("http://127.0.0.1:8000" + '/api/v1/staff/transaction/update', data={'access_token': token,
+def update(api_token, uuid):
+    requests.put("http://127.0.0.1:8000" + '/api/v1/staff/transaction/update', data={'access_token': api_token,
                                                                                      'item_id': uuid})
 
 
-def get_validity(token, uuid, event):
+def get_validity(api_token, uuid, event):
     """
-
-    :param token:
+    :param api_token:
     :param uuid:
     :param event:
     :return:
     """
-    transactions: list[PyStaffTransaction] = get_transactions(token=token, checkout_id=str(uuid))
+    transactions: list[PyStaffTransaction] = get_transactions(token=api_token, checkout_id=str(uuid))
     # With get_transactions we fetch a list of PyStaffTransactions
     # For each item in the list: ( example as "for v in transactions:" )
     #   A unique id has been provided in v.interaction.id

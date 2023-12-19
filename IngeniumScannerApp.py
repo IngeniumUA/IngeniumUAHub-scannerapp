@@ -9,7 +9,6 @@ from kivymd.uix.screenmanager import MDScreenManager
 
 from camera4kivy import Preview
 from PIL import Image
-
 from pyzbar.pyzbar import decode
 
 import requests
@@ -25,7 +24,7 @@ def update(api_token, uuid):
                                                                                      'item_id': uuid})
 
 
-def get_validity(api_token, uuid, event):
+def get_validity(api_token, uuid: str, event):
     """
     :param api_token:
     :param uuid:
@@ -33,15 +32,9 @@ def get_validity(api_token, uuid, event):
     :return:
     """
     transactions: list[PyStaffTransaction] = get_transactions(token=api_token, checkout_id=str(uuid))
-    # With get_transactions we fetch a list of PyStaffTransactions
-    # For each item in the list: ( example as "for v in transactions:" )
-    #   A unique id has been provided in v.interaction.id
-    #   Check the validity with v.validity == 'valid' .. or v.validity == 'invalid'
-    #   Display product name v.product['name']
-
-    if transactions is None:
+    if transactions == "login_invalid":
         return "APITokenError", 0
-    if transactions == []:
+    if transactions == [] or transactions == "uuid_invalid":
         return "UUIDError", 0
     for transaction in transactions:
         if transaction.interaction.item_name.lower() == event:
@@ -51,22 +44,20 @@ def get_validity(api_token, uuid, event):
 
 class LoginScreen(MDScreen):
     def login(self):
-        global token
-        token = authenticate(self.ids.mail.text.lower(), self.ids.passw.text)
-        if token is None:
+        app.token = authenticate(self.ids.mail.text.lower(), self.ids.passw.text)
+        if app.token is None:
             self.ids.validitylabel.text = "Email or Password incorrect"
         else:
             self.ids.validitylabel.text = ""
         pass
 
     def buttonpress(self):
-        global token
-        if token is None:
+        if app.token is None:
             scanner_allowed = False
         else:
             scanner_allowed = True
-        sm.transition.direction = "left"
-        sm.current = "scan" if scanner_allowed else "login"
+        app.sm.transition.direction = "left"
+        app.sm.current = "scan" if scanner_allowed else "login"
         pass
 
 
@@ -80,39 +71,45 @@ class ScanScreen(MDScreen):
 
     @mainthread
     def got_result(self, result):
-        # self.ids.ti.text = str(result)
-        global prev_event, prev_result, token
-        if result == prev_result and self.ids.event.text.lower() == prev_event:
+
+        try:
+            if self.prev_event == "" and self.prev_result == "":
+                pass
+        except AttributeError:
+            self.prev_event = ""
+            self.prev_result = ""
+
+        if result == self.prev_result and self.ids.event.text.lower() == self.prev_event:
             return
-        validity, item_id = get_validity(token, result, self.ids.event.text.lower())
+        validity, item_id = get_validity(app.token, result, self.ids.event.text.lower())
         if validity == "APITokenError":
             result = ""
-            prev_result = ""
-            token = refresh_token(token)
-            if token is None:
-                sm.transition.direction = "right"
-                sm.current = "login"
+            self.prev_result = ""
+            app.token = refresh_token(app.token)
+            if app.token is None:
+                app.sm.transition.direction = "right"
+                app.sm.current = "login"
             else:
-                sm.transition.direction = "left"
-                sm.current = "token"
+                app.sm.transition.direction = "left"
+                app.sm.current = "token"
         elif validity == ValidityEnum.valid:
-            sm.transition.direction = "left"
-            sm.current = "valid"
-            update(token, item_id)
+            app.sm.transition.direction = "left"
+            app.sm.current = "valid"
+            update(app.token, item_id)
         elif validity == ValidityEnum.invalid:
-            sm.transition.direction = "left"
-            sm.current = "invalid"
-            update(token, item_id)
+            app.sm.transition.direction = "left"
+            app.sm.current = "invalid"
+            update(app.token, item_id)
         elif validity == ValidityEnum.consumed:
-            sm.transition.direction = "left"
-            sm.current = "used"
+            app.sm.transition.direction = "left"
+            app.sm.current = "used"
         elif validity == ("eventError" or "UUIDError"):
-            sm.transition.direction = "left"
-            sm.current = "payless"
+            app.sm.transition.direction = "left"
+            app.sm.current = "payless"
         else:
             print("ERROR - validity unknown")
-        prev_result = result
-        prev_event = self.ids.event.text.lower()
+        self.prev_result = result
+        self.prev_event = self.ids.event.text.lower()
 
 
 class ScanAnalyze(Preview):
@@ -151,6 +148,11 @@ class PaylessScreen(MDScreen):
 
 class QRScan(MDApp):
 
+    def __init__(self):
+        super(QRScan, self).__init__()
+        self.sm = MDScreenManager()
+        self.token: PyToken = PyToken()
+
     def on_stop(self):
         ScanScreen.stopping(ScanScreen())
 
@@ -159,22 +161,16 @@ class QRScan(MDApp):
             from pythonforandroid.recipes.android.src.android.permissions import request_permissions, Permission
             request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO])
 
-        global sm
-        sm = MDScreenManager()
-        sm.add_widget(LoginScreen(name='login'))
-        sm.add_widget(ScanScreen(name='scan'))
-        sm.add_widget(TokenScreen(name='token'))
-        sm.add_widget(ValidScreen(name='valid'))
-        sm.add_widget(InValidScreen(name='invalid'))
-        sm.add_widget(UsedScreen(name='used'))
-        sm.add_widget(PaylessScreen(name='payless'))
-        return sm
+        self.sm.add_widget(LoginScreen(name='login'))
+        self.sm.add_widget(ScanScreen(name='scan'))
+        self.sm.add_widget(TokenScreen(name='token'))
+        self.sm.add_widget(ValidScreen(name='valid'))
+        self.sm.add_widget(InValidScreen(name='invalid'))
+        self.sm.add_widget(UsedScreen(name='used'))
+        self.sm.add_widget(PaylessScreen(name='payless'))
+        return self.sm
 
 
 if __name__ == '__main__':
-    token: PyToken
-    sm: MDScreenManager
-    prev_event = ""
-    prev_result = ""
-
-    QRScan().run()
+    app = QRScan()
+    app.run()

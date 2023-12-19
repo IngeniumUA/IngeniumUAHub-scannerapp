@@ -45,7 +45,7 @@ def get_validity(api_token, uuid, event):
         return "UUIDError", 0
     for transaction in transactions:
         if transaction.interaction.item_name.lower() == event:
-            return transaction.validity.value, transaction.interaction.item_id
+            return transaction.validity, transaction.interaction.item_id
     return "eventError", 0
 
 
@@ -60,7 +60,7 @@ class LoginScreen(MDScreen):
         pass
 
     def buttonpress(self):
-        global token, sm
+        global token
         if token is None:
             scanner_allowed = False
         else:
@@ -81,7 +81,7 @@ class ScanScreen(MDScreen):
     @mainthread
     def got_result(self, result):
         # self.ids.ti.text = str(result)
-        global prev_event, prev_result, token, sm
+        global prev_event, prev_result, token
         if result == prev_result and self.ids.event.text.lower() == prev_event:
             return
         validity, item_id = get_validity(token, result, self.ids.event.text.lower())

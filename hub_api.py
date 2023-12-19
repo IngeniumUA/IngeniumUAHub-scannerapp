@@ -11,12 +11,14 @@ class PyToken(BaseModel):
     refresh_token: str
 
 
-def authenticate(username: str, password: str) -> PyToken:
+def authenticate(username: str, password: str) -> PyToken | str:
     response = requests.post(
         api_url + "auth/token",
         {'username': username, 'password': password})
     if response.status_code == 200:  # OK
         return PyToken(**response.json())
+    else:
+        return "login_error"
 
 
 def refresh_token(token: PyToken) -> PyToken:
@@ -68,7 +70,7 @@ def get_transactions(token: PyToken,
     if response.status_code == 200:
         response_body: list[dict] = response.json()  # Already correctly parsed as list of dictionaries
         return list(PyStaffTransaction(**value) for value in response_body)
-    elif response.status_code == 401:  # token has expired
+    elif response.status_code == 401 or response.status_code == 500:  # token has expired
         return "login_invalid"
     elif response.status_code == 406:  # uuid has invalid form
         return "uuid_invalid"

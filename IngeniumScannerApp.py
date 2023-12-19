@@ -45,7 +45,7 @@ def get_validity(api_token, uuid: str, event):
 class LoginScreen(MDScreen):
     def login(self):
         app.token = authenticate(self.ids.mail.text.lower(), self.ids.passw.text)
-        if app.token is None:
+        if app.token == "login_error":
             self.ids.validitylabel.text = "Email or Password incorrect"
         else:
             self.ids.validitylabel.text = ""
@@ -103,7 +103,7 @@ class ScanScreen(MDScreen):
         elif validity == ValidityEnum.consumed:
             app.sm.transition.direction = "left"
             app.sm.current = "used"
-        elif validity == ("eventError" or "UUIDError"):
+        elif validity == "eventError" or validity == "UUIDError":
             app.sm.transition.direction = "left"
             app.sm.current = "payless"
         else:
@@ -151,7 +151,7 @@ class QRScan(MDApp):
     def __init__(self):
         super(QRScan, self).__init__()
         self.sm = MDScreenManager()
-        self.token: PyToken = PyToken()
+        self.token: PyToken | None = None
 
     def on_stop(self):
         ScanScreen.stopping(ScanScreen())

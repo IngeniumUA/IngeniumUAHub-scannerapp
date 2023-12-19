@@ -20,7 +20,7 @@ def authenticate(username: str, password: str) -> PyToken:
 
 
 def get_transactions(token: PyToken,
-                     checkout_id: str | None = None, user_id: str | None = None, item_id: str | None = None,
+                     checkout_id: str | None = None, user_id: str | None = None, item: str | None = None,
                      status: str | None = None, validity: str | int | None = None,
                      limit: int = 50, offset: int = 0, ordering: str | None = None) -> list[PyStaffTransaction]:
     """
@@ -37,7 +37,7 @@ def get_transactions(token: PyToken,
     :param token:
     :param checkout_id:
     :param user_id:
-    :param item_id:
+    :param item:
     :param status:
     :param validity:
     :param limit:

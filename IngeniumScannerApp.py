@@ -14,7 +14,7 @@ from pyzbar.pyzbar import decode
 
 import requests
 
-from data_models import PyStaffTransaction
+from data_models import PyStaffTransaction, ValidityEnum
 from hub_api import get_transactions, authenticate, refresh_token, PyToken
 
 Config.set('graphics', 'resizable', True)
@@ -92,15 +92,15 @@ class ScanScreen(MDScreen):
             else:
                 sm.transition.direction = "left"
                 sm.current = "token"
-        elif validity == "valid":
+        elif validity == ValidityEnum.valid:
             sm.transition.direction = "left"
             sm.current = "valid"
             update(token, item_id)
-        elif validity == "invalid":
+        elif validity == ValidityEnum.invalid:
             sm.transition.direction = "left"
             sm.current = "invalid"
             update(token, item_id)
-        elif validity == "consumed":
+        elif validity == ValidityEnum.consumed:
             sm.transition.direction = "left"
             sm.current = "used"
         elif validity == ("eventError" or "UUIDError"):

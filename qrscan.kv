@@ -158,8 +158,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: email_text
-        text: "Email: "
+        id: voornaam_naam_text
+        text: "Voornaam en naam: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -173,7 +173,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: email_drop
+        id: voornaam_naam_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -188,8 +188,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: lidstatus_text
-        text: "Lidstatus: "
+        id: email_text
+        text: "Email: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -203,7 +203,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: lidstatus_drop
+        id: email_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -218,8 +218,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: products_count_text
-        text: "Producten + hoeveelheid: "
+        id: lidstatus_text
+        text: "Lidstatus: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -233,7 +233,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: products_count_drop
+        id: lidstatus_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -248,8 +248,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: validity_text
-        text: "Validity: "
+        id: products_count_text
+        text: "Producten + hoeveelheid: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -263,7 +263,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: validity_drop
+        id: products_count_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -278,13 +278,43 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
+        id: validity_text
+        text: "Validity: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.65}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.6}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
         id: checkout_status_text
         text: "Checkout status: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
-        pos_hint: {"x":0.3, "y":0.65}
+        pos_hint: {"x":0.3, "y":0.6}
         halign: "left"
         opacity: 0
         canvas.before:
@@ -340,8 +370,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: email_text
-        text: "Email: "
+        id: voornaam_naam_text
+        text: "Voornaam en naam: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -355,7 +385,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: email_drop
+        id: voornaam_naam_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -370,8 +400,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: lidstatus_text
-        text: "Lidstatus: "
+        id: email_text
+        text: "Email: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -385,7 +415,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: lidstatus_drop
+        id: email_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -400,13 +430,43 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
+        id: lidstatus_text
+        text: "Lidstatus: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.75}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lidstatus_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.7}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
         id: products_count_text
         text: "Producten + hoeveelheid: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
-        pos_hint: {"x":0.3, "y":0.75}
+        pos_hint: {"x":0.3, "y":0.7}
         halign: "left"
         opacity: 0
         canvas.before:
@@ -421,7 +481,7 @@
 
     MDLabel:
         size_hint_x: 0.3
-        pos_hint: {"x":0, "y":0.70}
+        pos_hint: {"x":0, "y":0.65}
         halign: "right"
         opacity: 0
         canvas.before:
@@ -436,7 +496,7 @@
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
-        pos_hint: {"x":0.3, "y":0.70}
+        pos_hint: {"x":0.3, "y":0.65}
         halign: "left"
         opacity: 0
         canvas.before:
@@ -451,7 +511,7 @@
 
     MDLabel:
         size_hint_x: 0.3
-        pos_hint: {"x":0, "y":0.65}
+        pos_hint: {"x":0, "y":0.6}
         halign: "right"
         opacity: 0
         canvas.before:
@@ -466,7 +526,7 @@
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
-        pos_hint: {"x":0.3, "y":0.65}
+        pos_hint: {"x":0.3, "y":0.6}
         halign: "left"
         opacity: 0
         canvas.before:
@@ -522,8 +582,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: email_text
-        text: "Email: "
+        id: voornaam_naam_text
+        text: "Voornaam en naam: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -537,7 +597,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: email_drop
+        id: voornaam_naam_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -552,8 +612,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: lidstatus_text
-        text: "Lidstatus: "
+        id: email_text
+        text: "Email: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -567,7 +627,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: lidstatus_drop
+        id: email_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -582,8 +642,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: products_count_text
-        text: "Producten + hoeveelheid: "
+        id: lidstatus_text
+        text: "Lidstatus: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -597,7 +657,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: products_count_drop
+        id: lidstatus_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -612,8 +672,8 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: validity_text
-        text: "Validity: "
+        id: products_count_text
+        text: "Producten + hoeveelheid: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
@@ -627,7 +687,7 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        id: validity_drop
+        id: products_count_drop
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
 
@@ -642,13 +702,43 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
+        id: validity_text
+        text: "Validity: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.65}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.6}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
         id: checkout_status_text
         text: "Checkout status: "
         font_name: 'assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
-        pos_hint: {"x":0.3, "y":0.65}
+        pos_hint: {"x":0.3, "y":0.6}
         halign: "left"
         opacity: 0
         canvas.before:

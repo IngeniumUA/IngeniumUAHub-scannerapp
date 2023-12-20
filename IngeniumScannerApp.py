@@ -14,7 +14,7 @@ from pyzbar.pyzbar import decode
 import requests
 
 from data_models import PyStaffTransaction, ValidityEnum
-from hub_api import get_transactions, authenticate, refresh_token, PyToken
+from hub_api import get_transactions, authenticate, refresh_token, PyToken, get_userdata
 
 Config.set('graphics', 'resizable', True)
 
@@ -26,6 +26,10 @@ def update(api_token, uuid):
 
 def alg_make_visible(self):
     self.ids.more_info_button.text = "Less info"
+
+    self.ids.voornaam_naam_drop.text = app.voornaam_naam
+    self.ids.voornaam_naam_drop.opacity = 1
+    self.ids.voornaam_naam_text.opacity = 1
 
     self.ids.email_drop.text = app.email
     self.ids.email_drop.opacity = 1
@@ -51,6 +55,9 @@ def alg_make_visible(self):
 def alg_make_invisible(self):
     self.ids.more_info_button.text = "More info"
 
+    self.ids.voornaam_naam_drop.opacity = 0
+    self.ids.voornaam_naam_text.opacity = 0
+
     self.ids.email_drop.opacity = 0
     self.ids.email_text.opacity = 0
 
@@ -75,23 +82,33 @@ def get_results(api_token, uuid: str, event):
     :return:
     """
     transactions: list[PyStaffTransaction] = get_transactions(token=api_token, checkout_id=str(uuid))
-    products_dict = dict()
+    products_str = str()
+    transaction_to_save = []
     if transactions == "login_invalid":
         return {"validity": "APITokenError"}
     if transactions == [] or transactions == "uuid_invalid":
         return {"validity": "UUIDError"}
     for transaction in transactions:
-        products_dict.update({transaction.interaction.item_name.lower(): transaction.count})
+        products_str += str(transaction.count) + " x " + str(transaction.interaction.item_name.lower()) + ", "
         if transaction.interaction.item_name.lower() == event:
-            return {"validity": transaction.validity,
-                    "item_id": transaction.interaction.item_id,
-                    "products": products_dict,
-                    "email": transaction.interaction.user_email,
-                    "checkout_status": transaction.status}
-    return {"validity": "eventError",
-            "products": products_dict,
-            "email": transactions[0].interaction.user_email,
-            "checkout_status": transactions[0].status}
+            transaction_to_save.append(transaction)
+    if transaction_to_save != []:
+        userdata = get_userdata(transaction_to_save[0].interaction.user_id)
+        return {"validity": transaction_to_save[0].validity.value,
+                "item_id": transaction_to_save[0].interaction.item_id,
+                "products": products_str,
+                "email": transaction_to_save[0].interaction.user_email,
+                "checkout_status": transaction_to_save[0].status.value,
+                "voornaam_naam": userdata["voornaam"] + " " + userdata["achternaam"],
+                "lidstatus": str(userdata["lidstatus"])}
+    else:
+        userdata = get_userdata(transactions[0].interaction.user_id)
+        return {"validity": "eventError",
+                "products": products_str,
+                "email": transactions[0].interaction.user_email,
+                "checkout_status": transactions[0].status.value,
+                "voornaam_naam": userdata["voornaam"] + " " + userdata["achternaam"],
+                "lidstatus": str(userdata["lidstatus"])}
 
 
 class LoginScreen(MDScreen):
@@ -126,7 +143,20 @@ class ScanScreen(MDScreen):
 
         if result == app.prev_result and self.ids.event.text.lower() == app.prev_event:
             return
+
         response_dict = get_results(app.token, result, self.ids.event.text.lower())
+        if (response_dict["validity"] == "valid"
+                or response_dict["validity"] == "invalid"
+                or response_dict["validity"] == "consumed"
+                or response_dict["validity"] == "eventError"):
+
+            app.voornaam_naam = response_dict["voornaam_naam"]
+            app.email = response_dict["email"]
+            app.validity = response_dict["validity"]
+            app.lidstatus = response_dict["lidstatus"]
+            app.checkout_status = response_dict["checkout_status"]
+            app.products_count = response_dict["products"]
+
         if response_dict["validity"] == "APITokenError":
             result = ""
             app.prev_result = ""
@@ -137,15 +167,15 @@ class ScanScreen(MDScreen):
             else:
                 app.sm.transition.direction = "left"
                 app.sm.current = "token"
-        elif response_dict["validity"] == ValidityEnum.valid:
+        elif response_dict["validity"] == "valid":
             app.sm.transition.direction = "left"
             app.sm.current = "valid"
             update(app.token, response_dict["item_id"])
-        elif response_dict["validity"] == ValidityEnum.invalid:
+        elif response_dict["validity"] == "invalid":
             app.sm.transition.direction = "left"
             app.sm.current = "invalid"
             update(app.token, response_dict["item_id"])
-        elif response_dict["validity"] == ValidityEnum.consumed or response_dict["validity"] == "eventError":
+        elif response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError":
             app.sm.transition.direction = "left"
             app.sm.current = "used"
         elif response_dict["validity"] == "UUIDError":
@@ -153,6 +183,7 @@ class ScanScreen(MDScreen):
             app.sm.current = "payless"
         else:
             print("ERROR - validity unknown")
+
         app.prev_result = result
         app.prev_event = self.ids.event.text.lower()
 

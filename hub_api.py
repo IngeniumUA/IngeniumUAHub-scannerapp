@@ -29,6 +29,16 @@ def refresh_token(token: PyToken) -> PyToken:
         return PyToken(**response.json())
 
 
+def get_userdata(uuid: str | None = None) -> dict:
+    response = requests.get(url=api_url + "/api/v1/staff/user/" + uuid)
+    if response.status_code == 200:
+        return {"lidstatus": response.json()["roles"]["is_lid"],
+                "voornaam": response.json()["user_detail"]["voornaam"],
+                "achternaam": response.json()["user_detail"]["achternaam"]}
+    else:
+        return {"lidstatus": False, "voornaam": "", "achternaam": ""}
+
+
 def get_transactions(token: PyToken,
                      checkout_id: str | None = None, user_id: str | None = None, item: str | None = None,
                      status: str | None = None, validity: str | int | None = None,

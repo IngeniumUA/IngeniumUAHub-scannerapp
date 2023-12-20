@@ -13,7 +13,7 @@ from pyzbar.pyzbar import decode
 
 import requests
 
-from data_models import PyStaffTransaction, ValidityEnum
+from data_models import PyStaffTransaction
 from hub_api import get_transactions, authenticate, refresh_token, PyToken, get_userdata
 
 Config.set('graphics', 'resizable', True)

@@ -38,7 +38,6 @@
             root.manager.current = "login"
 
 
-
 <LoginScreen>
     MDLabel:
 		size_hint_y: None
@@ -131,55 +130,640 @@
                 root.manager.current = "scan"
 
 <ValidScreen>
-    GridLayout:
-        cols:1
-        Image:
-            source: 'assets/checkmark.png'
-			size_hint_y: 0.8
-        Button:
-            size_hint_y: 0.2
-            text: "Back"
-            font_name: 'assets/D-DIN.otf'
-            color: 1,1,1,1
-            background_normal: 'assets/buttonnormal.png'
-            background_down: 'assets/buttondown.png'
-            on_release:
-                root.manager.transition.direction = "right"
-                root.manager.current = "scan"
+    Button:
+        size_hint_y: 0.1
+        pos_hint: {"x":0, "y":0.9}
+        text: "More info"
+        id: more_info_button
+        font_name: 'assets/D-DIN.otf'
+        background_normal: 'assets/buttonnormal.png'
+        background_down: 'assets/buttondown.png'
+        on_release:
+            root.make_visible()
+
+    Image:
+        source: 'assets/checkmark.png'
+        size_hint_y: 0.7
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0.2}
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.85}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: voornaam_naam_text
+        text: "Voornaam en Naam: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.85}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: voornaam_naam_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.8}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: email_text
+        text: "Email: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.8}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: email_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.75}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lidstatus_text
+        text: "Lidstatus: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.75}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lidstatus_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.7}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: products_count_text
+        text: "Producten + hoeveelheid: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.7}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: products_count_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.65}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_text
+        text: "Validity: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.65}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.6}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: checkout_status_text
+        text: "Checkout status: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.6}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: checkout_status_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0}
+        size_hint_y: 0.2
+        text: "Back"
+        font_name: 'assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'assets/buttonnormal.png'
+        background_down: 'assets/buttondown.png'
+        on_release:
+            root.set_invisible()
+            root.manager.transition.direction = "right"
+            root.manager.current = "scan"
 
 <InValidScreen>
-    GridLayout:
-        cols:1
-        Image:
-            source: 'assets/dashmark.png'
-			size_hint_y: 0.8
-        Button:
-            size_hint_y: 0.2
-            text: "Back"
-            font_name: 'assets/D-DIN.otf'
-            color: 1,1,1,1
-            background_normal: 'assets/buttonnormal.png'
-            background_down: 'assets/buttondown.png'
-            on_release:
-                root.manager.transition.direction = "right"
-                root.manager.current = "scan"
+    Button:
+        size_hint_y: 0.1
+        pos_hint: {"x":0, "y":0.9}
+        text: "More info"
+        id: more_info_button
+        font_name: 'assets/D-DIN.otf'
+        background_normal: 'assets/buttonnormal.png'
+        background_down: 'assets/buttondown.png'
+        on_release:
+            root.make_visible()
+
+    Image:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0.2}
+        source: 'assets/dashmark.png'
+        size_hint_y: 0.7
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.85}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: voornaam_naam_text
+        text: "Voornaam en Naam: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.85}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: voornaam_naam_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.8}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: email_text
+        text: "Email: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.8}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: email_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.75}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lidstatus_text
+        text: "Lidstatus: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.75}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lidstatus_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.7}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: products_count_text
+        text: "Producten + hoeveelheid: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.7}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: products_count_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.65}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_text
+        text: "Validity: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.65}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.6}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: checkout_status_text
+        text: "Checkout status: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.6}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: checkout_status_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0}
+        size_hint_y: 0.2
+        text: "Back"
+        font_name: 'assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'assets/buttonnormal.png'
+        background_down: 'assets/buttondown.png'
+        on_release:
+            root.set_invisible()
+            root.manager.transition.direction = "right"
+            root.manager.current = "scan"
 
 <UsedScreen>
-    GridLayout:
-        cols:1
-        Image:
-            source: 'assets/xmark.png'
-			size_hint_y: 0.8
-        Button:
-            size_hint_y: 0.2
-            text: "Back"
-            font_name: 'assets/D-DIN.otf'
-            color: 1,1,1,1
-            background_normal: 'assets/buttonnormal.png'
-            background_down: 'assets/buttondown.png'
-            on_release:
-                root.manager.transition.direction = "right"
-                root.manager.current = "scan"
+    Button:
+        size_hint_y: 0.1
+        pos_hint: {"x":0, "y":0.9}
+        text: "More info"
+        id: more_info_button
+        font_name: 'assets/D-DIN.otf'
+        background_normal: 'assets/buttonnormal.png'
+        background_down: 'assets/buttondown.png'
+        on_release:
+            root.make_visible()
+
+    Image:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0.2}
+        source: 'assets/xmark.png'
+        size_hint_y: 0.7
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.85}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: voornaam_naam_text
+        text: "Voornaam en Naam: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.85}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: voornaam_naam_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.8}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: email_text
+        text: "Email: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.8}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: email_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.75}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lidstatus_text
+        text: "Lidstatus: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.75}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lidstatus_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.7}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: products_count_text
+        text: "Producten + hoeveelheid: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.7}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: products_count_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.65}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_text
+        text: "Validity: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.65}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: validity_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    MDLabel:
+        size_hint_x: 0.3
+        pos_hint: {"x":0, "y":0.6}
+        halign: "right"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: checkout_status_text
+        text: "Checkout status: "
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+    MDLabel:
+        size_hint_x: 0.7
+        pos_hint: {"x":0.3, "y":0.6}
+        halign: "left"
+        opacity: 0
+        canvas.before:
+            Color:
+                rgba: 0, 0, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: checkout_status_drop
+        font_name: 'assets/D-DIN.otf'
+        size_hint_y: 0.05
+
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0}
+        size_hint_y: 0.2
+        text: "Back"
+        font_name: 'assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'assets/buttonnormal.png'
+        background_down: 'assets/buttondown.png'
+        on_release:
+            root.set_invisible()
+            root.manager.transition.direction = "right"
+            root.manager.current = "scan"
 
 <PaylessScreen>
     GridLayout:

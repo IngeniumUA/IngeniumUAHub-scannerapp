@@ -24,6 +24,56 @@ def update(api_token, uuid):
                                                                                      'item_id': uuid})
 
 
+def alg_make_visible(self):
+    self.ids.more_info_button.text = "Less info"
+
+    self.ids.voornaam_naam_drop.text = app.voornaam_naam
+    self.ids.voornaam_naam_drop.opacity = 1
+    self.ids.voornaam_naam_text.opacity = 1
+
+    self.ids.email_drop.text = app.email
+    self.ids.email_drop.opacity = 1
+    self.ids.email_text.opacity = 1
+
+    self.ids.lidstatus_drop.text = app.lidstatus
+    self.ids.lidstatus_drop.opacity = 1
+    self.ids.lidstatus_text.opacity = 1
+
+    self.ids.products_count_drop.text = app.products_count
+    self.ids.products_count_drop.opacity = 1
+    self.ids.products_count_text.opacity = 1
+
+    self.ids.validity_drop.text = app.validity
+    self.ids.validity_drop.opacity = 1
+    self.ids.validity_text.opacity = 1
+
+    self.ids.checkout_status_drop.text = app.checkout_status
+    self.ids.checkout_status_drop.opacity = 1
+    self.ids.checkout_status_text.opacity = 1
+
+
+def alg_make_invisible(self):
+    self.ids.more_info_button.text = "More info"
+
+    self.ids.voornaam_naam_drop.opacity = 0
+    self.ids.voornaam_naam_text.opacity = 0
+
+    self.ids.email_drop.opacity = 0
+    self.ids.email_text.opacity = 0
+
+    self.ids.lidstatus_drop.opacity = 0
+    self.ids.lidstatus_text.opacity = 0
+
+    self.ids.products_count_drop.opacity = 0
+    self.ids.products_count_text.opacity = 0
+
+    self.ids.validity_drop.opacity = 0
+    self.ids.validity_text.opacity = 0
+
+    self.ids.checkout_status_drop.opacity = 0
+    self.ids.checkout_status_text.opacity = 0
+
+
 def get_validity(api_token, uuid: str, event):
     """
     :param api_token:
@@ -72,19 +122,12 @@ class ScanScreen(MDScreen):
     @mainthread
     def got_result(self, result):
 
-        try:
-            if self.prev_event == "" and self.prev_result == "":
-                pass
-        except AttributeError:
-            self.prev_event = ""
-            self.prev_result = ""
-
-        if result == self.prev_result and self.ids.event.text.lower() == self.prev_event:
+        if result == app.prev_result and self.ids.event.text.lower() == app.prev_event:
             return
         validity, item_id = get_validity(app.token, result, self.ids.event.text.lower())
         if validity == "APITokenError":
             result = ""
-            self.prev_result = ""
+            app.prev_result = ""
             app.token = refresh_token(app.token)
             if app.token is None:
                 app.sm.transition.direction = "right"
@@ -100,16 +143,16 @@ class ScanScreen(MDScreen):
             app.sm.transition.direction = "left"
             app.sm.current = "invalid"
             update(app.token, item_id)
-        elif validity == ValidityEnum.consumed:
+        elif validity == ValidityEnum.consumed or validity == "eventError":
             app.sm.transition.direction = "left"
             app.sm.current = "used"
-        elif validity == "eventError" or validity == "UUIDError":
+        elif validity == "UUIDError":
             app.sm.transition.direction = "left"
             app.sm.current = "payless"
         else:
             print("ERROR - validity unknown")
-        self.prev_result = result
-        self.prev_event = self.ids.event.text.lower()
+        app.prev_result = result
+        app.prev_event = self.ids.event.text.lower()
 
 
 class ScanAnalyze(Preview):
@@ -131,14 +174,50 @@ class TokenScreen(MDScreen):
 
 
 class ValidScreen(MDScreen):
+    def make_visible(self):
+        if not app.visibility:
+            alg_make_visible(self)
+            app.visibility = True
+        elif app.visibility:
+            alg_make_invisible(self)
+            app.visibility = False
+
+    def set_invisible(self):
+        if app.visibility:
+            alg_make_invisible(self)
+            app.visibility = False
     pass
 
 
 class InValidScreen(MDScreen):
+    def make_visible(self):
+        if not app.visibility:
+            alg_make_visible(self)
+            app.visibility = True
+        elif app.visibility:
+            alg_make_invisible(self)
+            app.visibility = False
+
+    def set_invisible(self):
+        if app.visibility:
+            alg_make_invisible(self)
+            app.visibility = False
     pass
 
 
 class UsedScreen(MDScreen):
+    def make_visible(self):
+        if not app.visibility:
+            alg_make_visible(self)
+            app.visibility = True
+        elif app.visibility:
+            alg_make_invisible(self)
+            app.visibility = False
+
+    def set_invisible(self):
+        if app.visibility:
+            alg_make_invisible(self)
+            app.visibility = False
     pass
 
 
@@ -152,6 +231,16 @@ class QRScan(MDApp):
         super(QRScan, self).__init__()
         self.sm = MDScreenManager()
         self.token: PyToken | None = None
+        self.visibility = False
+
+        self.prev_event = ""
+        self.prev_result = ""
+        self.voornaam_naam = ""
+        self.email = ""
+        self.lidstatus = ""
+        self.products_count = ""
+        self.validity = ""
+        self.checkout_status = ""
 
     def on_stop(self):
         ScanScreen.stopping(ScanScreen())

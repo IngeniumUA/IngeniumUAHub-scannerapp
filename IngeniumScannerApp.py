@@ -27,10 +27,6 @@ def update(api_token, uuid):
 def alg_make_visible(self):
     self.ids.more_info_button.text = "Less info"
 
-    self.ids.voornaam_naam_drop.text = app.voornaam_naam
-    self.ids.voornaam_naam_drop.opacity = 1
-    self.ids.voornaam_naam_text.opacity = 1
-
     self.ids.email_drop.text = app.email
     self.ids.email_drop.opacity = 1
     self.ids.email_text.opacity = 1
@@ -55,9 +51,6 @@ def alg_make_visible(self):
 def alg_make_invisible(self):
     self.ids.more_info_button.text = "More info"
 
-    self.ids.voornaam_naam_drop.opacity = 0
-    self.ids.voornaam_naam_text.opacity = 0
-
     self.ids.email_drop.opacity = 0
     self.ids.email_text.opacity = 0
 
@@ -74,7 +67,7 @@ def alg_make_invisible(self):
     self.ids.checkout_status_text.opacity = 0
 
 
-def get_validity(api_token, uuid: str, event):
+def get_results(api_token, uuid: str, event):
     """
     :param api_token:
     :param uuid:
@@ -82,14 +75,23 @@ def get_validity(api_token, uuid: str, event):
     :return:
     """
     transactions: list[PyStaffTransaction] = get_transactions(token=api_token, checkout_id=str(uuid))
+    products_dict = dict()
     if transactions == "login_invalid":
-        return "APITokenError", 0
+        return {"validity": "APITokenError"}
     if transactions == [] or transactions == "uuid_invalid":
-        return "UUIDError", 0
+        return {"validity": "UUIDError"}
     for transaction in transactions:
+        products_dict.update({transaction.interaction.item_name.lower(): transaction.count})
         if transaction.interaction.item_name.lower() == event:
-            return transaction.validity, transaction.interaction.item_id
-    return "eventError", 0
+            return {"validity": transaction.validity,
+                    "item_id": transaction.interaction.item_id,
+                    "products": products_dict,
+                    "email": transaction.interaction.user_email,
+                    "checkout_status": transaction.status}
+    return {"validity": "eventError",
+            "products": products_dict,
+            "email": transactions[0].interaction.user_email,
+            "checkout_status": transactions[0].status}
 
 
 class LoginScreen(MDScreen):
@@ -124,8 +126,8 @@ class ScanScreen(MDScreen):
 
         if result == app.prev_result and self.ids.event.text.lower() == app.prev_event:
             return
-        validity, item_id = get_validity(app.token, result, self.ids.event.text.lower())
-        if validity == "APITokenError":
+        response_dict = get_results(app.token, result, self.ids.event.text.lower())
+        if response_dict["validity"] == "APITokenError":
             result = ""
             app.prev_result = ""
             app.token = refresh_token(app.token)
@@ -135,18 +137,18 @@ class ScanScreen(MDScreen):
             else:
                 app.sm.transition.direction = "left"
                 app.sm.current = "token"
-        elif validity == ValidityEnum.valid:
+        elif response_dict["validity"] == ValidityEnum.valid:
             app.sm.transition.direction = "left"
             app.sm.current = "valid"
-            update(app.token, item_id)
-        elif validity == ValidityEnum.invalid:
+            update(app.token, response_dict["item_id"])
+        elif response_dict["validity"] == ValidityEnum.invalid:
             app.sm.transition.direction = "left"
             app.sm.current = "invalid"
-            update(app.token, item_id)
-        elif validity == ValidityEnum.consumed or validity == "eventError":
+            update(app.token, response_dict["item_id"])
+        elif response_dict["validity"] == ValidityEnum.consumed or response_dict["validity"] == "eventError":
             app.sm.transition.direction = "left"
             app.sm.current = "used"
-        elif validity == "UUIDError":
+        elif response_dict["validity"] == "UUIDError":
             app.sm.transition.direction = "left"
             app.sm.current = "payless"
         else:

@@ -25,7 +25,10 @@ def update(api_token, uuid):
 
 
 def alg_make_visible(self, visibility: bool):
-    self.ids.more_info_button.text = "Less info"
+    if visibility:
+        self.ids.more_info_button.text = "Less info"
+    else:
+        self.ids.more_info_button.text = "More info"
 
     self.ids.voornaam_naam_drop.text = app.voornaam_naam
     self.ids.voornaam_naam_drop.opacity = int(visibility)
@@ -188,7 +191,7 @@ class TokenScreen(MDScreen):
 
 
 class ValidInvalidUsedScreen(MDScreen):
-    def on_enter(self):
+    def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
 
     def make_visible(self):
@@ -213,7 +216,7 @@ class QRScan(MDApp):
         self.sm = MDScreenManager()
         self.token: PyToken | None = None
         self.visibility = False
-        self.iconpath = None
+        self.iconpath = ""
 
         self.prev_event = ""
         self.prev_result = ""

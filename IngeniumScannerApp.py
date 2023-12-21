@@ -11,17 +11,10 @@ from camera4kivy import Preview
 from PIL import Image
 from pyzbar.pyzbar import decode
 
-import requests
-
 from data_models import PyStaffTransaction
-from hub_api import get_transactions, authenticate, refresh_token, PyToken, get_userdata
+from hub_api import get_transactions, authenticate, refresh_token, PyToken, get_userdata, update_validity
 
 Config.set('graphics', 'resizable', True)
-
-
-def update(api_token, uuid):
-    requests.put("http://127.0.0.1:8000" + '/api/v1/staff/transaction/update', data={'access_token': api_token,
-                                                                                     'item_id': uuid})
 
 
 def alg_make_visible(self, visibility: bool):
@@ -31,28 +24,27 @@ def alg_make_visible(self, visibility: bool):
         self.ids.more_info_button.text = "More info"
 
     self.ids.voornaam_naam_drop.text = app.voornaam_naam
-    self.ids.voornaam_naam_drop.opacity = int(visibility)
-    self.ids.voornaam_naam_text.opacity = int(visibility)
-
     self.ids.email_drop.text = app.email
-    self.ids.email_drop.opacity = int(visibility)
-    self.ids.email_text.opacity = int(visibility)
-
     self.ids.lidstatus_drop.text = app.lidstatus
-    self.ids.lidstatus_drop.opacity = int(visibility)
-    self.ids.lidstatus_text.opacity = int(visibility)
-
     self.ids.products_count_drop.text = app.products_count
-    self.ids.products_count_drop.opacity = int(visibility)
-    self.ids.products_count_text.opacity = int(visibility)
-
     self.ids.validity_drop.text = app.validity
-    self.ids.validity_drop.opacity = int(visibility)
-    self.ids.validity_text.opacity = int(visibility)
-
     self.ids.checkout_status_drop.text = app.checkout_status
-    self.ids.checkout_status_drop.opacity = int(visibility)
-    self.ids.checkout_status_text.opacity = int(visibility)
+
+    objs = [self.ids.voornaam_naam_drop,
+            self.ids.voornaam_naam_text,
+            self.ids.email_drop,
+            self.ids.email_text,
+            self.ids.lidstatus_drop,
+            self.ids.lidstatus_text,
+            self.ids.products_count_drop,
+            self.ids.products_count_text,
+            self.ids.validity_drop,
+            self.ids.validity_text,
+            self.ids.checkout_status_drop,
+            self.ids.checkout_status_text]
+
+    for obj in objs:
+        obj.opacity = int(visibility)
 
 
 def get_results(api_token, uuid: str, event):
@@ -73,13 +65,21 @@ def get_results(api_token, uuid: str, event):
         products_str += str(transaction.count) + " x " + str(transaction.interaction.item_name.lower()) + ", "
         if transaction.interaction.item_name.lower() == event:
             transaction_to_save.append(transaction)
-    if transaction_to_save != []:
+    if transaction_to_save:
         userdata = get_userdata(transaction_to_save[0].interaction.user_id)
-        return {"validity": transaction_to_save[0].validity.value,
-                "item_id": transaction_to_save[0].interaction.item_id,
+
+        transaction_to_save_len = len(transaction_to_save)
+        item_to_return = 0
+        for item_to_return in range(transaction_to_save_len):
+            if (transaction_to_save[item_to_return].validity.value != "consumed"
+                    or item_to_return == transaction_to_save_len - 1):
+                break
+
+        return {"validity": transaction_to_save[item_to_return].validity.value,
+                "id": transaction_to_save[item_to_return].interaction.id,
                 "products": products_str,
-                "email": transaction_to_save[0].interaction.user_email,
-                "checkout_status": transaction_to_save[0].status.value,
+                "email": transaction_to_save[item_to_return].interaction.user_email,
+                "checkout_status": transaction_to_save[item_to_return].status.value,
                 "voornaam_naam": userdata["voornaam"] + " " + userdata["achternaam"],
                 "lidstatus": str(userdata["lidstatus"])}
     else:
@@ -112,6 +112,8 @@ class LoginScreen(MDScreen):
 
 
 class ScanScreen(MDScreen):
+    def on_enter(self):
+        app.prev_result = ""
 
     def on_kv_post(self, obj):
         self.ids.preview.connect_camera(enable_analyze_pixels=True, default_zoom=0.0)
@@ -130,7 +132,6 @@ class ScanScreen(MDScreen):
                 or response_dict["validity"] == "invalid"
                 or response_dict["validity"] == "consumed"
                 or response_dict["validity"] == "eventError"):
-
             app.voornaam_naam = response_dict["voornaam_naam"]
             app.email = response_dict["email"]
             app.validity = response_dict["validity"]
@@ -152,12 +153,12 @@ class ScanScreen(MDScreen):
             app.iconpath = "assets/checkmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
-            update(app.token, response_dict["item_id"])
+            update_validity(response_dict["id"])
         elif response_dict["validity"] == "invalid":
             app.iconpath = "assets/dashmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
-            update(app.token, response_dict["item_id"])
+            update_validity(response_dict["id"])
         elif response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError":
             app.iconpath = "assets/xmark.png"
             app.sm.transition.direction = "left"

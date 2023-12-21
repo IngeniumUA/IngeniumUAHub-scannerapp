@@ -30,13 +30,17 @@ def refresh_token(token: PyToken) -> PyToken:
 
 
 def get_userdata(uuid: str | None = None) -> dict:
-    response = requests.get(url=api_url + "/api/v1/staff/user/" + uuid)
+    response = requests.get(url=api_url + "staff/user/" + uuid)
     if response.status_code == 200:
         return {"lidstatus": response.json()["roles"]["is_lid"],
                 "voornaam": response.json()["user_detail"]["voornaam"],
                 "achternaam": response.json()["user_detail"]["achternaam"]}
     else:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
+
+
+def update_validity(interaction_id):
+    requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": "consumed"})
 
 
 def get_transactions(token: PyToken,

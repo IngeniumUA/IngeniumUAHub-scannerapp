@@ -5,7 +5,7 @@
 		size_hint_x: 0.3
         pos_hint: {"x":0, "y":0.92}
 		text: "Event "
-		font_name: 'assets/D-DIN.otf'
+		font_name: 'app/assets/D-DIN.otf'
 		halign: 'right'
 
 	TextInput:
@@ -15,7 +15,7 @@
         pos_hint: {"x":0.3, "y":0.92}
         id: event
         multiline: False
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
 
     ScanAnalyze:
         size_hint_y: 0.8
@@ -29,10 +29,10 @@
         size_hint_x: 0.98
         pos_hint: {"x":0.01, "y":0}
         text: "Back"
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1
-        background_normal: 'assets/buttonnormal.png'
-        background_down: 'assets/buttondown.png'
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
         on_release:
             root.manager.transition.direction = "right"
             root.manager.current = "login"
@@ -45,7 +45,7 @@
 		size_hint_x: 0.3
         pos_hint: {"x":0, "y":0.7}
 		text: "Email "
-		font_name: 'assets/D-DIN.otf'
+		font_name: 'app/assets/D-DIN.otf'
 		halign: 'right'
 
     TextInput:
@@ -55,7 +55,7 @@
 		pos_hint: {"x":0.3, "y":0.7}
         id: mail
         multiline: False
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
 
 
     MDLabel:
@@ -64,7 +64,7 @@
 		size_hint_x: 0.3
         pos_hint: {"x":0, "y":0.65}
 		text: "Password "
-		font_name: 'assets/D-DIN.otf'
+		font_name: 'app/assets/D-DIN.otf'
 		halign: 'right'
 
 	TextInput:
@@ -75,7 +75,7 @@
         id: passw
         multiline: False
         password: True
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
 
     MDLabel:
         id: validitylabel
@@ -86,17 +86,17 @@
 		halign: 'left'
 		color: 1,0,0,1
 		font_size: 17
-		font_name: 'assets/D-DIN.otf'
+		font_name: 'app/assets/D-DIN.otf'
 
     Button:
         id: confirmbutton
         size_hint: .5, .08
         pos_hint: {"x":0.25, "y":0.5}
         text: "Submit"
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1
-        background_normal: 'assets/buttonnormal.png'
-        background_down: 'assets/buttondown.png'
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
         on_release:
             root.login()
             root.buttonpress()
@@ -109,7 +109,7 @@
         MDLabel:
             halign: "center"
             text: "Refreshing Token"
-            font_name: 'assets/D-DIN.otf'
+            font_name: 'app/assets/D-DIN.otf'
 			size_hint_y: 0.8
 			background_color: 0, 0, 1, 1
             canvas.before:
@@ -121,10 +121,10 @@
         Button:
             size_hint_y: 0.2
             text: "Back"
-            font_name: 'assets/D-DIN.otf'
+            font_name: 'app/assets/D-DIN.otf'
             color: 1,1,1,1
-            background_normal: 'assets/buttonnormal.png'
-            background_down: 'assets/buttondown.png'
+            background_normal: 'app/assets/buttonnormal.png'
+            background_down: 'app/assets/buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "scan"
@@ -135,9 +135,9 @@
         pos_hint: {"x":0, "y":0.9}
         text: "More info"
         id: more_info_button
-        font_name: 'assets/D-DIN.otf'
-        background_normal: 'assets/buttonnormal.png'
-        background_down: 'assets/buttondown.png'
+        font_name: 'app/assets/D-DIN.otf'
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
         on_release:
             root.make_visible()
 
@@ -161,7 +161,7 @@
                 pos: self.pos
         id: voornaam_naam_text
         text: "Voornaam en naam: "
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
@@ -175,7 +175,7 @@
                 size: self.size
                 pos: self.pos
         id: voornaam_naam_drop
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
 
     MDLabel:
@@ -191,7 +191,7 @@
                 pos: self.pos
         id: email_text
         text: "Email: "
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
@@ -205,7 +205,7 @@
                 size: self.size
                 pos: self.pos
         id: email_drop
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
 
     MDLabel:
@@ -221,7 +221,7 @@
                 pos: self.pos
         id: lidstatus_text
         text: "Lidstatus: "
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
@@ -235,7 +235,7 @@
                 size: self.size
                 pos: self.pos
         id: lidstatus_drop
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
 
     MDLabel:
@@ -251,7 +251,7 @@
                 pos: self.pos
         id: products_count_text
         text: "Producten + hoeveelheid: "
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
@@ -265,7 +265,7 @@
                 size: self.size
                 pos: self.pos
         id: products_count_drop
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
 
     MDLabel:
@@ -281,7 +281,7 @@
                 pos: self.pos
         id: validity_text
         text: "Validity: "
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
@@ -295,7 +295,7 @@
                 size: self.size
                 pos: self.pos
         id: validity_drop
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
 
     MDLabel:
@@ -311,7 +311,7 @@
                 pos: self.pos
         id: checkout_status_text
         text: "Checkout status: "
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
     MDLabel:
         size_hint_x: 0.7
@@ -325,7 +325,7 @@
                 size: self.size
                 pos: self.pos
         id: checkout_status_drop
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.05
 
     Button:
@@ -333,10 +333,10 @@
         pos_hint: {"x":0, "y":0}
         size_hint_y: 0.2
         text: "Back"
-        font_name: 'assets/D-DIN.otf'
+        font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1
-        background_normal: 'assets/buttonnormal.png'
-        background_down: 'assets/buttondown.png'
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
         on_release:
             root.set_invisible()
             root.manager.transition.direction = "right"
@@ -347,15 +347,15 @@
     GridLayout:
         cols:1
         Image:
-            source: 'assets/xmark.png'
+            source: 'app/assets/xmark.png'
 			size_hint_y: 0.8
         Button:
             size_hint_y: 0.2
             text: "Back"
-            font_name: 'assets/D-DIN.otf'
+            font_name: 'app/assets/D-DIN.otf'
             color: 1,1,1,1
-            background_normal: 'assets/buttonnormal.png'
-            background_down: 'assets/buttondown.png'
+            background_normal: 'app/assets/buttonnormal.png'
+            background_down: 'app/assets/buttondown.png'
             on_release:
                 root.manager.transition.direction = "right"
                 root.manager.current = "scan"

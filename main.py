@@ -107,17 +107,17 @@ class ScanScreen(MDScreen):
                 app.sm.transition.direction = "left"
                 app.sm.current = "token"
         elif response_dict["validity"] == "valid":
-            app.iconpath = "assets/checkmark.png"
+            app.iconpath = "app/assets/checkmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
             update_validity(response_dict["id"])
         elif response_dict["validity"] == "invalid":
-            app.iconpath = "assets/dashmark.png"
+            app.iconpath = "app/assets/dashmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
             update_validity(response_dict["id"])
         elif response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError":
-            app.iconpath = "assets/xmark.png"
+            app.iconpath = "app/assets/xmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
         elif response_dict["validity"] == "UUIDError":

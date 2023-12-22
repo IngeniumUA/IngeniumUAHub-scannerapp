@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from app.api.data_models import PyStaffTransaction
 
-api_url = "http://127.0.0.1:8000/api/v1/"
+api_url = "https://hub.dev.ingeniumua.be/api/v1/"
 
 
 class PyToken(BaseModel):

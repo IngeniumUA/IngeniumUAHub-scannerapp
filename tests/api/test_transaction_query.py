@@ -1,5 +1,3 @@
-import pytest
-import requests
 import hub_api
 
 EMAIL = "admin@ingeniumua.be"

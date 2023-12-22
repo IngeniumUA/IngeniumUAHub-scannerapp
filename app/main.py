@@ -11,8 +11,10 @@ from camera4kivy import Preview
 from PIL import Image
 from pyzbar.pyzbar import decode
 
-from data_models import PyStaffTransaction
-from hub_api import get_transactions, authenticate, refresh_token, PyToken, get_userdata, update_validity
+from app.api.hub_api import PyToken, refresh_token, update_validity, authenticate
+from app.functions.get_results import get_results
+from app.screens.token_screen import TokenScreen
+from app.screens.payless_screen import PaylessScreen
 
 Config.set('graphics', 'resizable', True)
 
@@ -45,51 +47,6 @@ def alg_make_visible(self, visibility: bool):
 
     for obj in objs:
         obj.opacity = int(visibility)
-
-
-def get_results(api_token, uuid: str, event):
-    """
-    :param api_token:
-    :param uuid:
-    :param event:
-    :return:
-    """
-    transactions: list[PyStaffTransaction] = get_transactions(token=api_token, checkout_id=str(uuid))
-    products_str = str()
-    transaction_to_save = []
-    if transactions == "login_invalid":
-        return {"validity": "APITokenError"}
-    if transactions == [] or transactions == "uuid_invalid":
-        return {"validity": "UUIDError"}
-    for transaction in transactions:
-        products_str += str(transaction.count) + " x " + str(transaction.interaction.item_name.lower()) + ", "
-        if transaction.interaction.item_name.lower() == event:
-            transaction_to_save.append(transaction)
-    if transaction_to_save:
-        userdata = get_userdata(transaction_to_save[0].interaction.user_id)
-
-        transaction_to_save_len = len(transaction_to_save)
-        item_to_return = 0
-        for item_to_return in range(transaction_to_save_len):
-            if (transaction_to_save[item_to_return].validity.value != "consumed"
-                    or item_to_return == transaction_to_save_len - 1):
-                break
-
-        return {"validity": transaction_to_save[item_to_return].validity.value,
-                "id": transaction_to_save[item_to_return].interaction.id,
-                "products": products_str,
-                "email": transaction_to_save[item_to_return].interaction.user_email,
-                "checkout_status": transaction_to_save[item_to_return].status.value,
-                "voornaam_naam": userdata["voornaam"] + " " + userdata["achternaam"],
-                "lidstatus": str(userdata["lidstatus"])}
-    else:
-        userdata = get_userdata(transactions[0].interaction.user_id)
-        return {"validity": "eventError",
-                "products": products_str,
-                "email": transactions[0].interaction.user_email,
-                "checkout_status": transactions[0].status.value,
-                "voornaam_naam": userdata["voornaam"] + " " + userdata["achternaam"],
-                "lidstatus": str(userdata["lidstatus"])}
 
 
 class LoginScreen(MDScreen):
@@ -173,24 +130,6 @@ class ScanScreen(MDScreen):
         app.prev_event = self.ids.event.text.lower()
 
 
-class ScanAnalyze(Preview):
-    extracted_data = ObjectProperty(None)
-
-    def analyze_pixels_callback(self, pixels, image_size, image_pos, scale, mirror):
-        pimage = Image.frombytes(mode='RGBA', size=image_size, data=pixels)
-        list_of_all_barcodes = decode(pimage)
-
-        if list_of_all_barcodes:
-            if self.extracted_data:
-                self.extracted_data(list_of_all_barcodes[0].data.decode('utf-8'))
-            else:
-                print("Not found")
-
-
-class TokenScreen(MDScreen):
-    pass
-
-
 class ValidInvalidUsedScreen(MDScreen):
     def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
@@ -206,14 +145,24 @@ class ValidInvalidUsedScreen(MDScreen):
     pass
 
 
-class PaylessScreen(MDScreen):
-    pass
+class ScanAnalyze(Preview):
+    extracted_data = ObjectProperty(None)
+
+    def analyze_pixels_callback(self, pixels, image_size, image_pos, scale, mirror):
+        pimage = Image.frombytes(mode='RGBA', size=image_size, data=pixels)
+        list_of_all_barcodes = decode(pimage)
+
+        if list_of_all_barcodes:
+            if self.extracted_data:
+                self.extracted_data(list_of_all_barcodes[0].data.decode('utf-8'))
+            else:
+                print("Not found")
 
 
-class QRScan(MDApp):
+class IngeniumApp(MDApp):
 
     def __init__(self):
-        super(QRScan, self).__init__()
+        super(IngeniumApp, self).__init__()
         self.sm = MDScreenManager()
         self.token: PyToken | None = None
         self.visibility = False
@@ -245,5 +194,5 @@ class QRScan(MDApp):
 
 
 if __name__ == '__main__':
-    app = QRScan()
+    app = IngeniumApp()
     app.run()

@@ -1,7 +1,7 @@
 import requests
 from pydantic import BaseModel
 
-from data_models import PyStaffTransaction
+from app.api.data_models import PyStaffTransaction
 
 api_url = "http://127.0.0.1:8000/api/v1/"
 

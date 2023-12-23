@@ -39,8 +39,8 @@ def get_userdata(uuid: str | None = None) -> dict:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
 
 
-def update_validity(interaction_id):
-    requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": "consumed"})
+def update_validity(interaction_id, validity):
+    requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": validity})
 
 
 def get_transactions(token: PyToken,

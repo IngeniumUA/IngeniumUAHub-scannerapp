@@ -63,7 +63,7 @@ class LoginScreen(MDScreen):
         pass
 
     def buttonpress(self):
-        if app.token is None:
+        if app.token == "login_error":
             scanner_allowed = False
         else:
             scanner_allowed = True
@@ -116,12 +116,10 @@ class ScanScreen(MDScreen):
             app.iconpath = "app/assets/checkmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
-            update_validity(response_dict["id"])
         elif response_dict["validity"] == "invalid":
             app.iconpath = "app/assets/dashmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
-            update_validity(response_dict["id"])
         elif (response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError"
               or response_dict["validity"] == "manually_verified"):
             app.iconpath = "app/assets/xmark.png"
@@ -142,21 +140,37 @@ class ValidInvalidUsedScreen(MDScreen):
         self.ids.validity_image.source = app.iconpath
         self.load_table()
 
+    def on_leave(self):
+        app.id_list = []
+
+    def change_validity(self):
+        for ids in app.id_list:
+            update_validity(ids, self.ids.validity_button_text.text.lower())
+
     def load_table(self):
         self.product_table = MDDataTable(
-            size_hint_y=0.625,
+            size_hint_y=0.525,
             size_hint_x=1,
-            pos_hint={"x": 0, "y": 0.1},
+            check=True,
+            pos_hint={"x": 0, "y": 0.2},
             column_data=[("[size=15]Item[/size]", dp(Window.width*0.062*1.55)),
                          ("[size=15]Validity[/size]", dp(Window.width*0.023*1.55)),
-                         ("[size=15]Amount[/size]", dp(Window.width*0.015*1.55))],
+                         ("[size=15]Amount[/size]", dp(Window.width*0.015*1.55)),
+                         ("id", dp(Window.width+10))],
             row_data=app.table_data,
             opacity=0,
-            background_color=(0, 0, 1, 0.2),
+            background_color=(1, 1, 1, 1),
             background_color_cell=(0, 0, 1, 0),
             background_color_header=(0, 0, 1, 0),
             background_color_selected_cell=(0, 0, 1, 0))
+        self.product_table.bind(on_check_press=self.check_press)
         self.add_widget(self.product_table)
+
+    def check_press(self, instance_table, current_row):
+        if int(current_row[3]) in app.id_list:
+            app.id_list.remove(int(current_row[3]))
+        else:
+            app.id_list.append(int(current_row[3]))
 
     def make_visible(self):
         alg_make_visible(self, not app.visibility)
@@ -202,6 +216,7 @@ class IngeniumApp(MDApp):
         self.table_data = ""
         self.validity = ""
         self.checkout_status = ""
+        self.id_list = []
 
     def on_stop(self):
         ScanScreen.stopping(ScanScreen())

@@ -144,12 +144,12 @@ class ValidInvalidUsedScreen(MDScreen):
 
     def load_table(self):
         self.product_table = MDDataTable(
-            size_hint_y=0.525,
+            size_hint_y=0.625,
             size_hint_x=1,
-            pos_hint={"x": 0, "y": 0.2},
-            column_data=[("[size=15]Item[/size]", dp(Window.width*0.062*1.6)),
-                         ("[size=15]Validity[/size]", dp(Window.width*0.023*1.6)),
-                         ("[size=15]Amount[/size]", dp(Window.width*0.015*1.6))],
+            pos_hint={"x": 0, "y": 0.1},
+            column_data=[("[size=15]Item[/size]", dp(Window.width*0.062*1.55)),
+                         ("[size=15]Validity[/size]", dp(Window.width*0.023*1.55)),
+                         ("[size=15]Amount[/size]", dp(Window.width*0.015*1.55))],
             row_data=app.table_data,
             opacity=0,
             background_color=(0, 0, 1, 0.2),

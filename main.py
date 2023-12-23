@@ -2,10 +2,13 @@ from kivy.properties import ObjectProperty
 from kivy.clock import mainthread
 from kivy.utils import platform
 from kivy.config import Config
+from kivy.core.window import Window
+from kivy.metrics import dp
 
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.screenmanager import MDScreenManager
+from kivymd.uix.datatables import MDDataTable
 
 from camera4kivy import Preview
 from PIL import Image
@@ -25,21 +28,22 @@ def alg_make_visible(self, visibility: bool):
     else:
         self.ids.more_info_button.text = "More info"
 
-    self.ids.voornaam_naam_drop.text = app.voornaam_naam
+    self.ids.voornaam_drop.text = app.voornaam
+    self.ids.naam_drop.text = app.naam
     self.ids.email_drop.text = app.email
     self.ids.lidstatus_drop.text = app.lidstatus
-    self.ids.products_count_drop.text = app.products_count
     self.ids.validity_drop.text = app.validity
     self.ids.checkout_status_drop.text = app.checkout_status
 
-    objs = [self.ids.voornaam_naam_drop,
-            self.ids.voornaam_naam_text,
+    objs = [self.ids.voornaam_drop,
+            self.ids.voornaam_text,
+            self.ids.naam_drop,
+            self.ids.naam_text,
             self.ids.email_drop,
             self.ids.email_text,
             self.ids.lidstatus_drop,
             self.ids.lidstatus_text,
-            self.ids.products_count_drop,
-            self.ids.products_count_text,
+            self.product_table,
             self.ids.validity_drop,
             self.ids.validity_text,
             self.ids.checkout_status_drop,
@@ -88,13 +92,15 @@ class ScanScreen(MDScreen):
         if (response_dict["validity"] == "valid"
                 or response_dict["validity"] == "invalid"
                 or response_dict["validity"] == "consumed"
+                or response_dict["validity"] == "manually_verified"
                 or response_dict["validity"] == "eventError"):
-            app.voornaam_naam = response_dict["voornaam_naam"]
+            app.voornaam = response_dict["voornaam"]
+            app.naam = response_dict["naam"]
             app.email = response_dict["email"]
             app.validity = response_dict["validity"]
             app.lidstatus = response_dict["lidstatus"]
             app.checkout_status = response_dict["checkout_status"]
-            app.products_count = response_dict["products"]
+            app.table_data = response_dict["table_data"]
 
         if response_dict["validity"] == "APITokenError":
             result = ""
@@ -116,7 +122,8 @@ class ScanScreen(MDScreen):
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
             update_validity(response_dict["id"])
-        elif response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError":
+        elif (response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError"
+              or response_dict["validity"] == "manually_verified"):
             app.iconpath = "app/assets/xmark.png"
             app.sm.transition.direction = "left"
             app.sm.current = "valid_invalid_used"
@@ -133,6 +140,23 @@ class ScanScreen(MDScreen):
 class ValidInvalidUsedScreen(MDScreen):
     def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
+        self.load_table()
+
+    def load_table(self):
+        self.product_table = MDDataTable(
+            size_hint_y=0.525,
+            size_hint_x=1,
+            pos_hint={"x": 0, "y": 0.2},
+            column_data=[("[size=15]Item[/size]", dp(Window.width*0.062*1.6)),
+                         ("[size=15]Validity[/size]", dp(Window.width*0.023*1.6)),
+                         ("[size=15]Amount[/size]", dp(Window.width*0.015*1.6))],
+            row_data=app.table_data,
+            opacity=0,
+            background_color=(0, 0, 1, 0.2),
+            background_color_cell=(0, 0, 1, 0),
+            background_color_header=(0, 0, 1, 0),
+            background_color_selected_cell=(0, 0, 1, 0))
+        self.add_widget(self.product_table)
 
     def make_visible(self):
         alg_make_visible(self, not app.visibility)
@@ -142,6 +166,7 @@ class ValidInvalidUsedScreen(MDScreen):
         if app.visibility:
             alg_make_visible(self, False)
             app.visibility = False
+
     pass
 
 
@@ -170,10 +195,11 @@ class IngeniumApp(MDApp):
 
         self.prev_event = ""
         self.prev_result = ""
-        self.voornaam_naam = ""
+        self.voornaam = ""
+        self.naam = ""
         self.email = ""
         self.lidstatus = ""
-        self.products_count = ""
+        self.table_data = ""
         self.validity = ""
         self.checkout_status = ""
 

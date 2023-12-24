@@ -139,6 +139,7 @@ class ValidInvalidUsedScreen(MDScreen):
     def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
         self.load_table()
+        self.add_first_nonconsumed()
 
     def on_leave(self):
         app.id_list = []
@@ -146,6 +147,13 @@ class ValidInvalidUsedScreen(MDScreen):
     def change_validity(self):
         for ids in app.id_list:
             update_validity(ids, self.ids.validity_button_text.text.lower())
+            for i in range(len(app.table_data)):
+                if app.table_data[i][3] == str(ids):
+                    self.product_table.update_row(self.product_table.row_data[i],
+                                                  [self.product_table.row_data[i][0],
+                                                   "[size=15]" + self.ids.validity_button_text.text.lower() + "[/size]",
+                                                   self.product_table.row_data[i][2],
+                                                   self.product_table.row_data[i][3]])
 
     def load_table(self):
         self.product_table = MDDataTable(
@@ -156,7 +164,7 @@ class ValidInvalidUsedScreen(MDScreen):
             column_data=[("[size=15]Item[/size]", dp(Window.width*0.062*1.55)),
                          ("[size=15]Validity[/size]", dp(Window.width*0.023*1.55)),
                          ("[size=15]Amount[/size]", dp(Window.width*0.015*1.55)),
-                         ("id", dp(Window.width+10))],
+                         ("id", dp(Window.width*2))],
             row_data=app.table_data,
             opacity=0,
             background_color=(1, 1, 1, 1),
@@ -167,10 +175,23 @@ class ValidInvalidUsedScreen(MDScreen):
         self.add_widget(self.product_table)
 
     def check_press(self, instance_table, current_row):
-        if int(current_row[3]) in app.id_list:
+        if int(current_row[3]) in app.id_list and int(current_row[3]) != self.added_item:
             app.id_list.remove(int(current_row[3]))
+        elif int(current_row[3]) == self.added_item:
+            self.added_item = 0
+        elif self.added_item != 0:
+            app.id_list.append(int(current_row[3]))
+            app.id_list.remove(self.added_item)
         else:
             app.id_list.append(int(current_row[3]))
+
+    def add_first_nonconsumed(self):
+        self.added_item = 0
+        for row in app.table_data:
+            if row[1] != '[size=15]consumed[/size]':
+                app.id_list.append(int(row[3]))
+                self.added_item = int(row[3])
+                break
 
     def make_visible(self):
         alg_make_visible(self, not app.visibility)

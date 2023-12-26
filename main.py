@@ -4,6 +4,7 @@ from kivy.utils import platform
 from kivy.config import Config
 from kivy.core.window import Window
 from kivy.metrics import dp
+from kivy.uix.button import Button
 
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
@@ -141,30 +142,33 @@ class ValidInvalidUsedScreen(MDScreen):
         self.load_table()
         self.add_first_nonconsumed()
 
+    def on_kv_post(self, obj):
+        self.load_dropdown()
+
     def on_leave(self):
         app.id_list = []
 
     def change_validity(self):
         for ids in app.id_list:
-            update_validity(ids, self.ids.validity_button_text.text.lower())
+            update_validity(ids, self.ids.button_drop_main.text.lower())
             for i in range(len(app.table_data)):
                 if app.table_data[i][3] == str(ids):
                     self.product_table.update_row(self.product_table.row_data[i],
                                                   [self.product_table.row_data[i][0],
-                                                   "[size=15]" + self.ids.validity_button_text.text.lower() + "[/size]",
+                                                   "[size=15]" + self.ids.button_drop_main.text.lower() + "[/size]",
                                                    self.product_table.row_data[i][2],
                                                    self.product_table.row_data[i][3]])
 
     def load_table(self):
         self.product_table = MDDataTable(
-            size_hint_y=0.525,
+            size_hint_y=0.575,
             size_hint_x=1,
             check=True,
-            pos_hint={"x": 0, "y": 0.2},
-            column_data=[("[size=15]Item[/size]", dp(Window.width*0.062*1.55)),
-                         ("[size=15]Validity[/size]", dp(Window.width*0.023*1.55)),
-                         ("[size=15]Amount[/size]", dp(Window.width*0.015*1.55)),
-                         ("id", dp(Window.width*2))],
+            pos_hint={"x": 0, "y": 0.15},
+            column_data=[("[size=15]Item[/size]", dp(Window.width * 0.062 * 1.55)),
+                         ("[size=15]Validity[/size]", dp(Window.width * 0.023 * 1.55)),
+                         ("[size=15]Amount[/size]", dp(Window.width * 0.015 * 1.55)),
+                         ("id", dp(Window.width+10))],
             row_data=app.table_data,
             opacity=0,
             background_color=(1, 1, 1, 1),
@@ -172,7 +176,7 @@ class ValidInvalidUsedScreen(MDScreen):
             background_color_header=(0, 0, 1, 0),
             background_color_selected_cell=(0, 0, 1, 0))
         self.product_table.bind(on_check_press=self.check_press)
-        self.add_widget(self.product_table)
+        self.add_widget(self.product_table, index=4)
 
     def check_press(self, instance_table, current_row):
         if int(current_row[3]) in app.id_list and int(current_row[3]) != self.added_item:
@@ -201,6 +205,66 @@ class ValidInvalidUsedScreen(MDScreen):
         if app.visibility:
             alg_make_visible(self, False)
             app.visibility = False
+
+    def load_dropdown(self):
+        self.button_drop_1 = Button(
+            size_hint_x=0.5,
+            pos_hint={"x": 0, "y": 0.152},
+            size_hint_y=0.05,
+            text="Invalid",
+            font_name='app/assets/D-DIN.otf',
+            color=(1, 1, 1, 1),
+            opacity=0,
+            background_normal='app/assets/drop.png',
+            background_down='app/assets/drop.png')
+        self.button_drop_1.bind(on_release=self.dropdown_swap1)
+        self.button_drop_1.bind(on_release=self.dropdown_open_close)
+        self.add_widget(self.button_drop_1, index=1)
+        self.button_drop_2 = Button(
+            size_hint_x=0.5,
+            pos_hint={"x": 0, "y": 0.202},
+            size_hint_y=0.05,
+            text="Valid",
+            font_name='app/assets/D-DIN.otf',
+            color=(1, 1, 1, 1),
+            opacity=0,
+            background_normal='app/assets/drop.png',
+            background_down='app/assets/drop.png')
+        self.button_drop_2.bind(on_release=self.dropdown_swap2)
+        self.button_drop_2.bind(on_release=self.dropdown_open_close)
+        self.add_widget(self.button_drop_2, index=2)
+        self.button_drop_3 = Button(
+            size_hint_x=0.5,
+            pos_hint={"x": 0, "y": 0.252},
+            size_hint_y=0.05,
+            text="Consumed",
+            font_name='app/assets/D-DIN.otf',
+            color=(1, 1, 1, 1),
+            opacity=0,
+            background_normal='app/assets/drop.png',
+            background_down='app/assets/drop.png')
+        self.button_drop_3.bind(on_release=self.dropdown_swap3)
+        self.button_drop_3.bind(on_release=self.dropdown_open_close)
+        self.add_widget(self.button_drop_3, index=3)
+
+    def dropdown_swap1(self, event):
+        self.ids.button_drop_main.text = self.button_drop_1.text
+
+    def dropdown_swap2(self, event):
+        self.ids.button_drop_main.text = self.button_drop_2.text
+
+    def dropdown_swap3(self, event):
+        self.ids.button_drop_main.text = self.button_drop_3.text
+
+    def dropdown_open_close(self, event):
+        if self.button_drop_1.opacity:
+            self.button_drop_1.opacity = 0
+            self.button_drop_2.opacity = 0
+            self.button_drop_3.opacity = 0
+        else:
+            self.button_drop_1.opacity = 1
+            self.button_drop_2.opacity = 1
+            self.button_drop_3.opacity = 1
 
     pass
 

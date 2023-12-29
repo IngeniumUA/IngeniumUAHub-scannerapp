@@ -61,7 +61,6 @@ class LoginScreen(MDScreen):
             self.ids.validitylabel.text = "Email or Password incorrect"
         else:
             self.ids.validitylabel.text = ""
-        pass
 
     def buttonpress(self):
         if app.token == "login_error":
@@ -70,7 +69,6 @@ class LoginScreen(MDScreen):
             scanner_allowed = True
         app.sm.transition.direction = "left"
         app.sm.current = "scan" if scanner_allowed else "login"
-        pass
 
 
 class ScanScreen(MDScreen):
@@ -190,7 +188,7 @@ class ValidInvalidUsedScreen(MDScreen):
             app.id_list.append(int(current_row[3]))
 
     def add_first_nonconsumed(self):
-        self.added_item = 0
+        self.added_item: int = 0
         for row in app.table_data:
             if row[1] != '[size=15]consumed[/size]':
                 app.id_list.append(int(row[3]))
@@ -266,8 +264,6 @@ class ValidInvalidUsedScreen(MDScreen):
             self.button_drop_2.opacity = 1
             self.button_drop_3.opacity = 1
 
-    pass
-
 
 class ScanAnalyze(Preview):
     extracted_data = ObjectProperty(None)
@@ -279,8 +275,6 @@ class ScanAnalyze(Preview):
         if list_of_all_barcodes:
             if self.extracted_data:
                 self.extracted_data(list_of_all_barcodes[0].data.decode('utf-8'))
-            else:
-                print("Not found")
 
 
 class IngeniumApp(MDApp):
@@ -289,19 +283,19 @@ class IngeniumApp(MDApp):
         super(IngeniumApp, self).__init__()
         self.sm = MDScreenManager()
         self.token: PyToken | None = None
-        self.visibility = False
-        self.iconpath = ""
+        self.visibility: bool = False
+        self.iconpath: str = ""
 
-        self.prev_event = ""
-        self.prev_result = ""
-        self.voornaam = ""
-        self.naam = ""
-        self.email = ""
-        self.lidstatus = ""
-        self.table_data = ""
-        self.validity = ""
-        self.checkout_status = ""
-        self.id_list = []
+        self.prev_event: str = ""
+        self.prev_result: str = ""
+        self.voornaam: str = ""
+        self.naam: str = ""
+        self.email: str = ""
+        self.lidstatus: str = ""
+        self.table_data: str = ""
+        self.validity: str = ""
+        self.checkout_status: str = ""
+        self.id_list: list = []
 
     def on_stop(self):
         ScanScreen.stopping(ScanScreen())

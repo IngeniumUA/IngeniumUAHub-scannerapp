@@ -2,7 +2,7 @@ from app.api.data_models import PyStaffTransaction
 from app.api.hub_api import get_transactions, get_userdata
 
 
-def get_results(api_token, uuid: str, event):
+def get_results(api_token, uuid: str, event) -> dict:
     """
     :param api_token:
     :param uuid:

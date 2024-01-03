@@ -1,3 +1,10 @@
+<Sm>
+    LoginScreen:
+    ScanScreen:
+    TokenScreen:
+    ValidInvalidUsedScreen:
+    PaylessScreen:
+
 <ScanScreen>:
     MDLabel:
         size_hint_y: None
@@ -352,26 +359,8 @@
         size_hint_y: 0.03
 
     Button:
-        size_hint_x: 0.5
-        pos_hint: {"x":0, "y":0.1}
-        size_hint_y: 0.05
-        text: "Consumed"
-        font_name: 'app/assets/D-DIN.otf'
-        color: 1,1,1,1
-        id: button_drop_main
-        background_normal: 'app/assets/drop.png'
-        background_down: 'app/assets/drop.png'
-        on_release:
-            root.dropdown_open_close("why")
-    Image:
-        source: "app/assets/dropicon.png"
-        size_hint_y: 0.03
-        size_hint_x: 0.03
-        pos_hint: {"x":0.469, "y":0.11}
-    Button:
-        size_hint_x: 0.5
+        size_hint: 0.5, 0.05
         pos_hint: {"x":0.5, "y":0.1}
-        size_hint_y: 0.05
         text: "Update Validity"
         font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1

@@ -5,6 +5,7 @@ from kivy.config import Config
 from kivy.core.window import Window
 from kivy.metrics import dp
 from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
 
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
@@ -17,8 +18,7 @@ from pyzbar.pyzbar import decode
 
 from app.api.hub_api import PyToken, refresh_token, update_validity, authenticate
 from app.functions.get_results import get_results
-from app.screens.token_screen import TokenScreen
-from app.screens.payless_screen import PaylessScreen
+from app.screens.trivial_screens import TokenScreen, PaylessScreen
 
 Config.set('graphics', 'resizable', True)
 
@@ -67,8 +67,8 @@ class LoginScreen(MDScreen):
             scanner_allowed = False
         else:
             scanner_allowed = True
-        app.sm.transition.direction = "left"
-        app.sm.current = "scan" if scanner_allowed else "login"
+        self.manager.transition.direction = "left"
+        self.manager.current = "scan" if scanner_allowed else "login"
 
 
 class ScanScreen(MDScreen):
@@ -106,27 +106,27 @@ class ScanScreen(MDScreen):
             app.prev_result = ""
             app.token = refresh_token(app.token)
             if app.token is None:
-                app.sm.transition.direction = "right"
-                app.sm.current = "login"
+                self.manager.transition.direction = "right"
+                self.manager.current = "login"
             else:
-                app.sm.transition.direction = "left"
-                app.sm.current = "token"
+                self.manager.transition.direction = "left"
+                self.manager.current = "token"
         elif response_dict["validity"] == "valid":
             app.iconpath = "app/assets/checkmark.png"
-            app.sm.transition.direction = "left"
-            app.sm.current = "valid_invalid_used"
+            self.manager.transition.direction = "left"
+            self.manager.current = "valid_invalid_used"
         elif response_dict["validity"] == "invalid":
             app.iconpath = "app/assets/dashmark.png"
-            app.sm.transition.direction = "left"
-            app.sm.current = "valid_invalid_used"
+            self.manager.transition.direction = "left"
+            self.manager.current = "valid_invalid_used"
         elif (response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError"
               or response_dict["validity"] == "manually_verified"):
             app.iconpath = "app/assets/xmark.png"
-            app.sm.transition.direction = "left"
-            app.sm.current = "valid_invalid_used"
+            self.manager.transition.direction = "left"
+            self.manager.current = "valid_invalid_used"
         elif response_dict["validity"] == "UUIDError":
-            app.sm.transition.direction = "left"
-            app.sm.current = "payless"
+            self.manager.transition.direction = "left"
+            self.manager.current = "payless"
         else:
             print("ERROR - validity unknown")
 
@@ -148,12 +148,12 @@ class ValidInvalidUsedScreen(MDScreen):
 
     def change_validity(self):
         for ids in app.id_list:
-            update_validity(ids, self.ids.button_drop_main.text.lower())
+            update_validity(ids, self.main_button.text.lower())
             for i in range(len(app.table_data)):
                 if app.table_data[i][3] == str(ids):
                     self.product_table.update_row(self.product_table.row_data[i],
                                                   [self.product_table.row_data[i][0],
-                                                   "[size=15]" + self.ids.button_drop_main.text.lower() + "[/size]",
+                                                   "[size=15]" + self.main_button.text.lower() + "[/size]",
                                                    self.product_table.row_data[i][2],
                                                    self.product_table.row_data[i][3]])
 
@@ -166,7 +166,7 @@ class ValidInvalidUsedScreen(MDScreen):
             column_data=[("[size=15]Item[/size]", dp(Window.width * 0.062 * 1.55)),
                          ("[size=15]Validity[/size]", dp(Window.width * 0.023 * 1.55)),
                          ("[size=15]Amount[/size]", dp(Window.width * 0.015 * 1.55)),
-                         ("id", dp(Window.width+10))],
+                         ("id", dp(Window.width + 10))],
             row_data=app.table_data,
             opacity=0,
             background_color=(1, 1, 1, 1),
@@ -174,7 +174,7 @@ class ValidInvalidUsedScreen(MDScreen):
             background_color_header=(0, 0, 1, 0),
             background_color_selected_cell=(0, 0, 1, 0))
         self.product_table.bind(on_check_press=self.check_press)
-        self.add_widget(self.product_table, index=4)
+        self.add_widget(self.product_table, index=9)
 
     def check_press(self, instance_table, current_row):
         if int(current_row[3]) in app.id_list and int(current_row[3]) != self.added_item:
@@ -205,64 +205,27 @@ class ValidInvalidUsedScreen(MDScreen):
             app.visibility = False
 
     def load_dropdown(self):
-        self.button_drop_1 = Button(
-            size_hint_x=0.5,
-            pos_hint={"x": 0, "y": 0.152},
-            size_hint_y=0.05,
-            text="Invalid",
-            font_name='app/assets/D-DIN.otf',
-            color=(1, 1, 1, 1),
-            opacity=0,
-            background_normal='app/assets/drop.png',
-            background_down='app/assets/drop.png')
-        self.button_drop_1.bind(on_release=self.dropdown_swap1)
-        self.button_drop_1.bind(on_release=self.dropdown_open_close)
-        self.add_widget(self.button_drop_1, index=1)
-        self.button_drop_2 = Button(
-            size_hint_x=0.5,
-            pos_hint={"x": 0, "y": 0.202},
-            size_hint_y=0.05,
-            text="Valid",
-            font_name='app/assets/D-DIN.otf',
-            color=(1, 1, 1, 1),
-            opacity=0,
-            background_normal='app/assets/drop.png',
-            background_down='app/assets/drop.png')
-        self.button_drop_2.bind(on_release=self.dropdown_swap2)
-        self.button_drop_2.bind(on_release=self.dropdown_open_close)
-        self.add_widget(self.button_drop_2, index=2)
-        self.button_drop_3 = Button(
-            size_hint_x=0.5,
-            pos_hint={"x": 0, "y": 0.252},
-            size_hint_y=0.05,
-            text="Consumed",
-            font_name='app/assets/D-DIN.otf',
-            color=(1, 1, 1, 1),
-            opacity=0,
-            background_normal='app/assets/drop.png',
-            background_down='app/assets/drop.png')
-        self.button_drop_3.bind(on_release=self.dropdown_swap3)
-        self.button_drop_3.bind(on_release=self.dropdown_open_close)
-        self.add_widget(self.button_drop_3, index=3)
+        self.dropdown_validity = DropDown()
+        items = ["Consumed", "Valid", "Invalid"]
 
-    def dropdown_swap1(self, event):
-        self.ids.button_drop_main.text = self.button_drop_1.text
+        for item in items:
+            opts = Button(
+                text=item,
+                size_hint_y=None,
+                height=30,
+                font_name='app/assets/D-DIN.otf')
+            opts.bind(on_release=lambda opt: self.dropdown_validity.select(opt.text))
+            self.dropdown_validity.add_widget(opts)
 
-    def dropdown_swap2(self, event):
-        self.ids.button_drop_main.text = self.button_drop_2.text
+        self.main_button = Button(
+            text='consumed',
+            size_hint=(0.5, 0.05),
+            pos_hint={'x': 0, 'y': 0.1},
+            font_name='app/assets/D-DIN.otf')
+        self.main_button.bind(on_release=self.dropdown_validity.open)
+        self.dropdown_validity.bind(on_select=lambda instance, x: setattr(self.main_button, 'text', x))
 
-    def dropdown_swap3(self, event):
-        self.ids.button_drop_main.text = self.button_drop_3.text
-
-    def dropdown_open_close(self, event):
-        if self.button_drop_1.opacity:
-            self.button_drop_1.opacity = 0
-            self.button_drop_2.opacity = 0
-            self.button_drop_3.opacity = 0
-        else:
-            self.button_drop_1.opacity = 1
-            self.button_drop_2.opacity = 1
-            self.button_drop_3.opacity = 1
+        self.add_widget(self.main_button, index=1)
 
 
 class ScanAnalyze(Preview):
@@ -277,11 +240,21 @@ class ScanAnalyze(Preview):
                 self.extracted_data(list_of_all_barcodes[0].data.decode('utf-8'))
 
 
+class Sm(MDScreenManager):
+    def __init__(self):
+        super(Sm, self).__init__()
+
+        self.add_widget(LoginScreen(name='login'))
+        self.add_widget(ScanScreen(name='scan'))
+        self.add_widget(TokenScreen(name='token'))
+        self.add_widget(ValidInvalidUsedScreen(name='valid_invalid_used'))
+        self.add_widget(PaylessScreen(name='payless'))
+
+
 class IngeniumApp(MDApp):
 
     def __init__(self):
         super(IngeniumApp, self).__init__()
-        self.sm = MDScreenManager()
         self.token: PyToken | None = None
         self.visibility: bool = False
         self.iconpath: str = ""
@@ -304,13 +277,7 @@ class IngeniumApp(MDApp):
         if platform == 'android':
             from pythonforandroid.recipes.android.src.android.permissions import request_permissions, Permission
             request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO])
-
-        self.sm.add_widget(LoginScreen(name='login'))
-        self.sm.add_widget(ScanScreen(name='scan'))
-        self.sm.add_widget(TokenScreen(name='token'))
-        self.sm.add_widget(ValidInvalidUsedScreen(name='valid_invalid_used'))
-        self.sm.add_widget(PaylessScreen(name='payless'))
-        return self.sm
+        return Sm()
 
 
 if __name__ == '__main__':

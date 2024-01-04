@@ -60,16 +60,15 @@ class LoginScreen(MDScreen):
         app.token = authenticate(self.ids.mail.text.lower(), self.ids.passw.text)
         if app.token == "login_error":
             self.ids.validitylabel.text = "Email of wachtwoord incorrect"
+        elif app.token == "server_error":
+            self.ids.validitylabel.text = "Kon geen verbinding met de server maken"
         else:
             self.ids.validitylabel.text = ""
 
     def buttonpress(self):
-        if app.token == "login_error":
-            scanner_allowed = False
-        else:
-            scanner_allowed = True
-        self.manager.transition.direction = "left"
-        self.manager.current = "scan" if scanner_allowed else "login"
+        if app.token != "login_error" and app.token != "server_error":
+            self.manager.transition.direction = "left"
+            self.manager.current = "scan"
 
 
 class ScanScreen(MDScreen):

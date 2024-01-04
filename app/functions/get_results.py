@@ -17,6 +17,9 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
     if transactions == [] or transactions == "uuid_invalid":
         return {"validity": "UUIDError"}
     for transaction in transactions:
+        if transaction.validity.value == "forbidden":
+            event_tickets = ["forbidden"]
+            break
         products_str = str()
         products_str += (str(transaction.count) + " x "
                          + str(transaction.interaction.item_name.lower()) + ':\n'
@@ -30,7 +33,7 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
             event_tickets.append(transaction)
     userdata = get_userdata(transactions[0].interaction.user_id)
     i = 0
-    if event_tickets:
+    if event_tickets != [] and event_tickets != ["forbidden"]:
         for i in range(len(event_tickets)):
             if event_tickets[i].validity.value != "consumed":
                 break
@@ -41,6 +44,8 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
                 "voornaam": userdata["voornaam"],
                 "naam": userdata["achternaam"],
                 "lidstatus": str(userdata["lidstatus"])}
+    elif event_tickets == ["forbidden"]:
+        return {"validity": "UUIDError"}
     else:
         return {"validity": "eventError",
                 "table_data": table_data,

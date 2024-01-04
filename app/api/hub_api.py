@@ -1,5 +1,6 @@
 import requests
 from pydantic import BaseModel
+import datetime
 
 from app.api.data_models import PyStaffTransaction
 
@@ -90,3 +91,15 @@ def get_transactions(token: PyToken,
         return "uuid_invalid"
     else:
         print(response.json())
+
+
+def get_all_events(current_date: datetime.datetime) -> dict:
+    current_date += datetime.timedelta(days=1)  # add 1 day just in case
+    moment = "&end_date_ge=" + str(current_date).replace(":", "%3A").replace(" ", "T")+"%2B00%3A00"
+    response = requests.get(url=api_url + "staff/event?limit=50&offset=0&available=true&disabled=false")
+    if response.status_code == 200:
+        return_dict: dict = dict()
+        for event in response.json():
+            if event["event_item"] is not None:
+                return_dict[event["item"]["name"]] = event["item"]["uuid"]
+        return return_dict

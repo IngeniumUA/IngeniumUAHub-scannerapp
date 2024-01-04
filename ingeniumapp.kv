@@ -6,23 +6,6 @@
     PaylessScreen:
 
 <ScanScreen>:
-    MDLabel:
-        size_hint_y: None
-		height:'30dp'
-		size_hint_x: 0.3
-        pos_hint: {"x":0, "y":0.92}
-		text: "Event "
-		font_name: 'app/assets/D-DIN.otf'
-		halign: 'right'
-
-	TextInput:
-		size_hint_y: None
-		height:'30dp'
-		size_hint_x: 0.55
-        pos_hint: {"x":0.3, "y":0.92}
-        id: event
-        multiline: False
-        font_name: 'app/assets/D-DIN.otf'
 
     ScanAnalyze:
         size_hint_y: 0.8
@@ -35,7 +18,7 @@
         size_hint_y: 0.08
         size_hint_x: 0.98
         pos_hint: {"x":0.01, "y":0}
-        text: "Back"
+        text: "Terug"
         font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1
         background_normal: 'app/assets/buttonnormal.png'
@@ -70,7 +53,7 @@
 		height:'30dp'
 		size_hint_x: 0.3
         pos_hint: {"x":0, "y":0.65}
-		text: "Password "
+		text: "Wachtwoord "
 		font_name: 'app/assets/D-DIN.otf'
 		halign: 'right'
 
@@ -99,7 +82,7 @@
         id: confirmbutton
         size_hint: .5, .08
         pos_hint: {"x":0.25, "y":0.5}
-        text: "Submit"
+        text: "Log in"
         font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1
         background_normal: 'app/assets/buttonnormal.png'
@@ -114,7 +97,7 @@
         cols:1
         MDLabel:
             halign: "center"
-            text: "Refreshing Token"
+            text: "Token verversen"
             font_name: 'app/assets/D-DIN.otf'
 			size_hint_y: 0.8
 			background_color: 0, 0, 1, 1
@@ -126,7 +109,7 @@
                     pos: self.pos
         Button:
             size_hint_y: 0.2
-            text: "Back"
+            text: "Terug"
             font_name: 'app/assets/D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'app/assets/buttonnormal.png'
@@ -139,7 +122,7 @@
     Button:
         size_hint_y: 0.1
         pos_hint: {"x":0, "y":0.9}
-        text: "More info"
+        text: "Meer info"
         id: more_info_button
         font_name: 'app/assets/D-DIN.otf'
         background_normal: 'app/assets/buttonnormal.png'
@@ -304,7 +287,7 @@
                 size: self.size
                 pos: self.pos
         id: validity_text
-        text: "Validity: "
+        text: "Geldigheid: "
         font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.03
     MDLabel:
@@ -338,7 +321,7 @@
                 size: self.size
                 pos: self.pos
         id: checkout_status_text
-        text: "Checkout: "
+        text: "Status: "
         font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.03
     MDLabel:
@@ -361,7 +344,7 @@
     Button:
         size_hint: 0.5, 0.05
         pos_hint: {"x":0.5, "y":0.1}
-        text: "Update Validity"
+        text: "Update Geldigheid"
         font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1
         background_normal: 'app/assets/buttonnormal.png'
@@ -373,7 +356,7 @@
         size_hint_x: 1
         pos_hint: {"x":0, "y":0}
         size_hint_y: 0.1
-        text: "Back"
+        text: "Terug"
         font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1
         background_normal: 'app/assets/buttonnormal.png'
@@ -392,7 +375,7 @@
 			size_hint_y: 0.8
         Button:
             size_hint_y: 0.2
-            text: "Back"
+            text: "Terug"
             font_name: 'app/assets/D-DIN.otf'
             color: 1,1,1,1
             background_normal: 'app/assets/buttonnormal.png'

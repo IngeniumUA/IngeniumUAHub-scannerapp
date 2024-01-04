@@ -15,8 +15,9 @@ from kivymd.uix.datatables import MDDataTable
 from camera4kivy import Preview
 from PIL import Image
 from pyzbar.pyzbar import decode
+import datetime
 
-from app.api.hub_api import PyToken, refresh_token, update_validity, authenticate
+from app.api.hub_api import PyToken, refresh_token, update_validity, authenticate, get_all_events
 from app.functions.get_results import get_results
 from app.screens.trivial_screens import TokenScreen, PaylessScreen
 
@@ -25,9 +26,9 @@ Config.set('graphics', 'resizable', True)
 
 def alg_make_visible(self, visibility: bool):
     if visibility:
-        self.ids.more_info_button.text = "Less info"
+        self.ids.more_info_button.text = "Minder info"
     else:
-        self.ids.more_info_button.text = "More info"
+        self.ids.more_info_button.text = "Meer info"
 
     self.ids.voornaam_drop.text = app.voornaam
     self.ids.naam_drop.text = app.naam
@@ -58,7 +59,7 @@ class LoginScreen(MDScreen):
     def login(self):
         app.token = authenticate(self.ids.mail.text.lower(), self.ids.passw.text)
         if app.token == "login_error":
-            self.ids.validitylabel.text = "Email or Password incorrect"
+            self.ids.validitylabel.text = "Email of wachtwoord incorrect"
         else:
             self.ids.validitylabel.text = ""
 
@@ -77,6 +78,7 @@ class ScanScreen(MDScreen):
 
     def on_kv_post(self, obj):
         self.ids.preview.connect_camera(enable_analyze_pixels=True, default_zoom=0.0)
+        self.load_dropdown_events()
 
     def stopping(self):
         self.ids.preview.disconnect_camera()
@@ -84,10 +86,10 @@ class ScanScreen(MDScreen):
     @mainthread
     def got_result(self, result):
 
-        if result == app.prev_result and self.ids.event.text.lower() == app.prev_event:
+        if result == app.prev_result:
             return
 
-        response_dict = get_results(app.token, result, self.ids.event.text.lower())
+        response_dict = get_results(app.token, result, self.event_items[app.main_button_events.text])
         if (response_dict["validity"] == "valid"
                 or response_dict["validity"] == "invalid"
                 or response_dict["validity"] == "consumed"
@@ -131,10 +133,40 @@ class ScanScreen(MDScreen):
             print("ERROR - validity unknown")
 
         app.prev_result = result
-        app.prev_event = self.ids.event.text.lower()
+
+    def load_dropdown_events(self):
+        self.dropdown_events = DropDown()
+        self.event_items = get_all_events(datetime.datetime.now())
+        self.event_items['Selecteer een evenement'] = ""
+
+        for item in list(self.event_items.keys()):
+            opts_events = Button(
+                text=item,
+                size_hint_y=None,
+                height=dp(30),
+                font_name='app/assets/D-DIN.otf')
+            opts_events.bind(on_release=lambda opt_events: self.dropdown_events.select(opt_events.text))
+            self.dropdown_events.add_widget(opts_events)
+
+        app.main_button_events = Button(
+            text='Selecteer een evenement',
+            size_hint=(0.9, None),
+            height=dp(30),
+            pos_hint={'x': 0.05, 'y': 0.93},
+            font_name='app/assets/D-DIN.otf')
+        app.main_button_events.bind(on_release=self.dropdown_events.open)
+        self.dropdown_events.bind(on_select=lambda instance, x: setattr(app.main_button_events, 'text', x))
+
+        self.add_widget(app.main_button_events, index=1)
 
 
 class ValidInvalidUsedScreen(MDScreen):
+    def __init__(self, **kwargs):
+        super(ValidInvalidUsedScreen, self).__init__(**kwargs)
+
+        self.product_table: MDDataTable = MDDataTable()
+        self.added_item: int = 0
+
     def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
         self.load_table()
@@ -218,7 +250,7 @@ class ValidInvalidUsedScreen(MDScreen):
             self.dropdown_validity.add_widget(opts)
 
         self.main_button = Button(
-            text='consumed',
+            text='Consumed',
             size_hint=(0.5, 0.05),
             pos_hint={'x': 0, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')
@@ -259,7 +291,6 @@ class IngeniumApp(MDApp):
         self.visibility: bool = False
         self.iconpath: str = ""
 
-        self.prev_event: str = ""
         self.prev_result: str = ""
         self.voornaam: str = ""
         self.naam: str = ""
@@ -269,6 +300,8 @@ class IngeniumApp(MDApp):
         self.validity: str = ""
         self.checkout_status: str = ""
         self.id_list: list = []
+
+        self.main_button_events: Button | None = None
 
     def on_stop(self):
         ScanScreen.stopping(ScanScreen())

@@ -6,23 +6,25 @@
     PaylessScreen:
 
 <ScanScreen>:
-    MDLabel:
-        id: event_empty
-		size_hint_y: None
-		height:'30dp'
-		size_hint_x: 0.7
-        pos_hint: {"x":0.15, "y":0.9}
-		halign: 'center'
-		color: 1,0,0,1
-		font_size: 17
-		font_name: 'app/assets/D-DIN.otf'
-
     ScanAnalyze:
         size_hint_y: 0.8
         size_hint_x: 0.98
         pos_hint: {"x":0.01, "y":0.1}
         id:preview
         extracted_data: root.got_result
+
+    MDLabel:
+        id: event_empty
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.7
+        pos_hint: {"x":0.15, "y":0.5}
+		halign: 'center'
+		color: 1,0,0,1
+		text: "Selecteer eerst een evenement"
+		opacity: 0
+		font_size: 50
+		font_name: 'app/assets/D-DIN.otf'
 
     Button:
         size_hint_y: 0.08
@@ -357,7 +359,7 @@
         background_normal: 'app/assets/buttonnormal.png'
         background_down: 'app/assets/buttondown.png'
         on_release:
-            root.change_validity()
+            root.change_validity(False)
 
     Button:
         size_hint_x: 1

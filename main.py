@@ -135,7 +135,7 @@ class ScanScreen(MDScreen):
             self.manager.transition.direction = "left"
             self.manager.current = "payless"
         elif response_dict["validity"] == "emptyEvent":
-            self.ids.event_empty.text = "Selecteer eerst een evenement"
+            self.ids.event_empty.opacity = 1
         else:
             print("ERROR - validity unknown")
 
@@ -159,16 +159,16 @@ class ScanScreen(MDScreen):
             text='Selecteer een evenement',
             size_hint=(0.9, None),
             height=dp(30),
-            pos_hint={'x': 0.05, 'y': 0.95},
+            pos_hint={'x': 0.05, 'y': 0.92},
             font_name='app/assets/D-DIN.otf')
         app.main_button_events.bind(on_release=self.dropdown_events.open)
-        app.main_button_events.bind(on_release=self.reset_event_empty)
+        app.main_button_events.bind(on_release=lambda x: self.reset_event_empty())
         self.dropdown_events.bind(on_select=lambda instance, x: setattr(app.main_button_events, 'text', x))
 
         self.add_widget(app.main_button_events, index=1)
 
     def reset_event_empty(self):
-        self.ids.event_empty.text = ""
+        self.ids.event_empty.opacity = 0
 
 
 class ValidInvalidUsedScreen(MDScreen):
@@ -181,8 +181,10 @@ class ValidInvalidUsedScreen(MDScreen):
     def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
         self.load_table()
-        self.add_first_nonconsumed()
-        self.change_validity()
+        if app.iconpath != "app/assets/xmark.png":
+            self.add_first_nonconsumed()
+            self.change_validity(True)
+            app.id_list = []
 
     def on_kv_post(self, obj):
         self.load_dropdown()
@@ -190,14 +192,18 @@ class ValidInvalidUsedScreen(MDScreen):
     def on_leave(self):
         app.id_list = []
 
-    def change_validity(self):
+    def change_validity(self, by_entry: bool):
+        if by_entry:
+            validity = "consumed"
+        else:
+            validity = self.main_button.text.lower()
         for ids in app.id_list:
-            update_validity(ids, self.main_button.text.lower())
+            update_validity(ids, validity)
             for i in range(len(app.table_data)):
                 if app.table_data[i][3] == str(ids):
                     self.product_table.update_row(self.product_table.row_data[i],
                                                   [self.product_table.row_data[i][0],
-                                                   "[size=15]" + self.main_button.text.lower() + "[/size]",
+                                                   "[size=15]" + validity + "[/size]",
                                                    self.product_table.row_data[i][2],
                                                    self.product_table.row_data[i][3]])
 

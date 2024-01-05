@@ -1,5 +1,5 @@
 from app.api.data_models import PyStaffTransaction
-from app.api.hub_api import get_transactions, get_userdata
+from app.api.hub_api import get_transactions, get_userdata, get_niet_lid_price
 
 
 def get_results(api_token, uuid: str, event_uuid) -> dict:
@@ -26,13 +26,20 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
         products_str += (str(transaction.count) + " x "
                          + str(transaction.interaction.item_name.lower()) + ':\n'
                          + str(transaction.product["name"]))
-        amount = '€' + "%.2f" % transaction.amount
-        table_data.append(("[size=15]" + products_str + "[/size]",
-                           "[size=15]" + str(transaction.validity.value) + "[/size]",
-                           "[size=15]" + amount + "[/size]",
-                           str(transaction.interaction.id)))
         if transaction.interaction.item_id == event_uuid:
             event_tickets.append(transaction)
+            if transaction.validity.value == "invalid":
+                niet_lid_price = get_niet_lid_price(transaction.product_blueprint_id)
+                to_pay = niet_lid_price*transaction.count - float(transaction.amount)
+            else:
+                to_pay = 0
+            to_pay = '€' + "%.2f" % to_pay
+        else:
+            to_pay = "NVT"
+        table_data.append(("[size=15]" + products_str + "[/size]",
+                           "[size=15]" + str(transaction.validity.value) + "[/size]",
+                           "[size=15]" + to_pay + "[/size]",
+                           "[size=15]" + str(transaction.interaction.id) + "[/size]"))
     userdata = get_userdata(transactions[0].interaction.user_id)
     i = 0
     if event_tickets != [] and event_tickets != ["forbidden"]:

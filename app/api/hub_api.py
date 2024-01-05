@@ -119,3 +119,17 @@ def get_all_events(current_date: datetime.datetime) -> dict:
             if event["event_item"] is not None:
                 return_dict[event["item"]["name"]] = event["item"]["uuid"]
         return return_dict
+
+
+def get_niet_lid_price(product_blueprint_id) -> float:
+    try:
+        response = requests.get(url=api_url + "staff/blueprint/" + str(product_blueprint_id))
+    except requests.exceptions.ConnectionError:
+        return 999
+    if response.status_code == 200:
+        policy_list = []
+        for policy in response.json()["price_policies"]:
+            policy_list.append(policy["price"])
+        return max(policy_list)
+    else:
+        return 999

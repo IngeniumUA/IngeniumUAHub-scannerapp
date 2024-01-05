@@ -41,6 +41,13 @@ def alg_make_visible(self, visibility: bool):
     self.ids.validity_button.disabled = not visibility
     self.main_button.disabled = not visibility
 
+    if app.iconpath == "app/assets/dashmark.png" and visibility:
+        self.remove_widget(self.main_button_invalids)
+        self.remove_widget(self.confirm_button_invalids)
+    elif app.iconpath == "app/assets/dashmark.png":
+        self.add_widget(self.main_button_invalids, index=2)
+        self.add_widget(self.confirm_button_invalids, index=1)
+
     objs = [self.ids.voornaam_drop,
             self.ids.voornaam_text,
             self.ids.naam_drop,
@@ -169,6 +176,7 @@ class ScanScreen(MDScreen):
 
     def reset_event_empty(self):
         self.ids.event_empty.opacity = 0
+        app.prev_result = ""
 
 
 class ValidInvalidUsedScreen(MDScreen):
@@ -181,16 +189,21 @@ class ValidInvalidUsedScreen(MDScreen):
     def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
         self.load_table()
-        if app.iconpath != "app/assets/xmark.png":
+        if app.iconpath == "app/assets/checkmark.png":
             self.add_first_nonconsumed()
             self.change_validity(True)
             app.id_list = []
+        if app.iconpath == "app/assets/dashmark.png":
+            self.load_dropdown_invalids()
 
     def on_kv_post(self, obj):
         self.load_dropdown()
 
     def on_leave(self):
         app.id_list = []
+        if app.iconpath == "app/assets/dashmark.png":
+            self.remove_widget(self.main_button_invalids)
+            self.remove_widget(self.confirm_button_invalids)
 
     def change_validity(self, by_entry: bool):
         if by_entry:
@@ -200,7 +213,7 @@ class ValidInvalidUsedScreen(MDScreen):
         for ids in app.id_list:
             update_validity(ids, validity)
             for i in range(len(app.table_data)):
-                if app.table_data[i][3] == str(ids):
+                if app.table_data[i][3].replace('[size=15]', '').replace("[/size]", "") == str(ids):
                     self.product_table.update_row(self.product_table.row_data[i],
                                                   [self.product_table.row_data[i][0],
                                                    "[size=15]" + validity + "[/size]",
@@ -215,8 +228,8 @@ class ValidInvalidUsedScreen(MDScreen):
             pos_hint={"x": 0, "y": 0.15},
             column_data=[("[size=15]Item[/size]", dp(Window.width * 0.062 * 1.55)),
                          ("[size=15]Validity[/size]", dp(Window.width * 0.023 * 1.55)),
-                         ("[size=15]Amount[/size]", dp(Window.width * 0.015 * 1.55)),
-                         ("id", dp(Window.width + 10))],
+                         ("[size=15]To Pay[/size]", dp(Window.width * 0.015 * 1.55)),
+                         ("[size=15]id[/size]", dp(Window.width * 0.015 * 1.55))],
             row_data=app.table_data,
             opacity=0,
             disabled=True,
@@ -228,15 +241,15 @@ class ValidInvalidUsedScreen(MDScreen):
         self.add_widget(self.product_table, index=9)
 
     def check_press(self, instance_table, current_row):
-        if int(current_row[3]) in app.id_list:
-            app.id_list.remove(int(current_row[3]))
+        if int(current_row[3].replace('[size=15]', '').replace("[/size]", "")) in app.id_list:
+            app.id_list.remove(int(current_row[3].replace('[size=15]', '').replace("[/size]", "")))
         else:
-            app.id_list.append(int(current_row[3]))
+            app.id_list.append(int(current_row[3].replace('[size=15]', '').replace("[/size]", "")))
 
     def add_first_nonconsumed(self):
         for row in app.table_data:
             if row[1] != '[size=15]consumed[/size]':
-                app.id_list.append(int(row[3]))
+                app.id_list.append(int(row[3].replace('[size=15]', '').replace("[/size]", "")))
                 break
 
     def make_visible(self):
@@ -271,7 +284,79 @@ class ValidInvalidUsedScreen(MDScreen):
         self.main_button.bind(on_release=self.dropdown_validity.open)
         self.dropdown_validity.bind(on_select=lambda instance, x: setattr(self.main_button, 'text', x))
 
-        self.add_widget(self.main_button, index=1)
+        self.add_widget(self.main_button, index=3)
+
+    def load_dropdown_invalids(self):
+        self.dropdown_invalids = DropDown()
+        first = True
+        huidig = ""
+        floatalle = 0
+        self.saved_i = 0
+        for i in range(len(app.table_data)):
+            amount = app.table_data[i][2].replace("[size=15]€", "").replace("[/size]", "").replace("[size=15]NVT", "0")
+            amount = float(amount)
+            if first and int(amount) != 0:
+                huidig = "%.2f" % (amount / int(app.table_data[i][0].split(" x ")[0]))
+                self.saved_i = i
+                first = False
+            floatalle += amount
+        if huidig == "":
+            huidig = "%.2f" % 0
+        huidig = "Huidig ticket: €" + huidig
+        alle = "Alle Tickets: €" + "%.2f" % floatalle
+        self.invalids_items = [huidig, alle]
+
+        for item in self.invalids_items:
+            opts_invalids = Button(
+                text=item,
+                size_hint_y=None,
+                height=dp(30),
+                font_name='app/assets/D-DIN.otf')
+            opts_invalids.bind(on_release=lambda opt_invalids: self.dropdown_invalids.select(opt_invalids.text))
+            self.dropdown_invalids.add_widget(opts_invalids)
+
+        self.main_button_invalids = Button(
+            text=huidig,
+            size_hint=(0.5, 0.05),
+            pos_hint={'x': 0, 'y': 0.1},
+            font_name='app/assets/D-DIN.otf')
+        self.main_button_invalids.bind(on_release=self.dropdown_invalids.open)
+        self.dropdown_invalids.bind(on_select=lambda instance, x: setattr(self.main_button_invalids, 'text', x))
+
+        self.add_widget(self.main_button_invalids, index=2)
+
+        self.confirm_button_invalids = Button(
+            text="Valideer",
+            size_hint=(0.5, 0.05),
+            pos_hint={'x': 0.5, 'y': 0.1},
+            font_name='app/assets/D-DIN.otf',
+            background_normal='app/assets/buttonnormal.png',
+            background_down='app/assets/buttondown.png')
+        self.confirm_button_invalids.bind(on_release=lambda x: self.validate())
+        self.add_widget(self.confirm_button_invalids, index=1)
+
+    def validate(self):
+        if self.main_button_invalids.text.startswith("Huidig ticket"):
+            ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=15]', '').replace("[/size]", ""))
+            update_validity(ids, "consumed")
+            to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
+            new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=15]€', '')
+                               .replace("[/size]", "")) - to_subtract
+            self.product_table.update_row(self.product_table.row_data[self.saved_i],
+                                          [self.product_table.row_data[self.saved_i][0],
+                                           "[size=15]" + "consumed" + "[/size]",
+                                           '[size=15]€' + "%.2f" % new_to_pay + "[/size]",
+                                           self.product_table.row_data[self.saved_i][3]])
+        else:
+            for i in range(len(app.table_data)):
+                if self.product_table.row_data[i][1] == "[size=15]invalid[/size]":
+                    ids = int(self.product_table.row_data[i][3].replace('[size=15]', '').replace("[/size]", ""))
+                    update_validity(ids, "consumed")
+                    self.product_table.update_row(self.product_table.row_data[i],
+                                                  [self.product_table.row_data[i][0],
+                                                   "[size=15]" + "consumed" + "[/size]",
+                                                   '[size=15]€' + "0.00" + "[/size]",
+                                                   self.product_table.row_data[i][3]])
 
 
 class ScanAnalyze(Preview):

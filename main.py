@@ -37,6 +37,10 @@ def alg_make_visible(self, visibility: bool):
     self.ids.validity_drop.text = app.validity
     self.ids.checkout_status_drop.text = app.checkout_status
 
+    self.product_table.disabled = not visibility
+    self.ids.validity_button.disabled = not visibility
+    self.main_button.disabled = not visibility
+
     objs = [self.ids.voornaam_drop,
             self.ids.voornaam_text,
             self.ids.naam_drop,
@@ -49,7 +53,9 @@ def alg_make_visible(self, visibility: bool):
             self.ids.validity_drop,
             self.ids.validity_text,
             self.ids.checkout_status_drop,
-            self.ids.checkout_status_text]
+            self.ids.checkout_status_text,
+            self.main_button,
+            self.ids.validity_button]
 
     for obj in objs:
         obj.opacity = int(visibility)
@@ -128,6 +134,8 @@ class ScanScreen(MDScreen):
         elif response_dict["validity"] == "UUIDError":
             self.manager.transition.direction = "left"
             self.manager.current = "payless"
+        elif response_dict["validity"] == "emptyEvent":
+            self.ids.event_empty.text = "Selecteer eerst een evenement"
         else:
             print("ERROR - validity unknown")
 
@@ -151,12 +159,16 @@ class ScanScreen(MDScreen):
             text='Selecteer een evenement',
             size_hint=(0.9, None),
             height=dp(30),
-            pos_hint={'x': 0.05, 'y': 0.93},
+            pos_hint={'x': 0.05, 'y': 0.95},
             font_name='app/assets/D-DIN.otf')
         app.main_button_events.bind(on_release=self.dropdown_events.open)
+        app.main_button_events.bind(on_release=self.reset_event_empty)
         self.dropdown_events.bind(on_select=lambda instance, x: setattr(app.main_button_events, 'text', x))
 
         self.add_widget(app.main_button_events, index=1)
+
+    def reset_event_empty(self):
+        self.ids.event_empty.text = ""
 
 
 class ValidInvalidUsedScreen(MDScreen):
@@ -170,6 +182,7 @@ class ValidInvalidUsedScreen(MDScreen):
         self.ids.validity_image.source = app.iconpath
         self.load_table()
         self.add_first_nonconsumed()
+        self.change_validity()
 
     def on_kv_post(self, obj):
         self.load_dropdown()
@@ -200,6 +213,7 @@ class ValidInvalidUsedScreen(MDScreen):
                          ("id", dp(Window.width + 10))],
             row_data=app.table_data,
             opacity=0,
+            disabled=True,
             background_color=(1, 1, 1, 1),
             background_color_cell=(0, 0, 1, 0),
             background_color_header=(0, 0, 1, 0),
@@ -208,22 +222,15 @@ class ValidInvalidUsedScreen(MDScreen):
         self.add_widget(self.product_table, index=9)
 
     def check_press(self, instance_table, current_row):
-        if int(current_row[3]) in app.id_list and int(current_row[3]) != self.added_item:
+        if int(current_row[3]) in app.id_list:
             app.id_list.remove(int(current_row[3]))
-        elif int(current_row[3]) == self.added_item:
-            self.added_item = 0
-        elif self.added_item != 0:
-            app.id_list.append(int(current_row[3]))
-            app.id_list.remove(self.added_item)
         else:
             app.id_list.append(int(current_row[3]))
 
     def add_first_nonconsumed(self):
-        self.added_item: int = 0
         for row in app.table_data:
             if row[1] != '[size=15]consumed[/size]':
                 app.id_list.append(int(row[3]))
-                self.added_item = int(row[3])
                 break
 
     def make_visible(self):
@@ -249,7 +256,9 @@ class ValidInvalidUsedScreen(MDScreen):
             self.dropdown_validity.add_widget(opts)
 
         self.main_button = Button(
-            text='Consumed',
+            text='Valid',
+            opacity=0,
+            disabled=True,
             size_hint=(0.5, 0.05),
             pos_hint={'x': 0, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')

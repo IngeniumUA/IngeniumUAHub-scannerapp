@@ -9,6 +9,8 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
     :param event_uuid:
     :return:
     """
+    if event_uuid == "":
+        return {"validity": "emptyEvent"}
     transactions: list[PyStaffTransaction] = get_transactions(token=api_token, checkout_id=str(uuid))
     table_data = []
     event_tickets = []

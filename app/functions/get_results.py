@@ -1,47 +1,65 @@
 from app.api.data_models import PyStaffTransaction
-from app.api.hub_api import get_transactions, get_userdata
+from app.api.hub_api import get_transactions, get_userdata, get_niet_lid_price
 
 
-def get_results(api_token, uuid: str, event):
+def get_results(api_token, uuid: str, event_uuid) -> dict:
     """
     :param api_token:
     :param uuid:
-    :param event:
+    :param event_uuid:
     :return:
     """
+    if event_uuid == "":
+        return {"validity": "emptyEvent"}
     transactions: list[PyStaffTransaction] = get_transactions(token=api_token, checkout_id=str(uuid))
-    products_str = str()
-    transaction_to_save = []
+    table_data = []
+    event_tickets = []
     if transactions == "login_invalid":
         return {"validity": "APITokenError"}
     if transactions == [] or transactions == "uuid_invalid":
         return {"validity": "UUIDError"}
     for transaction in transactions:
-        products_str += str(transaction.count) + " x " + str(transaction.interaction.item_name.lower()) + ", "
-        if transaction.interaction.item_name.lower() == event:
-            transaction_to_save.append(transaction)
-    if transaction_to_save:
-        userdata = get_userdata(transaction_to_save[0].interaction.user_id)
-
-        transaction_to_save_len = len(transaction_to_save)
-        item_to_return = 0
-        for item_to_return in range(transaction_to_save_len):
-            if (transaction_to_save[item_to_return].validity.value != "consumed"
-                    or item_to_return == transaction_to_save_len - 1):
+        if transaction.validity.value == "forbidden":
+            event_tickets = ["forbidden"]
+            break
+        products_str = str()
+        products_str += (str(transaction.count) + " x "
+                         + str(transaction.interaction.item_name.lower()) + ':\n'
+                         + str(transaction.product["name"]))
+        if transaction.interaction.item_id == event_uuid:
+            event_tickets.append(transaction)
+            if transaction.validity.value == "invalid":
+                niet_lid_price = get_niet_lid_price(transaction.product_blueprint_id)
+                to_pay = niet_lid_price*transaction.count - float(transaction.amount)
+            else:
+                to_pay = 0
+            to_pay = '€' + "%.2f" % to_pay
+        else:
+            to_pay = "NVT"
+        table_data.append(("[size=15]" + products_str + "[/size]",
+                           "[size=15]" + str(transaction.validity.value) + "[/size]",
+                           "[size=15]" + to_pay + "[/size]",
+                           "[size=15]" + str(transaction.interaction.id) + "[/size]"))
+    userdata = get_userdata(transactions[0].interaction.user_id)
+    i = 0
+    if event_tickets != [] and event_tickets != ["forbidden"]:
+        for i in range(len(event_tickets)):
+            if event_tickets[i].validity.value != "consumed":
                 break
-
-        return {"validity": transaction_to_save[item_to_return].validity.value,
-                "id": transaction_to_save[item_to_return].interaction.id,
-                "products": products_str,
-                "email": transaction_to_save[item_to_return].interaction.user_email,
-                "checkout_status": transaction_to_save[item_to_return].status.value,
-                "voornaam_naam": userdata["voornaam"] + " " + userdata["achternaam"],
+        return {"validity": event_tickets[i].validity.value,
+                "table_data": table_data,
+                "email": event_tickets[i].interaction.user_email,
+                "checkout_status": event_tickets[i].status.value,
+                "voornaam": userdata["voornaam"],
+                "naam": userdata["achternaam"],
                 "lidstatus": str(userdata["lidstatus"])}
+    elif event_tickets == ["forbidden"]:
+        return {"validity": "UUIDError"}
     else:
-        userdata = get_userdata(transactions[0].interaction.user_id)
         return {"validity": "eventError",
-                "products": products_str,
+                "table_data": table_data,
                 "email": transactions[0].interaction.user_email,
                 "checkout_status": transactions[0].status.value,
-                "voornaam_naam": userdata["voornaam"] + " " + userdata["achternaam"],
+                "voornaam": userdata["voornaam"],
+                "naam": userdata["achternaam"],
                 "lidstatus": str(userdata["lidstatus"])}

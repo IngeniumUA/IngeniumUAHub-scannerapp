@@ -1,5 +1,6 @@
 import requests
 from pydantic import BaseModel
+import datetime
 
 from app.api.data_models import PyStaffTransaction
 
@@ -12,9 +13,12 @@ class PyToken(BaseModel):
 
 
 def authenticate(username: str, password: str) -> PyToken | str:
-    response = requests.post(
-        api_url + "auth/token",
-        {'username': username, 'password': password})
+    try:
+        response = requests.post(
+            api_url + "auth/token",
+            {'username': username, 'password': password})
+    except requests.exceptions.ConnectionError:
+        return "server_error"
     if response.status_code == 200:  # OK
         return PyToken(**response.json())
     else:
@@ -22,15 +26,21 @@ def authenticate(username: str, password: str) -> PyToken | str:
 
 
 def refresh_token(token: PyToken) -> PyToken:
-    response = requests.post(
-        api_url + "auth/refresh",
-        {token})
+    try:
+        response = requests.post(
+            api_url + "auth/refresh",
+            {token})
+    except requests.exceptions.ConnectionError:
+        return PyToken()
     if response.status_code == 200:  # OK
         return PyToken(**response.json())
 
 
 def get_userdata(uuid: str | None = None) -> dict:
-    response = requests.get(url=api_url + "staff/user/" + uuid)
+    try:
+        response = requests.get(url=api_url + "staff/user/" + uuid)
+    except requests.exceptions.ConnectionError:
+        return {"lidstatus": False, "voornaam": "", "achternaam": ""}
     if response.status_code == 200:
         return {"lidstatus": response.json()["roles"]["is_lid"],
                 "voornaam": response.json()["user_detail"]["voornaam"],
@@ -39,8 +49,11 @@ def get_userdata(uuid: str | None = None) -> dict:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
 
 
-def update_validity(interaction_id):
-    requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": "consumed"})
+def update_validity(interaction_id, validity) -> None:
+    try:
+        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": validity})
+    except requests.exceptions.ConnectionError:
+        pass
 
 
 def get_transactions(token: PyToken,
@@ -53,7 +66,7 @@ def get_transactions(token: PyToken,
      Examples
     --------
     >>> get_transactions(token, limit=50, offset=0, ordering='date_created', status='SUCCESSFUL', validity=1)
-    [PyStaffTransaction(), ..]
+    [PyStaffTransaction(), ...]
 
      Parameters
     ----------
@@ -79,8 +92,11 @@ def get_transactions(token: PyToken,
         if value or value == 0:  # offset=0 is matches on None, solving edge case
             query_params += "&" + str(arg) + "=" + str(value)
 
-    response = requests.get(url=api_url + "staff/transaction" + query_params,
+    try:
+        response = requests.get(url=api_url + "staff/transaction" + query_params,
                             headers={"authorization": "Bearer " + token.access_token})
+    except requests.exceptions.ConnectionError:
+        return "login_invalid"
     if response.status_code == 200:
         response_body: list[dict] = response.json()  # Already correctly parsed as list of dictionaries
         return list(PyStaffTransaction(**value) for value in response_body)
@@ -88,5 +104,32 @@ def get_transactions(token: PyToken,
         return "login_invalid"
     elif response.status_code == 406:  # uuid has invalid form
         return "uuid_invalid"
+
+
+def get_all_events(current_date: datetime.datetime) -> dict:
+    current_date += datetime.timedelta(days=1)  # add 1 day just in case
+    moment = "&end_date_ge=" + str(current_date).replace(":", "%3A").replace(" ", "T")+"%2B00%3A00"
+    try:
+        response = requests.get(url=api_url + "staff/event?limit=50&offset=0&available=true&disabled=false")
+    except requests.exceptions.ConnectionError:
+        return dict()
+    if response.status_code == 200:
+        return_dict: dict = dict()
+        for event in response.json():
+            if event["event_item"] is not None:
+                return_dict[event["item"]["name"]] = event["item"]["uuid"]
+        return return_dict
+
+
+def get_niet_lid_price(product_blueprint_id) -> float:
+    try:
+        response = requests.get(url=api_url + "staff/blueprint/" + str(product_blueprint_id))
+    except requests.exceptions.ConnectionError:
+        return 999
+    if response.status_code == 200:
+        policy_list = []
+        for policy in response.json()["price_policies"]:
+            policy_list.append(policy["price"])
+        return max(policy_list)
     else:
-        print(response.json())
+        return 999

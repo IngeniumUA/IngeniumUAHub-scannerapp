@@ -4,7 +4,7 @@ import datetime
 
 from app.api.data_models import PyStaffTransaction
 
-api_url = "http://127.0.0.1:8000/api/v1/"
+api_url = "https://hub.dev.ingeniumua.be/api/v1/"
 
 
 class PyToken(BaseModel):
@@ -119,6 +119,8 @@ def get_all_events(current_date: datetime.datetime) -> dict:
             if event["event_item"] is not None:
                 return_dict[event["item"]["name"]] = event["item"]["uuid"]
         return return_dict
+    else:
+        return dict()
 
 
 def get_niet_lid_price(product_blueprint_id) -> float:

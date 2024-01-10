@@ -34,11 +34,14 @@ def refresh_token(token: PyToken) -> PyToken:
         return PyToken()
     if response.status_code == 200:  # OK
         return PyToken(**response.json())
+    else:
+        return PyToken()
 
 
-def get_userdata(uuid: str | None = None) -> dict:
+def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
     try:
-        response = requests.get(url=api_url + "staff/user/" + uuid)
+        response = requests.get(url=api_url + "staff/user/" + uuid,
+                                headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
     if response.status_code == 200:
@@ -49,9 +52,10 @@ def get_userdata(uuid: str | None = None) -> dict:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
 
 
-def update_validity(interaction_id, validity) -> None:
+def update_validity(token: PyToken, interaction_id: int, validity: str) -> None:
     try:
-        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": validity})
+        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": validity},
+                       headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:
         pass
 
@@ -106,11 +110,12 @@ def get_transactions(token: PyToken,
         return "uuid_invalid"
 
 
-def get_all_events(current_date: datetime.datetime) -> dict:
+def get_all_events(token: PyToken, current_date: datetime.datetime) -> dict:
     current_date += datetime.timedelta(days=1)  # add 1 day just in case
     moment = "&end_date_ge=" + str(current_date).replace(":", "%3A").replace(" ", "T")+"%2B00%3A00"
     try:
-        response = requests.get(url=api_url + "staff/event?limit=50&offset=0&available=true&disabled=false")
+        response = requests.get(url=api_url + "staff/event?limit=50&offset=0&available=true&disabled=false",
+                                headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:
         return dict()
     if response.status_code == 200:
@@ -123,9 +128,10 @@ def get_all_events(current_date: datetime.datetime) -> dict:
         return dict()
 
 
-def get_niet_lid_price(product_blueprint_id) -> float:
+def get_niet_lid_price(token: PyToken, product_blueprint_id: int) -> float:
     try:
-        response = requests.get(url=api_url + "staff/blueprint/" + str(product_blueprint_id))
+        response = requests.get(url=api_url + "staff/blueprint/" + str(product_blueprint_id),
+                                headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:
         return 999
     if response.status_code == 200:

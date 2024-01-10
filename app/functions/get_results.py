@@ -36,10 +36,10 @@ def get_results(api_token, uuid: str, event_uuid, run_userdata: bool = True) -> 
             to_pay = '€' + "%.2f" % to_pay
         else:
             to_pay = "NVT"
-        table_data.append(("[size=15]" + products_str + "[/size]",
-                           "[size=15]" + str(transaction.validity.value) + "[/size]",
-                           "[size=15]" + to_pay + "[/size]",
-                           "[size=15]" + str(transaction.interaction.id) + "[/size]"))
+        table_data.append(("[size=30]" + products_str + "[/size]",
+                           "[size=30]" + str(transaction.validity.value) + "[/size]",
+                           "[size=30]" + to_pay + "[/size]",
+                           "[size=30]" + str(transaction.interaction.id) + "[/size]"))
     if run_userdata:
         userdata = get_userdata(api_token, transactions[0].interaction.user_id)
     else:

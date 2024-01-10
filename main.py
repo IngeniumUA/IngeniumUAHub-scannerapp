@@ -261,10 +261,10 @@ class ValidInvalidUsedScreen(MDScreen):
             size_hint_x=1,
             check=True,
             pos_hint={"x": 0, "y": 0.15},
-            column_data=[("[size=15]Item[/size]", dp(Window.width * 0.062 * 1.55)),
-                         ("[size=15]Validity[/size]", dp(Window.width * 0.023 * 1.55)),
-                         ("[size=15]To Pay[/size]", dp(Window.width * 0.015 * 1.55)),
-                         ("[size=15]id[/size]", dp(Window.width * 0.015 * 1.55))],
+            column_data=[("[size=30]Item[/size]", dp(Window.width * 0.062 * 1.55)),
+                         ("[size=30]Validity[/size]", dp(Window.width * 0.023 * 1.55)),
+                         ("[size=30]To Pay[/size]", dp(Window.width * 0.015 * 1.55)),
+                         ("[size=30]id[/size]", dp(Window.width * 0.015 * 1.55))],
             row_data=app.table_data,
             opacity=int(start_visible),
             disabled=not start_visible,
@@ -276,17 +276,17 @@ class ValidInvalidUsedScreen(MDScreen):
         self.add_widget(self.product_table, index=9)
 
     def check_press(self, instance_table, current_row):
-        if int(current_row[3].replace('[size=15]', '').replace("[/size]", "")) in list(app.id_list.keys()):
-            del app.id_list[int(current_row[3].replace('[size=15]', '').replace("[/size]", ""))]
+        if int(current_row[3].replace('[size=30]', '').replace("[/size]", "")) in list(app.id_list.keys()):
+            del app.id_list[int(current_row[3].replace('[size=30]', '').replace("[/size]", ""))]
         else:
-            app.id_list[int(current_row[3].replace('[size=15]', '').replace("[/size]", ""))] = (
-                int(current_row[0].replace('[size=15]', '').replace("[/size]", "").split(" x ")[0]))
+            app.id_list[int(current_row[3].replace('[size=30]', '').replace("[/size]", ""))] = (
+                int(current_row[0].replace('[size=30]', '').replace("[/size]", "").split(" x ")[0]))
 
     def add_first_nonconsumed(self):
         for row in app.table_data:
-            if row[1] != '[size=15]consumed[/size]':
-                app.id_list[int(row[3].replace('[size=15]', '').replace("[/size]", ""))] = (
-                    int(row[0].replace('[size=15]', '').replace("[/size]", "").split(" x ")[0]))
+            if row[1] != '[size=30]consumed[/size]':
+                app.id_list[int(row[3].replace('[size=30]', '').replace("[/size]", ""))] = (
+                    int(row[0].replace('[size=30]', '').replace("[/size]", "").split(" x ")[0]))
                 break
 
     def make_visible(self):
@@ -306,7 +306,7 @@ class ValidInvalidUsedScreen(MDScreen):
             opts = Button(
                 text=item,
                 size_hint_y=None,
-                height=30,
+                height=dp(30),
                 font_name='app/assets/D-DIN.otf')
             opts.bind(on_release=lambda opt: self.dropdown_validity.select(opt.text))
             self.dropdown_validity.add_widget(opts)
@@ -315,7 +315,7 @@ class ValidInvalidUsedScreen(MDScreen):
             text='Valid',
             opacity=0,
             disabled=True,
-            size_hint=(0.4, 0.05),
+            size_hint=(0.425, 0.05),
             pos_hint={'x': 0, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')
         self.main_button.bind(on_release=self.dropdown_validity.open)
@@ -330,7 +330,7 @@ class ValidInvalidUsedScreen(MDScreen):
         floatalle = 0
         self.saved_i = 0
         for i in range(len(app.table_data)):
-            amount = app.table_data[i][2].replace("[size=15]€", "").replace("[/size]", "").replace("[size=15]NVT", "0")
+            amount = app.table_data[i][2].replace("[size=30]€", "").replace("[/size]", "").replace("[size=30]NVT", "0")
             amount = float(amount)
             if first and int(amount) != 0:
                 huidig = "%.2f" % (amount / int(app.table_data[i][0].split(" x ")[0]))
@@ -374,15 +374,15 @@ class ValidInvalidUsedScreen(MDScreen):
 
     def validate(self):
         if self.main_button_invalids.text.startswith("Huidig ticket"):
-            ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=15]', '').replace("[/size]", ""))
+            ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=30]', '').replace("[/size]", ""))
             update_validity(app.token, ids, "consumed", 1)
             # to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
-            # new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=15]€', '')
+            # new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=30]€', '')
             #                    .replace("[/size]", "")) - to_subtract
             # self.product_table.update_row(self.product_table.row_data[self.saved_i],
             #                               [self.product_table.row_data[self.saved_i][0],
-            #                                "[size=15]" + "consumed" + "[/size]",
-            #                                '[size=15]€' + "%.2f" % new_to_pay + "[/size]",
+            #                                "[size=30]" + "consumed" + "[/size]",
+            #                                '[size=30]€' + "%.2f" % new_to_pay + "[/size]",
             #                                self.product_table.row_data[self.saved_i][3]])
             response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"],
                                         app.prev_args["event_uuid"], False)
@@ -391,10 +391,10 @@ class ValidInvalidUsedScreen(MDScreen):
             self.load_table(True)
         else:
             for i in range(len(app.table_data)):
-                if self.product_table.row_data[i][1] == "[size=15]invalid[/size]":
-                    ids = int(self.product_table.row_data[i][3].replace('[size=15]', '').replace("[/size]", ""))
+                if self.product_table.row_data[i][1] == "[size=30]invalid[/size]":
+                    ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
                     count = int(self.product_table.row_data[i][0]
-                                .replace('[size=15]', '').replace("[/size]", "").split(" x ")[0])
+                                .replace('[size=30]', '').replace("[/size]", "").split(" x ")[0])
                     update_validity(app.token, ids, "consumed", count)
             response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"],
                                         app.prev_args["event_uuid"], False)

@@ -347,10 +347,37 @@
         font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.03
 
+    TextInput:
+        size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.2
+		pos_hint: {"x":0.4, "y":0.1}
+        id: count_input
+        opacity: 0
+        disabled: True
+        text: "alle"
+        multiline: False
+        font_name: 'app/assets/D-DIN.otf'
+        on_text_validate:
+            root.change_validity_button()
+
+    MDLabel:
+        id: count_error
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.7
+        pos_hint: {"x":0.15, "y":0.15}
+		halign: 'center'
+		color: 1,0,0,1
+		opacity: 0
+		text: "Kon aantal niet lezen"
+		font_size: 45
+		font_name: 'app/assets/D-DIN.otf'
+
     Button:
-        size_hint: 0.5, 0.05
-        pos_hint: {"x":0.5, "y":0.1}
-        text: "Update Geldigheid"
+        size_hint: 0.4, 0.05
+        pos_hint: {"x":0.6, "y":0.1}
+        text: "Valideer"
         id: validity_button
         opacity: 0
         disabled: True
@@ -359,7 +386,7 @@
         background_normal: 'app/assets/buttonnormal.png'
         background_down: 'app/assets/buttondown.png'
         on_release:
-            root.change_validity(False)
+            root.change_validity_button()
 
     Button:
         size_hint_x: 1

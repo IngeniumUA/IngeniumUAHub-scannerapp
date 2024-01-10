@@ -52,9 +52,10 @@ def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
 
 
-def update_validity(token: PyToken, interaction_id: int, validity: str) -> None:
+def update_validity(token: PyToken, interaction_id: int, validity: str, count: int) -> None:
     try:
-        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id), json={"validity": validity},
+        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id),
+                       json={"validity": validity, "count": count},
                        headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:
         pass

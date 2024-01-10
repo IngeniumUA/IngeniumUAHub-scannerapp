@@ -2,7 +2,7 @@ from app.api.data_models import PyStaffTransaction
 from app.api.hub_api import get_transactions, get_userdata, get_niet_lid_price
 
 
-def get_results(api_token, uuid: str, event_uuid) -> dict:
+def get_results(api_token, uuid: str, event_uuid, run_userdata: bool = True) -> dict:
     """
     :param api_token:
     :param uuid:
@@ -40,7 +40,10 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
                            "[size=15]" + str(transaction.validity.value) + "[/size]",
                            "[size=15]" + to_pay + "[/size]",
                            "[size=15]" + str(transaction.interaction.id) + "[/size]"))
-    userdata = get_userdata(api_token, transactions[0].interaction.user_id)
+    if run_userdata:
+        userdata = get_userdata(api_token, transactions[0].interaction.user_id)
+    else:
+        userdata = {"voornaam": "", "achternaam": "", "lidstatus": False}
     i = 0
     if event_tickets != [] and event_tickets != ["forbidden"]:
         for i in range(len(event_tickets)):

@@ -39,6 +39,7 @@ def alg_make_visible(self, visibility: bool):
 
     self.product_table.disabled = not visibility
     self.ids.validity_button.disabled = not visibility
+    self.ids.count_input.disabled = not visibility
     self.main_button.disabled = not visibility
 
     if app.iconpath == "app/assets/dashmark.png" and visibility:
@@ -62,10 +63,14 @@ def alg_make_visible(self, visibility: bool):
             self.ids.checkout_status_drop,
             self.ids.checkout_status_text,
             self.main_button,
-            self.ids.validity_button]
+            self.ids.validity_button,
+            self.ids.count_input]
 
     for obj in objs:
         obj.opacity = int(visibility)
+
+    if app.show_count_error:
+        self.ids.count_error.opacity = int(visibility)
 
 
 class LoginScreen(MDScreen):
@@ -201,7 +206,7 @@ class ValidInvalidUsedScreen(MDScreen):
         if app.iconpath == "app/assets/checkmark.png":
             self.add_first_nonconsumed()
             self.change_validity(True)
-            app.id_list = []
+            app.id_list = dict()
         if app.iconpath == "app/assets/dashmark.png":
             self.load_dropdown_invalids()
 
@@ -209,26 +214,46 @@ class ValidInvalidUsedScreen(MDScreen):
         self.load_dropdown()
 
     def on_leave(self):
-        app.id_list = []
+        app.id_list = dict()
         self.remove_widget(self.product_table)
+        self.ids.count_input.text = "alle"
         if app.iconpath == "app/assets/dashmark.png":
             self.remove_widget(self.main_button_invalids)
             self.remove_widget(self.confirm_button_invalids)
 
-    def change_validity(self, by_entry: bool):
+    def change_validity(self, by_entry: bool, count: int | str = 1):
         if by_entry:
             validity = "consumed"
         else:
             validity = self.main_button.text.lower()
-        for ids in app.id_list:
-            update_validity(app.token, ids, validity)
-        response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"], app.prev_args["event_uuid"])
+        for ids in list(app.id_list.keys()):
+            if count == "alle":
+                count = app.id_list[ids]
+            if count > app.id_list[ids]:
+                count = app.id_list[ids]
+            update_validity(app.token, ids, validity, count)
+        response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"], app.prev_args["event_uuid"], False)
         app.table_data = response_dict["table_data"]
         self.remove_widget(self.product_table)
         if by_entry:
             self.load_table(False)
         else:
             self.load_table(True)
+
+    def change_validity_button(self):
+        if self.ids.count_input.text.isdigit():
+            count = int(self.ids.count_input.text)
+            self.change_validity(False, count)
+            app.show_count_error = False
+            self.ids.count_error.opacity = 0
+        elif self.ids.count_input.text.lower() == "alle":
+            self.change_validity(False, "alle")
+            app.show_count_error = False
+            self.ids.count_error.opacity = 0
+        else:
+            app.show_count_error = True
+            self.ids.count_error.opacity = 1
+        app.id_list = dict()
 
     def load_table(self, start_visible: bool = False):
         self.product_table = MDDataTable(
@@ -251,15 +276,17 @@ class ValidInvalidUsedScreen(MDScreen):
         self.add_widget(self.product_table, index=9)
 
     def check_press(self, instance_table, current_row):
-        if int(current_row[3].replace('[size=15]', '').replace("[/size]", "")) in app.id_list:
-            app.id_list.remove(int(current_row[3].replace('[size=15]', '').replace("[/size]", "")))
+        if int(current_row[3].replace('[size=15]', '').replace("[/size]", "")) in list(app.id_list.keys()):
+            del app.id_list[int(current_row[3].replace('[size=15]', '').replace("[/size]", ""))]
         else:
-            app.id_list.append(int(current_row[3].replace('[size=15]', '').replace("[/size]", "")))
+            app.id_list[int(current_row[3].replace('[size=15]', '').replace("[/size]", ""))] = (
+                int(current_row[0].replace('[size=15]', '').replace("[/size]", "").split(" x ")[0]))
 
     def add_first_nonconsumed(self):
         for row in app.table_data:
             if row[1] != '[size=15]consumed[/size]':
-                app.id_list.append(int(row[3].replace('[size=15]', '').replace("[/size]", "")))
+                app.id_list[int(row[3].replace('[size=15]', '').replace("[/size]", ""))] = (
+                    int(row[0].replace('[size=15]', '').replace("[/size]", "").split(" x ")[0]))
                 break
 
     def make_visible(self):
@@ -288,7 +315,7 @@ class ValidInvalidUsedScreen(MDScreen):
             text='Valid',
             opacity=0,
             disabled=True,
-            size_hint=(0.5, 0.05),
+            size_hint=(0.4, 0.05),
             pos_hint={'x': 0, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')
         self.main_button.bind(on_release=self.dropdown_validity.open)
@@ -348,7 +375,7 @@ class ValidInvalidUsedScreen(MDScreen):
     def validate(self):
         if self.main_button_invalids.text.startswith("Huidig ticket"):
             ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=15]', '').replace("[/size]", ""))
-            update_validity(app.token, ids, "consumed")
+            update_validity(app.token, ids, "consumed", 1)
             # to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
             # new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=15]€', '')
             #                    .replace("[/size]", "")) - to_subtract
@@ -357,7 +384,8 @@ class ValidInvalidUsedScreen(MDScreen):
             #                                "[size=15]" + "consumed" + "[/size]",
             #                                '[size=15]€' + "%.2f" % new_to_pay + "[/size]",
             #                                self.product_table.row_data[self.saved_i][3]])
-            response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"], app.prev_args["event_uuid"])
+            response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"],
+                                        app.prev_args["event_uuid"], False)
             app.table_data = response_dict["table_data"]
             self.remove_widget(self.product_table)
             self.load_table(True)
@@ -365,8 +393,11 @@ class ValidInvalidUsedScreen(MDScreen):
             for i in range(len(app.table_data)):
                 if self.product_table.row_data[i][1] == "[size=15]invalid[/size]":
                     ids = int(self.product_table.row_data[i][3].replace('[size=15]', '').replace("[/size]", ""))
-                    update_validity(app.token, ids, "consumed")
-            response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"], app.prev_args["event_uuid"])
+                    count = int(self.product_table.row_data[i][0]
+                                .replace('[size=15]', '').replace("[/size]", "").split(" x ")[0])
+                    update_validity(app.token, ids, "consumed", count)
+            response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"],
+                                        app.prev_args["event_uuid"], False)
             app.table_data = response_dict["table_data"]
             self.remove_widget(self.product_table)
             self.load_table(True)
@@ -402,6 +433,7 @@ class IngeniumApp(MDApp):
         self.token: PyToken | None = None
         self.visibility: bool = False
         self.iconpath: str = ""
+        self.show_count_error: bool = False
 
         self.prev_screen: str = ""
         self.prev_result: str = ""
@@ -414,7 +446,7 @@ class IngeniumApp(MDApp):
         self.table_data: str = ""
         self.validity: str = ""
         self.checkout_status: str = ""
-        self.id_list: list = []
+        self.id_list: dict = dict()
 
         self.main_button_events: Button | None = None
         self.event_items: dict = dict()

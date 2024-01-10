@@ -29,7 +29,7 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
         if transaction.interaction.item_id == event_uuid:
             event_tickets.append(transaction)
             if transaction.validity.value == "invalid":
-                niet_lid_price = get_niet_lid_price(transaction.product_blueprint_id)
+                niet_lid_price = get_niet_lid_price(api_token, transaction.product_blueprint_id)
                 to_pay = niet_lid_price*transaction.count - float(transaction.amount)
             else:
                 to_pay = 0
@@ -40,7 +40,7 @@ def get_results(api_token, uuid: str, event_uuid) -> dict:
                            "[size=15]" + str(transaction.validity.value) + "[/size]",
                            "[size=15]" + to_pay + "[/size]",
                            "[size=15]" + str(transaction.interaction.id) + "[/size]"))
-    userdata = get_userdata(transactions[0].interaction.user_id)
+    userdata = get_userdata(api_token, transactions[0].interaction.user_id)
     i = 0
     if event_tickets != [] and event_tickets != ["forbidden"]:
         for i in range(len(event_tickets)):

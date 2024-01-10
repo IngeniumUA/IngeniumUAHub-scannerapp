@@ -80,17 +80,19 @@ class LoginScreen(MDScreen):
 
     def buttonpress(self):
         if app.token != "login_error" and app.token != "server_error":
+            app.prev_screen = "login"
             self.manager.transition.direction = "left"
             self.manager.current = "scan"
 
 
 class ScanScreen(MDScreen):
-    def on_enter(self):
+    def on_pre_enter(self):
         app.prev_result = ""
+        if app.prev_screen == "login":
+            self.load_dropdown_events()
 
     def on_kv_post(self, obj):
         self.ids.preview.connect_camera(enable_analyze_pixels=True, default_zoom=0.0)
-        self.load_dropdown_events()
 
     def stopping(self):
         self.ids.preview.disconnect_camera()
@@ -101,7 +103,9 @@ class ScanScreen(MDScreen):
         if result == app.prev_result:
             return
 
-        response_dict = get_results(app.token, result, self.event_items[app.main_button_events.text])
+        response_dict = get_results(app.token, result, app.event_items[app.main_button_events.text])
+        app.prev_args = {"token": app.token, "uuid": result,
+                         "event_uuid": app.event_items[app.main_button_events.text]}
         if (response_dict["validity"] == "valid"
                 or response_dict["validity"] == "invalid"
                 or response_dict["validity"] == "consumed"
@@ -119,7 +123,8 @@ class ScanScreen(MDScreen):
             result = ""
             app.prev_result = ""
             app.token = refresh_token(app.token)
-            if app.token is None:
+            if app.token == PyToken():
+                app.prev_screen = "scan"
                 self.manager.transition.direction = "right"
                 self.manager.current = "login"
             else:
@@ -127,18 +132,22 @@ class ScanScreen(MDScreen):
                 self.manager.current = "token"
         elif response_dict["validity"] == "valid":
             app.iconpath = "app/assets/checkmark.png"
+            app.prev_screen = "scan"
             self.manager.transition.direction = "left"
             self.manager.current = "valid_invalid_used"
         elif response_dict["validity"] == "invalid":
             app.iconpath = "app/assets/dashmark.png"
+            app.prev_screen = "scan"
             self.manager.transition.direction = "left"
             self.manager.current = "valid_invalid_used"
         elif (response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError"
               or response_dict["validity"] == "manually_verified"):
+            app.prev_screen = "scan"
             app.iconpath = "app/assets/xmark.png"
             self.manager.transition.direction = "left"
             self.manager.current = "valid_invalid_used"
         elif response_dict["validity"] == "UUIDError":
+            app.prev_screen = "scan"
             self.manager.transition.direction = "left"
             self.manager.current = "payless"
         elif response_dict["validity"] == "emptyEvent":
@@ -150,10 +159,10 @@ class ScanScreen(MDScreen):
 
     def load_dropdown_events(self):
         self.dropdown_events = DropDown()
-        self.event_items = get_all_events(datetime.datetime.now())
-        self.event_items['Selecteer een evenement'] = ""
+        app.event_items = get_all_events(app.token, datetime.datetime.now())
+        app.event_items['Selecteer een evenement'] = ""
 
-        for item in list(self.event_items.keys()):
+        for item in list(app.event_items.keys()):
             opts_events = Button(
                 text=item,
                 size_hint_y=None,
@@ -188,7 +197,7 @@ class ValidInvalidUsedScreen(MDScreen):
 
     def on_pre_enter(self):
         self.ids.validity_image.source = app.iconpath
-        self.load_table()
+        self.load_table(False)
         if app.iconpath == "app/assets/checkmark.png":
             self.add_first_nonconsumed()
             self.change_validity(True)
@@ -201,6 +210,7 @@ class ValidInvalidUsedScreen(MDScreen):
 
     def on_leave(self):
         app.id_list = []
+        self.remove_widget(self.product_table)
         if app.iconpath == "app/assets/dashmark.png":
             self.remove_widget(self.main_button_invalids)
             self.remove_widget(self.confirm_button_invalids)
@@ -211,16 +221,16 @@ class ValidInvalidUsedScreen(MDScreen):
         else:
             validity = self.main_button.text.lower()
         for ids in app.id_list:
-            update_validity(ids, validity)
-            for i in range(len(app.table_data)):
-                if app.table_data[i][3].replace('[size=15]', '').replace("[/size]", "") == str(ids):
-                    self.product_table.update_row(self.product_table.row_data[i],
-                                                  [self.product_table.row_data[i][0],
-                                                   "[size=15]" + validity + "[/size]",
-                                                   self.product_table.row_data[i][2],
-                                                   self.product_table.row_data[i][3]])
+            update_validity(app.token, ids, validity)
+        response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"], app.prev_args["event_uuid"])
+        app.table_data = response_dict["table_data"]
+        self.remove_widget(self.product_table)
+        if by_entry:
+            self.load_table(False)
+        else:
+            self.load_table(True)
 
-    def load_table(self):
+    def load_table(self, start_visible: bool = False):
         self.product_table = MDDataTable(
             size_hint_y=0.575,
             size_hint_x=1,
@@ -231,8 +241,8 @@ class ValidInvalidUsedScreen(MDScreen):
                          ("[size=15]To Pay[/size]", dp(Window.width * 0.015 * 1.55)),
                          ("[size=15]id[/size]", dp(Window.width * 0.015 * 1.55))],
             row_data=app.table_data,
-            opacity=0,
-            disabled=True,
+            opacity=int(start_visible),
+            disabled=not start_visible,
             background_color=(1, 1, 1, 1),
             background_color_cell=(0, 0, 1, 0),
             background_color_header=(0, 0, 1, 0),
@@ -338,25 +348,28 @@ class ValidInvalidUsedScreen(MDScreen):
     def validate(self):
         if self.main_button_invalids.text.startswith("Huidig ticket"):
             ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=15]', '').replace("[/size]", ""))
-            update_validity(ids, "consumed")
-            to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
-            new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=15]€', '')
-                               .replace("[/size]", "")) - to_subtract
-            self.product_table.update_row(self.product_table.row_data[self.saved_i],
-                                          [self.product_table.row_data[self.saved_i][0],
-                                           "[size=15]" + "consumed" + "[/size]",
-                                           '[size=15]€' + "%.2f" % new_to_pay + "[/size]",
-                                           self.product_table.row_data[self.saved_i][3]])
+            update_validity(app.token, ids, "consumed")
+            # to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
+            # new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=15]€', '')
+            #                    .replace("[/size]", "")) - to_subtract
+            # self.product_table.update_row(self.product_table.row_data[self.saved_i],
+            #                               [self.product_table.row_data[self.saved_i][0],
+            #                                "[size=15]" + "consumed" + "[/size]",
+            #                                '[size=15]€' + "%.2f" % new_to_pay + "[/size]",
+            #                                self.product_table.row_data[self.saved_i][3]])
+            response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"], app.prev_args["event_uuid"])
+            app.table_data = response_dict["table_data"]
+            self.remove_widget(self.product_table)
+            self.load_table(True)
         else:
             for i in range(len(app.table_data)):
                 if self.product_table.row_data[i][1] == "[size=15]invalid[/size]":
                     ids = int(self.product_table.row_data[i][3].replace('[size=15]', '').replace("[/size]", ""))
-                    update_validity(ids, "consumed")
-                    self.product_table.update_row(self.product_table.row_data[i],
-                                                  [self.product_table.row_data[i][0],
-                                                   "[size=15]" + "consumed" + "[/size]",
-                                                   '[size=15]€' + "0.00" + "[/size]",
-                                                   self.product_table.row_data[i][3]])
+                    update_validity(app.token, ids, "consumed")
+            response_dict = get_results(app.prev_args["token"], app.prev_args["uuid"], app.prev_args["event_uuid"])
+            app.table_data = response_dict["table_data"]
+            self.remove_widget(self.product_table)
+            self.load_table(True)
 
 
 class ScanAnalyze(Preview):
@@ -390,7 +403,10 @@ class IngeniumApp(MDApp):
         self.visibility: bool = False
         self.iconpath: str = ""
 
+        self.prev_screen: str = ""
         self.prev_result: str = ""
+        self.prev_args: dict = dict()
+
         self.voornaam: str = ""
         self.naam: str = ""
         self.email: str = ""
@@ -401,6 +417,7 @@ class IngeniumApp(MDApp):
         self.id_list: list = []
 
         self.main_button_events: Button | None = None
+        self.event_items: dict = dict()
 
     def on_stop(self):
         ScanScreen.stopping(ScanScreen())

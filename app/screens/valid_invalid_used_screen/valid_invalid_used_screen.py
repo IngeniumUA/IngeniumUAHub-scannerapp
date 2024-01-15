@@ -11,10 +11,28 @@ from app.functions.variables import variables
 from app.api.hub_api import update_validity
 from app.functions.get_results import get_results
 
-Config.set('graphics', 'resizable', True)
+Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
 
-def alg_make_visible(self, visibility: bool):
+def alg_make_visible(self, visibility: bool) -> None:
+    """
+    will set all the elements of the "more info" dropdown to visible or invisible depending on visibility
+
+    Examples
+    --------
+    >>> alg_make_visible(self, False)
+    None
+
+    Parameters
+    ----------
+    :param self:
+    :param visibility:
+
+    Returns
+    -------
+    :return: None
+    """
+
     if visibility:
         self.ids.more_info_button.text = "Minder info"
     else:
@@ -32,9 +50,11 @@ def alg_make_visible(self, visibility: bool):
     self.ids.count_input.disabled = not visibility
     self.main_button.disabled = not visibility
 
+    # remove widgets so they can't accidentally be interacted with while in the "more info" dropdown
     if variables["iconpath"] == "app/assets/dashmark.png" and visibility:
         self.remove_widget(self.main_button_invalids)
         self.remove_widget(self.confirm_button_invalids)
+    # re-add widgets so they can be used again
     elif variables["iconpath"] == "app/assets/dashmark.png":
         self.add_widget(self.main_button_invalids, index=2)
         self.add_widget(self.confirm_button_invalids, index=1)
@@ -59,11 +79,12 @@ def alg_make_visible(self, visibility: bool):
     for obj in objs:
         obj.opacity = int(visibility)
 
-    if variables["show_count_error"]:
+    if variables["show_count_error"]:  # error message should only be shown outside the dropdown
         self.ids.count_error.opacity = int(visibility)
 
 
 class ValidInvalidUsedScreen(MDScreen):
+    # load the associated kv file
     kv = Builder.load_file('app/screens/valid_invalid_used_screen/valid_invalid_used_screen.kv')
 
     def __init__(self, **kwargs):
@@ -72,9 +93,12 @@ class ValidInvalidUsedScreen(MDScreen):
         self.product_table: MDDataTable = MDDataTable()
         self.added_item: int = 0
 
+    # called when the screen is loaded. set the image correctly and load the table from the "more info" dropdown
+    # when the ticket is valid, automatically validate it
+    # when the ticket is invalid, load widgets made for invalid tickets
     def on_pre_enter(self):
         self.ids.validity_image.source = variables["iconpath"]
-        self.load_table(False)
+        self.load_table(start_visible=False)
         if variables["iconpath"] == "app/assets/checkmark.png":
             self.add_first_nonconsumed()
             self.change_validity(True)
@@ -82,9 +106,11 @@ class ValidInvalidUsedScreen(MDScreen):
         if variables["iconpath"] == "app/assets/dashmark.png":
             self.load_dropdown_invalids()
 
+    # called when the app starts, loads the dropdown with the options for validity so this only needs to happen once
     def on_kv_post(self, obj):
         self.load_dropdown()
 
+    # called when the screen is left. reset all variables that may otherwise influence the next scanned item
     def on_leave(self):
         variables["id_list"] = dict()
         self.remove_widget(self.product_table)
@@ -93,25 +119,30 @@ class ValidInvalidUsedScreen(MDScreen):
             self.remove_widget(self.main_button_invalids)
             self.remove_widget(self.confirm_button_invalids)
 
+    # change the validity of an interaction based on the given parameters
     def change_validity(self, by_entry: bool, count: int | str = 1):
         if by_entry:
             validity = "consumed"
         else:
             validity = self.main_button.text.lower()
+
         for ids in list(variables["id_list"].keys()):
             if count == "alle":
                 count = variables["id_list"][ids]
             if count > variables["id_list"][ids]:
                 count = variables["id_list"][ids]
             update_validity(variables["token"], ids, validity, count)
+
         response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"], variables["prev_args"]["event_uuid"], False)
         variables["table_data"] = response_dict["table_data"]
         self.remove_widget(self.product_table)
+
         if by_entry:
             self.load_table(False)
         else:
             self.load_table(True)
 
+    # called when the button to change the validity is pressed, extracts data and calls change_validity
     def change_validity_button(self):
         if self.ids.count_input.text.isdigit():
             count = int(self.ids.count_input.text)
@@ -127,7 +158,7 @@ class ValidInvalidUsedScreen(MDScreen):
             self.ids.count_error.opacity = 1
         variables["id_list"] = dict()
 
-    def load_table(self, start_visible: bool = False):
+    def load_table(self, start_visible: bool = False):  # loads the table with the data acquired from the qr code
         self.product_table = MDDataTable(
             size_hint_y=0.575,
             size_hint_x=1,
@@ -147,6 +178,7 @@ class ValidInvalidUsedScreen(MDScreen):
         self.product_table.bind(on_check_press=self.check_press)
         self.add_widget(self.product_table, index=9)
 
+    # adds id of the checked transaction to the id_list and removes when unchecked
     def check_press(self, instance_table, current_row):
         if int(current_row[3].replace('[size=30]', '').replace("[/size]", "")) in list(variables["id_list"].keys()):
             del variables["id_list"][int(current_row[3].replace('[size=30]', '').replace("[/size]", ""))]
@@ -154,23 +186,23 @@ class ValidInvalidUsedScreen(MDScreen):
             variables["id_list"][int(current_row[3].replace('[size=30]', '').replace("[/size]", ""))] = (
                 int(current_row[0].replace('[size=30]', '').replace("[/size]", "").split(" x ")[0]))
 
-    def add_first_nonconsumed(self):
+    def add_first_nonconsumed(self):  # adds first ticket with a validity other than consumed to the id_list
         for row in variables["table_data"]:
             if row[1] != '[size=30]consumed[/size]':
                 variables["id_list"][int(row[3].replace('[size=30]', '').replace("[/size]", ""))] = (
                     int(row[0].replace('[size=30]', '').replace("[/size]", "").split(" x ")[0]))
                 break
 
-    def make_visible(self):
+    def make_visible(self):  # changes the visibility of all dropdown elements
         alg_make_visible(self, not variables["visibility"])
         variables["visibility"] = not variables["visibility"]
 
-    def set_invisible(self):
+    def set_invisible(self):  # sets the visibility of all dropdown elements to invisible
         if variables["visibility"]:
             alg_make_visible(self, False)
             variables["visibility"] = False
 
-    def load_dropdown(self):
+    def load_dropdown(self):  # loads the dropdown with the options for validity
         self.dropdown_validity = DropDown()
         items = ["Consumed", "Valid", "Invalid"]
 
@@ -195,7 +227,7 @@ class ValidInvalidUsedScreen(MDScreen):
 
         self.add_widget(self.main_button, index=3)
 
-    def load_dropdown_invalids(self):
+    def load_dropdown_invalids(self):  # loads the dropdown for paying when an invalid ticket was scanned
         self.dropdown_invalids = DropDown()
         first = True
         huidig = ""
@@ -244,7 +276,7 @@ class ValidInvalidUsedScreen(MDScreen):
         self.confirm_button_invalids.bind(on_release=lambda x: self.validate())
         self.add_widget(self.confirm_button_invalids, index=1)
 
-    def validate(self):
+    def validate(self):  # validates specifically the invalid tickets according to the invalid dropdown
         if self.main_button_invalids.text.startswith("Huidig ticket"):
             ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=30]', '').replace("[/size]", ""))
             update_validity(variables["token"], ids, "consumed", 1)

@@ -1,3 +1,4 @@
+# here all variables are kept that need to be shared across screens or need to be saved when switched to another screen
 variables = {
     "token": None,
     "visibility": False,

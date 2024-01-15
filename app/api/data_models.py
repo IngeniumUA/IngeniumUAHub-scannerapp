@@ -11,9 +11,9 @@ class InteractionType(IntEnum):
     1->99: Normal
         1: Elle ma is lelijk
         ...
-    100->199: Monetair
+    100->199: Monetary
         100: Bought
-        101: User_drived Refund
+        101: User_derived Refund
         102: Staff_driven Refund
         ...
     200->299: Staff
@@ -32,7 +32,7 @@ class InteractionType(IntEnum):
 
     """ Normal 1->99 """
 
-    """ Monetair 100->199 """
+    """ Monetary 100->199 """
     bought = 100
 
     """ Staff 200->299 """
@@ -45,14 +45,14 @@ class CheckoutStatusEnum(Enum):
     CANCELLED = "CANCELLED"  # Payment was cancelled
     FAILED = "FAILED"  # Payment Failed
     PENDING = "PENDING"  # Awaiting confirmation
-    PROCESSING = "PROCESSING"  # Not quite succeeded but we won't cancel the checkout anymore
+    PROCESSING = "PROCESSING"  # Not quite succeeded, but we won't cancel the checkout anymore
 
 
 class ValidityEnum(Enum):
-    valid = 'valid'
-    invalid = 'invalid'
-    manually_verified = 'manually_verified'
-    consumed = 'consumed'
+    valid = 'valid'  # everything is as should be
+    invalid = 'invalid'  # item was likely not fully paid for
+    manually_verified = 'manually_verified'  # item was manually verified
+    consumed = 'consumed'  # item was already used before
 
 
 class PyStaffInteraction(BaseModel):

@@ -10,7 +10,7 @@ Validity can be *Valid*, *Invalid*, *Used* and if the item does not exist *NotPa
 ##############################
 # created in ticket creation
 ##############################
-uuid = '0a56c773-bb2b-499b-ade0-b4b7eeb24345'
+uuid = 'c663cdfb-4987-4acf-960e-88a5de7adc75'
 
 ##############################
 # create qr-code

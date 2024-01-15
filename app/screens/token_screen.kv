@@ -1,0 +1,25 @@
+<TokenScreen>
+    GridLayout:
+        cols:1
+        MDLabel:
+            halign: "center"
+            text: "Token verversen"
+            font_name: 'app/assets/D-DIN.otf'
+			size_hint_y: 0.8
+			background_color: 0, 0, 1, 1
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 1, 1
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+        Button:
+            size_hint_y: 0.2
+            text: "Terug"
+            font_name: 'app/assets/D-DIN.otf'
+            color: 1,1,1,1
+            background_normal: 'app/assets/buttonnormal.png'
+            background_down: 'app/assets/buttondown.png'
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "scan"

@@ -1,0 +1,16 @@
+<PaylessScreen>
+    GridLayout:
+        cols:1
+        Image:
+            source: 'app/assets/xmark.png'
+			size_hint_y: 0.8
+        Button:
+            size_hint_y: 0.2
+            text: "Terug"
+            font_name: 'app/assets/D-DIN.otf'
+            color: 1,1,1,1
+            background_normal: 'app/assets/buttonnormal.png'
+            background_down: 'app/assets/buttondown.png'
+            on_release:
+                root.manager.transition.direction = "right"
+                root.manager.current = "scan"

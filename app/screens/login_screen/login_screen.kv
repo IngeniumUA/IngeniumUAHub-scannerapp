@@ -1,0 +1,57 @@
+<LoginScreen>
+    Image:
+        source: "app/assets/Ingenium-login.png"
+        fit_mode: "contain"
+        size_hint: 0.8, 0.1
+        pos_hint: {'x':0.1, 'y':0.8}
+
+    TextInput:
+        size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.70
+		pos_hint: {"x":0.15, "y":0.7}
+        id: mail
+        hint_text: "Email"
+        multiline: False
+        font_name: 'app/assets/D-DIN.otf'
+        on_text_validate:
+            root.login()
+            root.buttonpress()
+
+	TextInput:
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.70
+        pos_hint: {"x":0.15, "y":0.65}
+        id: passw
+        hint_text: "Wachtwoord"
+        multiline: False
+        password: True
+        font_name: 'app/assets/D-DIN.otf'
+        on_text_validate:
+            root.login()
+            root.buttonpress()
+
+    MDLabel:
+        id: validitylabel
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.7
+        pos_hint: {"x":0.15, "y":0.61}
+		halign: 'center'
+		color: 1,0,0,1
+		font_size: 45
+		font_name: 'app/assets/D-DIN.otf'
+
+    Button:
+        id: confirmbutton
+        size_hint: .5, .08
+        pos_hint: {"x":0.25, "y":0.5}
+        text: "Log in"
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.login()
+            root.buttonpress()

@@ -112,10 +112,10 @@ def get_transactions(token: PyToken,
 
 
 def get_all_events(token: PyToken, current_date: datetime.datetime) -> dict:
-    current_date += datetime.timedelta(days=1)  # add 1 day just in case
+    current_date -= datetime.timedelta(days=1)  # add 1 day just in case
     moment = "&end_date_ge=" + str(current_date).replace(":", "%3A").replace(" ", "T")+"%2B00%3A00"
     try:
-        response = requests.get(url=api_url + "staff/event?limit=50&offset=0&available=true&disabled=false",
+        response = requests.get(url=api_url + "staff/event?limit=50&offset=0&available=true&disabled=false" + moment,
                                 headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:
         return dict()

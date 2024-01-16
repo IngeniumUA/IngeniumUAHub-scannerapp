@@ -1,18 +1,25 @@
+# screen for refreshing the token, very rudimentary as it should happen very rarely if at all
+
 <TokenScreen>
     GridLayout:
         cols:1
+        # blue box with text "Token verversen"
         MDLabel:
             halign: "center"
             text: "Token verversen"
             font_name: 'app/assets/D-DIN.otf'
 			size_hint_y: 0.8
 			background_color: 0, 0, 1, 1
+
+			# sets the color of the box to blue
             canvas.before:
                 Color:
                     rgba: 0, 0, 1, 1
                 Rectangle:
                     size: self.size
                     pos: self.pos
+
+        # button to go back to the scan screen
         Button:
             size_hint_y: 0.2
             text: "Terug"

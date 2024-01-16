@@ -1,4 +1,7 @@
+# screen where the qr code is scanned
+
 <ScanScreen>:
+    # call class to decipher qr code and show camera
     ScanAnalyze:
         size_hint_y: 0.8
         size_hint_x: 0.98
@@ -6,6 +9,7 @@
         id:preview
         extracted_data: root.got_result
 
+    # label that shows error message if no event is selected
     MDLabel:
         id: event_empty
 		size_hint_y: None
@@ -19,6 +23,7 @@
 		font_size: 100
 		font_name: 'app/assets/D-DIN.otf'
 
+    # back to login screen button
     Button:
         size_hint_y: 0.08
         size_hint_x: 0.98

@@ -1,10 +1,14 @@
+# screen for giving credentials for the api
+
 <LoginScreen>
+    # show ingenium logo
     Image:
         source: "app/assets/Ingenium-login.png"
         fit_mode: "contain"
         size_hint: 0.8, 0.1
         pos_hint: {'x':0.1, 'y':0.8}
 
+    # email textbox
     TextInput:
         size_hint_y: None
 		height:'30dp'
@@ -18,6 +22,7 @@
             root.login()
             root.buttonpress()
 
+    # password textbox
 	TextInput:
 		size_hint_y: None
 		height:'30dp'
@@ -32,6 +37,7 @@
             root.login()
             root.buttonpress()
 
+    # label that shows error messages if any
     MDLabel:
         id: validitylabel
 		size_hint_y: None
@@ -43,6 +49,7 @@
 		font_size: 45
 		font_name: 'app/assets/D-DIN.otf'
 
+    # log in button
     Button:
         id: confirmbutton
         size_hint: .5, .08

@@ -9,8 +9,7 @@
         pos_hint: {"x":0.85, "y":0.92}
         source: 'app/assets/history_icon.png'
         fit_mode: "contain"
-        on_touch_down:
-            root.goto_history_screen()
+        on_touch_down: if self.collide_point(*args[1].pos): root.goto_history_screen()
 
     # call class to decipher qr code and show camera
     ScanAnalyze:

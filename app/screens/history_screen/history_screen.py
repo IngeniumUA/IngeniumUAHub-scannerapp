@@ -53,7 +53,7 @@ class HistoryScreen(MDScreen):
                          ("[size=30]Email[/size]", dp(Window.width * 0.062 * 0.65)),
                          ("[size=30]Naam[/size]", dp(Window.width * 0.062 * 0.65)),
                          ("[size=30]Achternaam[/size]", dp(Window.width * 0.062 * 0.65)),
-                         ("[size=30]Aanpassingen[/size]", dp(Window.width * 0.062 * 0.65))],
+                         ("[size=30]Aanpassingen[/size]", dp(Window.width * 0.025 * 0.65))],
             row_data=table_data,
             background_color=(1, 1, 1, 1),
             background_color_cell=(0, 0, 1, 0),

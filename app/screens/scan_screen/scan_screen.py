@@ -35,6 +35,11 @@ class ScanScreen(MDScreen):
     def close_camera(self):  # called when the app is stopped, closes the camera to prevent crashing
         self.ids.preview.disconnect_camera()
 
+    def goto_history_screen(self):  # when icon is clicked, the user is sent to the history screen
+        variables["prev_screen"] = "history"
+        self.manager.transition.direction = "left"
+        self.manager.current = "history"
+
     @mainthread
     def got_result(self, result):  # called when a qr code is detected, the string from the code is in result
 
@@ -125,7 +130,7 @@ class ScanScreen(MDScreen):
 
         variables["main_button_events"] = Button(
             text='Selecteer een evenement',
-            size_hint=(0.9, None),
+            size_hint=(0.75, None),
             height=dp(30),
             pos_hint={'x': 0.05, 'y': 0.92},
             font_name='app/assets/D-DIN.otf')

@@ -8,6 +8,7 @@ from app.screens.trivial_screens import TokenScreen, PaylessScreen
 from app.screens.login_screen.login_screen import LoginScreen
 from app.screens.valid_invalid_used_screen.valid_invalid_used_screen import ValidInvalidUsedScreen
 from app.screens.scan_screen.scan_screen import ScanScreen
+from app.screens.history_screen.history_screen import HistoryScreen
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
@@ -23,6 +24,7 @@ class Sm(MDScreenManager):
         self.add_widget(TokenScreen(name='token'))
         self.add_widget(ValidInvalidUsedScreen(name='valid_invalid_used'))
         self.add_widget(PaylessScreen(name='payless'))
+        self.add_widget(HistoryScreen(name='history'))
 
 
 # initiate the app itself

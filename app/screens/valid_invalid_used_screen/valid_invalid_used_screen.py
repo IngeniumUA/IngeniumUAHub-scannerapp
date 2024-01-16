@@ -11,7 +11,53 @@ from app.functions.variables import variables
 from app.api.hub_api import update_validity
 from app.functions.get_results import get_results
 
+import json
+
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
+
+
+def add_to_history(event: str, mail: str, naam: str, achternaam: str, count: int) -> None:
+    """
+    adds the validated ticket with the given info the history file, if the file doesn't exist, it will be created
+
+    Examples
+    --------
+    >>> add_to_history("All-In", "<EMAIL>", "<NAME>", "<LAST NAME>", 1)
+
+    Parameters
+    ----------
+    :param event:
+    :param mail:
+    :param naam:
+    :param achternaam:
+    :param count:
+
+    Returns
+    -------
+    :return: None
+    """
+
+    try:
+        with open("app/functions/scan_history.json", "r") as openfile:
+            history = json.load(openfile)
+        openfile.close()
+    except FileNotFoundError:  # if the file does not exist
+        history = dict()
+    except json.decoder.JSONDecodeError:  # if the file exists but is completely empty
+        openfile.close()
+        history = dict()
+
+    if event in list(history.keys()):
+        if mail in list(history[event].keys()):  # if the ticket was already scanned, but there were still valids
+            history[event][mail]["count"] += count
+        else:  # if the event was already used
+            history[event][mail] = {"naam": naam, "achternaam": achternaam, "count": count}
+    else:  # if the event was not yet used
+        history[event] = {mail: {"naam": naam, "achternaam": achternaam, "count": count}}
+
+    with open("app/functions/scan_history.json", "w") as outfile:  # update the file with the new data
+        json.dump(history, outfile)
+    outfile.close()
 
 
 def alg_make_visible(self, visibility: bool) -> None:
@@ -133,11 +179,16 @@ class ValidInvalidUsedScreen(MDScreen):
                 count = variables["id_list"][ids]
             update_validity(variables["token"], ids, validity, count)
 
-        response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"], variables["prev_args"]["event_uuid"], False)
+            # add the validated ticket to the history
+            add_to_history(variables["main_button_events"].text, variables["email"], variables["voornaam"],
+                           variables["naam"], count)
+
+        response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
+                                    variables["prev_args"]["event_uuid"], False)
         variables["table_data"] = response_dict["table_data"]
         self.remove_widget(self.product_table)
 
-        if by_entry:
+        if by_entry:  # if the function was called by the user entering the screen, load the table invisible
             self.load_table(False)
         else:
             self.load_table(True)
@@ -234,7 +285,8 @@ class ValidInvalidUsedScreen(MDScreen):
         floatalle = 0
         self.saved_i = 0
         for i in range(len(variables["table_data"])):
-            amount = variables["table_data"][i][2].replace("[size=30]€", "").replace("[/size]", "").replace("[size=30]NVT", "0")
+            amount = (variables["table_data"][i][2].replace("[size=30]€", "").replace("[/size]", "")
+                      .replace("[size=30]NVT", "0"))
             amount = float(amount)
             if first and int(amount) != 0:
                 huidig = "%.2f" % (amount / int(variables["table_data"][i][0].split(" x ")[0]))
@@ -278,8 +330,13 @@ class ValidInvalidUsedScreen(MDScreen):
 
     def validate(self):  # validates specifically the invalid tickets according to the invalid dropdown
         if self.main_button_invalids.text.startswith("Huidig ticket"):
+            count = 1
             ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=30]', '').replace("[/size]", ""))
-            update_validity(variables["token"], ids, "consumed", 1)
+            update_validity(variables["token"], ids, "consumed", count)
+
+            # add the validated ticket to the history
+            add_to_history(variables["main_button_events"].text, variables["email"], variables["voornaam"],
+                           variables["naam"], count)
             # to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
             # new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=30]€', '')
             #                    .replace("[/size]", "")) - to_subtract
@@ -289,7 +346,7 @@ class ValidInvalidUsedScreen(MDScreen):
             #                                '[size=30]€' + "%.2f" % new_to_pay + "[/size]",
             #                                self.product_table.row_data[self.saved_i][3]])
             response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
-                                        variables["prev_arg"]["event_uuid"], False)
+                                        variables["prev_args"]["event_uuid"], False)
             variables["table_data"] = response_dict["table_data"]
             self.remove_widget(self.product_table)
             self.load_table(True)
@@ -300,6 +357,11 @@ class ValidInvalidUsedScreen(MDScreen):
                     count = int(self.product_table.row_data[i][0]
                                 .replace('[size=30]', '').replace("[/size]", "").split(" x ")[0])
                     update_validity(variables["token"], ids, "consumed", count)
+
+                    # add the validated ticket to the history
+                    add_to_history(variables["main_button_events"].text, variables["email"], variables["voornaam"],
+                                   variables["naam"], count)
+
             response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                         variables["prev_args"]["event_uuid"], False)
             variables["table_data"] = response_dict["table_data"]

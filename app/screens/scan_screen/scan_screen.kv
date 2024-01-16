@@ -1,6 +1,17 @@
 # screen where the qr code is scanned
 
 <ScanScreen>:
+    # button to go to history screen
+    Image:
+        size_hint_y: None
+        height: '30dp'
+        size_hint_x: 0.1
+        pos_hint: {"x":0.85, "y":0.92}
+        source: 'app/assets/history_icon.png'
+        fit_mode: "contain"
+        on_touch_down:
+            root.goto_history_screen()
+
     # call class to decipher qr code and show camera
     ScanAnalyze:
         size_hint_y: 0.8

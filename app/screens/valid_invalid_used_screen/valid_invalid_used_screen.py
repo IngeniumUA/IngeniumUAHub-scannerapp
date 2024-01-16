@@ -15,13 +15,13 @@ from app.functions.get_results import get_results
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
 
-def add_to_history(event: str, mail: str, naam: str, achternaam: str, count: int) -> None:
+def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam: str, count: int) -> None:
     """
     adds the validated ticket with the given info the history file, if the file doesn't exist, it will be created
 
     Examples
     --------
-    >>> add_to_history("All-In", "<EMAIL>", "<NAME>", "<LAST NAME>", 1)
+    >>> add_to_history("All-In", "<EMAIL>", "automatic verification", "<NAME>", "<LAST NAME>", 1)
 
     Parameters
     ----------
@@ -30,21 +30,30 @@ def add_to_history(event: str, mail: str, naam: str, achternaam: str, count: int
     :param naam:
     :param achternaam:
     :param count:
+    :param edit_mode:
 
     Returns
     -------
     :return: None
     """
 
-    history = JsonStore("app/functions/scan_history.json")
+    history_json = JsonStore("app/functions/scan_history.json")
+    history = dict(history_json)  # convert the file to a dictionary
+    if history != dict():
+        history = history["data"]
 
     if event in list(history.keys()):
         if mail in list(history[event].keys()):  # if the ticket was already scanned, but there were still valids
-            history[event][mail]["count"] += count
+            if edit_mode in list(history[event][mail].keys()):  # pass the edit mode
+                count += history[event][mail][edit_mode]["count"]
+                history[event][mail][edit_mode] = {"naam": naam, "achternaam": achternaam, "count": count}
+            else:
+                history[event][mail][edit_mode] = {"naam": naam, "achternaam": achternaam, "count": count}
         else:  # if the event was already used
-            history[event][mail] = {"naam": naam, "achternaam": achternaam, "count": count}
+            history[event][mail] = {edit_mode: {"naam": naam, "achternaam": achternaam, "count": count}}
     else:  # if the event was not yet used
-        history[event] = {mail: {"naam": naam, "achternaam": achternaam, "count": count}}
+        history[event] = {mail: {edit_mode: {"naam": naam, "achternaam": achternaam, "count": count}}}
+    history_json["data"] = history  # write the dictionary to the file
 
 
 def alg_make_visible(self, visibility: bool) -> None:
@@ -167,7 +176,11 @@ class ValidInvalidUsedScreen(MDScreen):
             update_validity(variables["token"], ids, validity, count)
 
             # add the validated ticket to the history
-            add_to_history(variables["main_button_events"].text, variables["email"], variables["voornaam"],
+            if by_entry:
+                edit_mode = "automatisch geverifieerd"
+            else:
+                edit_mode = "manueel aangepast"
+            add_to_history(variables["main_button_events"].text, variables["email"], edit_mode, variables["voornaam"],
                            variables["naam"], count)
 
         response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
@@ -322,8 +335,8 @@ class ValidInvalidUsedScreen(MDScreen):
             update_validity(variables["token"], ids, "consumed", count)
 
             # add the validated ticket to the history
-            add_to_history(variables["main_button_events"].text, variables["email"], variables["voornaam"],
-                           variables["naam"], count)
+            add_to_history(variables["main_button_events"].text, variables["email"], "enkel ongeldig ticket",
+                           variables["voornaam"], variables["naam"], count)
             # to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
             # new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=30]€', '')
             #                    .replace("[/size]", "")) - to_subtract
@@ -346,8 +359,8 @@ class ValidInvalidUsedScreen(MDScreen):
                     update_validity(variables["token"], ids, "consumed", count)
 
                     # add the validated ticket to the history
-                    add_to_history(variables["main_button_events"].text, variables["email"], variables["voornaam"],
-                                   variables["naam"], count)
+                    add_to_history(variables["main_button_events"].text, variables["email"],
+                                   "meerdere ongeldige tickets", variables["voornaam"], variables["naam"], count)
 
             response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                         variables["prev_args"]["event_uuid"], False)

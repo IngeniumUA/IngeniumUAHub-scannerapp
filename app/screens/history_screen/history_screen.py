@@ -26,20 +26,25 @@ class HistoryScreen(MDScreen):
         self.clear_popup()
 
     def load_history(self):  # load the history table
-        history = JsonStore("app/functions/scan_history.json")
+        history_json = JsonStore("app/functions/scan_history.json")
+        history = dict(history_json)  # convert the file to a dictionary
+        if history != dict():
+            history = history["data"]
 
         # set up the table data
         table_data = []
         if history != dict():
             for event in list(history.keys()):
                 for mail in list(history[event].keys()):
-                    table_data.append((
-                        "[size=30]" + event + "[/size]",
-                        "[size=30]" + mail + "[/size]",
-                        "[size=30]" + history[event][mail]["naam"] + "[/size]",
-                        "[size=30]" + history[event][mail]["achternaam"] + "[/size]",
-                        "[size=30]" + str(history[event][mail]["count"]) + "[/size]"
-                    ))
+                    for mode in list(history[event][mail].keys()):
+                        table_data.append((
+                            "[size=30]" + event + "[/size]",
+                            "[size=30]" + mail + "[/size]",
+                            "[size=30]" + history[event][mail][mode]["naam"] + "[/size]",
+                            "[size=30]" + history[event][mail][mode]["achternaam"] + "[/size]",
+                            "[size=30]" + str(history[event][mail][mode]["count"]) + "[/size]",
+                            "[size=30]" + mode + "[/size]"
+                        ))
         else:
             table_data = []
 
@@ -53,7 +58,8 @@ class HistoryScreen(MDScreen):
                          ("[size=30]Email[/size]", dp(Window.width * 0.062 * 0.65)),
                          ("[size=30]Naam[/size]", dp(Window.width * 0.062 * 0.65)),
                          ("[size=30]Achternaam[/size]", dp(Window.width * 0.062 * 0.65)),
-                         ("[size=30]Aanpassingen[/size]", dp(Window.width * 0.025 * 0.65))],
+                         ("[size=30]Aanpassingen[/size]", dp(Window.width * 0.025 * 0.65)),
+                         ("[size=30]Aanpassingswijze[/size]", dp(Window.width * 0.062 * 0.65))],
             row_data=table_data,
             background_color=(1, 1, 1, 1),
             background_color_cell=(0, 0, 1, 0),

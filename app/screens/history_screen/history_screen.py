@@ -7,8 +7,7 @@ from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.metrics import dp
 from kivy.core.window import Window
-
-import json
+from kivy.storage.jsonstore import JsonStore
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
@@ -27,15 +26,7 @@ class HistoryScreen(MDScreen):
         self.clear_popup()
 
     def load_history(self):  # load the history table
-        try:  # try to load the history file
-            with open("app/functions/scan_history.json", "r") as openfile:
-                history = json.load(openfile)
-            openfile.close()
-        except FileNotFoundError:  # if the file does not exist
-            pass
-        except json.decoder.JSONDecodeError:  # if the file exists but is completely empty
-            openfile.close()
-            history = dict()
+        history = JsonStore("app/functions/scan_history.json")
 
         # set up the table data
         table_data = []
@@ -136,6 +127,4 @@ class HistoryScreen(MDScreen):
         self.backgroundimage.opacity = 0
 
     def reset_history(self):  # set the history file to an empty dictionary
-        file = open('app/functions/scan_history.json', 'w')
-        json.dump(dict(), file)
-        file.close()
+        JsonStore("app/functions/scan_history.json").clear()

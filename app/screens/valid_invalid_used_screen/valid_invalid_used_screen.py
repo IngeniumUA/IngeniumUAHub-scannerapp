@@ -6,12 +6,11 @@ from kivy.metrics import dp
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.config import Config
+from kivy.storage.jsonstore import JsonStore
 
 from app.functions.variables import variables
 from app.api.hub_api import update_validity
 from app.functions.get_results import get_results
-
-import json
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
@@ -37,15 +36,7 @@ def add_to_history(event: str, mail: str, naam: str, achternaam: str, count: int
     :return: None
     """
 
-    try:
-        with open("app/functions/scan_history.json", "r") as openfile:
-            history = json.load(openfile)
-        openfile.close()
-    except FileNotFoundError:  # if the file does not exist
-        history = dict()
-    except json.decoder.JSONDecodeError:  # if the file exists but is completely empty
-        openfile.close()
-        history = dict()
+    history = JsonStore("app/functions/scan_history.json")
 
     if event in list(history.keys()):
         if mail in list(history[event].keys()):  # if the ticket was already scanned, but there were still valids
@@ -54,10 +45,6 @@ def add_to_history(event: str, mail: str, naam: str, achternaam: str, count: int
             history[event][mail] = {"naam": naam, "achternaam": achternaam, "count": count}
     else:  # if the event was not yet used
         history[event] = {mail: {"naam": naam, "achternaam": achternaam, "count": count}}
-
-    with open("app/functions/scan_history.json", "w") as outfile:  # update the file with the new data
-        json.dump(history, outfile)
-    outfile.close()
 
 
 def alg_make_visible(self, visibility: bool) -> None:

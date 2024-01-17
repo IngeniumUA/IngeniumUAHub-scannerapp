@@ -15,7 +15,7 @@ from app.functions.get_results import get_results
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
 
-def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam: str, count: int) -> None:
+def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam: str, count: int, uuid: str) -> None:
     """
     adds the validated ticket with the given info the history file, if the file doesn't exist, it will be created
 
@@ -31,6 +31,7 @@ def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam:
     :param achternaam:
     :param count:
     :param edit_mode:
+    :param uuid:
 
     Returns
     -------
@@ -46,13 +47,13 @@ def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam:
         if mail in list(history[event].keys()):  # if the ticket was already scanned, but there were still valids
             if edit_mode in list(history[event][mail].keys()):  # pass the edit mode
                 count += history[event][mail][edit_mode]["count"]
-                history[event][mail][edit_mode] = {"naam": naam, "achternaam": achternaam, "count": count}
+                history[event][mail][edit_mode] = {"naam": naam, "achternaam": achternaam, "count": count, "uuid": uuid}
             else:
-                history[event][mail][edit_mode] = {"naam": naam, "achternaam": achternaam, "count": count}
+                history[event][mail][edit_mode] = {"naam": naam, "achternaam": achternaam, "count": count, "uuid": uuid}
         else:  # if the event was already used
-            history[event][mail] = {edit_mode: {"naam": naam, "achternaam": achternaam, "count": count}}
+            history[event][mail] = {edit_mode: {"naam": naam, "achternaam": achternaam, "count": count, "uuid": uuid}}
     else:  # if the event was not yet used
-        history[event] = {mail: {edit_mode: {"naam": naam, "achternaam": achternaam, "count": count}}}
+        history[event] = {mail: {edit_mode: {"naam": naam, "achternaam": achternaam, "count": count, "uuid": uuid}}}
     history_json["data"] = history  # write the dictionary to the file
 
 
@@ -181,7 +182,7 @@ class ValidInvalidUsedScreen(MDScreen):
             else:
                 edit_mode = "manueel aangepast"
             add_to_history(variables["main_button_events"].text, variables["email"], edit_mode, variables["voornaam"],
-                           variables["naam"], count)
+                           variables["naam"], count, variables["prev_result"])
 
         response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                     variables["prev_args"]["event_uuid"], False)
@@ -337,7 +338,7 @@ class ValidInvalidUsedScreen(MDScreen):
 
             # add the validated ticket to the history
             add_to_history(variables["main_button_events"].text, variables["email"], "enkel ongeldig ticket",
-                           variables["voornaam"], variables["naam"], count)
+                           variables["voornaam"], variables["naam"], count, variables["prev_result"])
             # to_subtract = float(self.main_button_invalids.text.replace('Huidig ticket: €', ''))
             # new_to_pay = float(self.product_table.row_data[self.saved_i][2].replace('[size=30]€', '')
             #                    .replace("[/size]", "")) - to_subtract
@@ -361,7 +362,8 @@ class ValidInvalidUsedScreen(MDScreen):
 
                     # add the validated ticket to the history
                     add_to_history(variables["main_button_events"].text, variables["email"],
-                                   "meerdere ongeldige tickets", variables["voornaam"], variables["naam"], count)
+                                   "meerdere ongeldige tickets", variables["voornaam"],
+                                   variables["naam"], count, variables["prev_result"])
 
             response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                         variables["prev_args"]["event_uuid"], False)

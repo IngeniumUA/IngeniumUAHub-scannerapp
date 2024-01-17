@@ -47,6 +47,9 @@ class ScanScreen(MDScreen):
         if result == variables["prev_result"]:
             return
 
+        # store the used result, so it won't be used util user gets sent to other screen
+        variables["prev_result"] = result
+
         # get data from the qr code and store used data for the api call in variables for access on other screens
         response_dict = get_results(variables["token"], result,
                                     variables["event_items"][variables["main_button_events"].text])
@@ -110,9 +113,6 @@ class ScanScreen(MDScreen):
             self.ids.event_empty.opacity = 1
         else:
             print("ERROR - validity unknown")  # this should never happen, print for debugging
-
-        # store the used result, so it won't be used util user gets sent to other screen
-        variables["prev_result"] = result
 
     def load_dropdown_events(self):  # load the dropdown from which the user can select the correct event
         self.dropdown_events = DropDown()

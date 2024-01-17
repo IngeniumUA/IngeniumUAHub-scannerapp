@@ -63,7 +63,7 @@ class HistoryScreen(MDScreen):
                          ("[size=30]Aanpassingen[/size]", dp(Window.width * 0.025 * (0.65 + float(variables["pc"])))),
                          ("[size=30]Aanpassingswijze[/size]", dp(Window.width * 0.062 *
                                                                  (0.65 + float(variables["pc"])))),
-                         ("[size=30]UUID[/size]", dp(Window.width * 0.062 * (0.65 + float(variables["pc"]))))],
+                         ("[size=30]UUID[/size]", dp(Window.width * 0.087 * (0.65 + float(variables["pc"]))))],
             row_data=table_data,
             background_color=(1, 1, 1, 1),
             background_color_cell=(0, 0, 1, 0),

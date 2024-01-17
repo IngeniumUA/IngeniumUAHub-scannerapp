@@ -9,6 +9,7 @@ from app.screens.login_screen.login_screen import LoginScreen
 from app.screens.valid_invalid_used_screen.valid_invalid_used_screen import ValidInvalidUsedScreen
 from app.screens.scan_screen.scan_screen import ScanScreen
 from app.screens.history_screen.history_screen import HistoryScreen
+from app.functions.variables import variables
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
@@ -33,7 +34,9 @@ class IngeniumApp(MDApp):
         ScanScreen.close_camera(ScanScreen())
 
     def build(self):  # start the app loop
+        variables["pc"] = True  # store if the os is android or not for table visuals
         if platform == 'android':  # when the os is android, permissions for camera use are requested
+            variables["pc"] = False
             from pythonforandroid.recipes.android.src.android.permissions import request_permissions, Permission
             request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO])
         return Sm()  # launch the screen manager so all screens get initiated

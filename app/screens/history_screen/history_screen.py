@@ -9,6 +9,8 @@ from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.storage.jsonstore import JsonStore
 
+from app.functions.variables import variables
+
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
 
@@ -45,8 +47,6 @@ class HistoryScreen(MDScreen):
                             "[size=30]" + str(history[event][mail][mode]["count"]) + "[/size]",
                             "[size=30]" + mode + "[/size]"
                         ))
-        else:
-            table_data = []
 
         # create the table
         self.info_table = MDDataTable(
@@ -54,12 +54,14 @@ class HistoryScreen(MDScreen):
             size_hint_x=1,
             check=False,
             pos_hint={"x": 0, "y": 0.1},
-            column_data=[("[size=30]Event[/size]", dp(Window.width * 0.062 * 0.65)),
-                         ("[size=30]Email[/size]", dp(Window.width * 0.062 * 0.65)),
-                         ("[size=30]Naam[/size]", dp(Window.width * 0.062 * 0.65)),
-                         ("[size=30]Achternaam[/size]", dp(Window.width * 0.062 * 0.65)),
-                         ("[size=30]Aanpassingen[/size]", dp(Window.width * 0.025 * 0.65)),
-                         ("[size=30]Aanpassingswijze[/size]", dp(Window.width * 0.062 * 0.65))],
+            # add 1 to width scaling when on pc
+            column_data=[("[size=30]Event[/size]", dp(Window.width * 0.062 * (0.65 + float(variables["pc"])))),
+                         ("[size=30]Email[/size]", dp(Window.width * 0.062 * (0.65 + float(variables["pc"])))),
+                         ("[size=30]Naam[/size]", dp(Window.width * 0.062 * (0.65 + float(variables["pc"])))),
+                         ("[size=30]Achternaam[/size]", dp(Window.width * 0.062 * (0.65 + float(variables["pc"])))),
+                         ("[size=30]Aanpassingen[/size]", dp(Window.width * 0.025 * (0.65 + float(variables["pc"])))),
+                         ("[size=30]Aanpassingswijze[/size]", dp(Window.width * 0.062 *
+                                                                 (0.65 + float(variables["pc"]))))],
             row_data=table_data,
             background_color=(1, 1, 1, 1),
             background_color_cell=(0, 0, 1, 0),
@@ -112,8 +114,8 @@ class HistoryScreen(MDScreen):
         )
         self.continue_button.bind(on_release=lambda x: self.reset_history())
         self.continue_button.bind(on_press=lambda x: self.clear_popup())
-        # table is now incorrect so remove it
-        self.continue_button.bind(on_release=lambda x: self.remove_widget(self.info_table))
+        # set the row data to empty
+        self.continue_button.bind(on_release=lambda x: setattr(self.info_table, "row_data", []))
         self.add_widget(self.continue_button, index=1)
 
     def show_popup(self):  # shows the popup

@@ -19,4 +19,6 @@ variables = {
     "id_list": dict(),
 
     "main_button_events": None,
-    "event_items": dict()}
+    "event_items": dict(),
+
+    "pc": bool}

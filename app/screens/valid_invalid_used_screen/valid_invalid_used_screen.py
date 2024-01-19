@@ -11,6 +11,7 @@ from kivy.storage.jsonstore import JsonStore
 from app.functions.variables import variables
 from app.api.hub_api import update_validity
 from app.functions.get_results import get_results
+from app.functions.send_to_screen import send_to_screen
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
@@ -186,6 +187,8 @@ class ValidInvalidUsedScreen(MDScreen):
 
         response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                     variables["prev_args"]["event_uuid"], False)
+        if response_dict["validity"] == "APITokenError":
+            send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
         variables["table_data"] = response_dict["table_data"]
         self.remove_widget(self.product_table)
 
@@ -349,6 +352,8 @@ class ValidInvalidUsedScreen(MDScreen):
             #                                self.product_table.row_data[self.saved_i][3]])
             response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                         variables["prev_args"]["event_uuid"], False)
+            if response_dict["validity"] == "APITokenError":
+                send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
             variables["table_data"] = response_dict["table_data"]
             self.remove_widget(self.product_table)
             self.load_table(True)
@@ -367,6 +372,8 @@ class ValidInvalidUsedScreen(MDScreen):
 
             response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                         variables["prev_args"]["event_uuid"], False)
+            if response_dict["validity"] == "APITokenError":
+                send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
             variables["table_data"] = response_dict["table_data"]
             self.remove_widget(self.product_table)
             self.load_table(True)

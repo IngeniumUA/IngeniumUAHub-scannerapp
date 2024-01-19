@@ -81,6 +81,9 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
     # run when userdata is asked
     if run_userdata:
         userdata = get_userdata(token, transactions[0].interaction.user_id)
+        if "error" in list(userdata.keys()):
+            if userdata["error"] == "expired token":
+                return {"validity": "APITokenError"}  # return expired token
     else:
         userdata = {"voornaam": "", "achternaam": "", "lidstatus": False}
 

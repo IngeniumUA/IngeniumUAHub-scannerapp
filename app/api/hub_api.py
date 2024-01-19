@@ -110,6 +110,8 @@ def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
         return {"lidstatus": response.json()["roles"]["is_lid"],
                 "voornaam": response.json()["user_detail"]["voornaam"],
                 "achternaam": response.json()["user_detail"]["achternaam"]}
+    elif response.status_code == 401:  # token expired
+        return {"error": "expired token"}
     else:  # return empty user
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
 

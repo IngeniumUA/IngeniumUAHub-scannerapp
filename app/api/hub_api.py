@@ -237,37 +237,3 @@ def get_all_events(token: PyToken, current_date: datetime.datetime) -> dict:
         return return_dict
     else:  # return empty dictionary
         return dict()
-
-
-def get_niet_lid_price(token: PyToken, product_blueprint_id: int) -> float:
-    """
-    gets the niet lid price for the product with the given product blueprint
-
-    Examples
-    --------
-    >>> get_niet_lid_price(token, 100)
-    float
-
-    Parameters
-    ----------
-    :param token:
-    :param product_blueprint_id:
-
-    Returns
-    -------
-    :return: float
-    """
-
-    try:  # try statement to prevent crashing when unable to connect
-        response = requests.get(url=api_url + "staff/blueprint/" + str(product_blueprint_id),
-                                headers={"authorization": "Bearer " + token.access_token})
-    except requests.exceptions.ConnectionError:  # return very high price to alarm the user that something went wrong
-        return 999
-
-    if response.status_code == 200:  # OK
-        policy_list = []
-        for policy in response.json()["price_policies"]:
-            policy_list.append(policy["price"])
-        return max(policy_list)  # find the highest price in the blueprint as this will always be the niet lid price
-    else:  # return very high price to alarm the user that something went wrong
-        return 999

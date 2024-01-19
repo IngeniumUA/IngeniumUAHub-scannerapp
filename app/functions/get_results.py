@@ -1,5 +1,6 @@
+from kivy.storage.jsonstore import JsonStore
 from app.api.data_models import PyStaffTransaction
-from app.api.hub_api import get_transactions, get_userdata, get_niet_lid_price
+from app.api.hub_api import get_transactions, get_userdata
 
 
 def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) -> dict:
@@ -58,7 +59,12 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
         if transaction.interaction.item_id == event_uuid:
             event_tickets.append(transaction)
             if transaction.validity.value == "invalid":  # if invalid, the "to pay" price has to be calculated
-                niet_lid_price = get_niet_lid_price(token, transaction.product_blueprint_id)
+                prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+                prices = dict(prices_json)  # convert the file to a dictionary
+                if prices != dict():
+                    prices = prices["data"]
+
+                niet_lid_price = prices[event_uuid]
                 to_pay = niet_lid_price*transaction.count - float(transaction.amount)  # niet lid price - already paid
             else:
                 to_pay = 0

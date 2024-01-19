@@ -291,7 +291,7 @@ class ValidInvalidUsedScreen(MDScreen):
                       .replace("[size=30]NVT", "0"))
             amount = float(amount)
             if first and int(amount) != 0:
-                huidig = "%.2f" % (amount / int(variables["table_data"][i][0].split(" x ")[0]))
+                huidig = "%.2f" % (amount / int(variables["table_data"][i][0].split(" x ")[0].replace("[size=30]", "")))
                 self.saved_i = i
                 first = False
             floatalle += amount

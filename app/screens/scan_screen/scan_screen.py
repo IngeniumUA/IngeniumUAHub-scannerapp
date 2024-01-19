@@ -6,15 +6,17 @@ from kivy.uix.dropdown import DropDown
 from kivymd.uix.screen import MDScreen
 from kivy.lang import Builder
 from kivy.config import Config
+from kivy.storage.jsonstore import JsonStore
 
 from camera4kivy import Preview
 from PIL import Image
 from pyzbar.pyzbar import decode
 import datetime
 
-from app.api.hub_api import PyToken, refresh_token, get_all_events
+from app.api.hub_api import get_all_events
 from app.functions.get_results import get_results
 from app.functions.variables import variables
+from app.functions.send_to_screen import send_to_screen
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
@@ -36,9 +38,25 @@ class ScanScreen(MDScreen):
         self.ids.preview.disconnect_camera()
 
     def goto_history_screen(self):  # when icon is clicked, the user is sent to the history screen
-        variables["prev_screen"] = "history"
+        variables["prev_screen"] = "scan"
         self.manager.transition.direction = "left"
         self.manager.current = "history"
+
+    def goto_niet_lid_price_screen(self):  # when icon is clicked, the user is sent to the niet_lid_price screen
+        variables["prev_screen"] = "scan"
+        self.manager.transition.direction = "left"
+        self.manager.current = "niet_lid_price"
+
+    def price_is_set(self, event_uuid: str) -> bool:  # returns whether the price of an event is set
+        prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+        prices = dict(prices_json)  # convert the file to a dictionary
+        if prices != dict():
+            prices = prices["data"]
+
+        if event_uuid in list(prices.keys()):
+            return prices[event_uuid] != -1
+        else:
+            return False
 
     @mainthread
     def got_result(self, result):  # called when a qr code is detected, the string from the code is in result
@@ -70,54 +88,30 @@ class ScanScreen(MDScreen):
             variables["checkout_status"] = response_dict["checkout_status"]
             variables["table_data"] = response_dict["table_data"]
 
-        # detect which validity or error the qr code has and send user to the appropriate screen
-        if response_dict["validity"] == "APITokenError":
-            result = ""
-            variables["prev_result"] = ""
-            variables["token"] = refresh_token(variables["token"])
-            # when the token is expired, attempt to refresh the token. if this fails, bring user back to login screen
-            if variables["token"] == PyToken():
-                variables["prev_screen"] = "scan"
-                self.manager.transition.direction = "right"
-                self.manager.current = "login"
-            else:
-                self.manager.transition.direction = "left"
-                self.manager.current = "token"
-
-        elif response_dict["validity"] == "valid":
-            variables["iconpath"] = "app/assets/checkmark.png"  # set icon to green checkmark
-            variables["prev_screen"] = "scan"
-            self.manager.transition.direction = "left"
-            self.manager.current = "valid_invalid_used"
-
-        elif response_dict["validity"] == "invalid":
-            variables["iconpath"] = "app/assets/dashmark.png"  # set icon to orange "stop sign"
-            variables["prev_screen"] = "scan"
-            self.manager.transition.direction = "left"
-            self.manager.current = "valid_invalid_used"
-
-        # when ticket is invalid but data was still acquired
-        elif (response_dict["validity"] == "consumed" or response_dict["validity"] == "eventError"
-              or response_dict["validity"] == "manually_verified"):
-            variables["prev_screen"] = "scan"
-            variables["iconpath"] = "app/assets/xmark.png"  # set icon to red cross
-            self.manager.transition.direction = "left"
-            self.manager.current = "valid_invalid_used"
-
-        elif response_dict["validity"] == "UUIDError":
-            variables["prev_screen"] = "scan"
-            self.manager.transition.direction = "left"
-            self.manager.current = "payless"
-
-        elif response_dict["validity"] == "emptyEvent":  # when no event was given
-            self.ids.event_empty.opacity = 1
+        # if the event price is set, send user to the right screen, else send user to niet_lid_price page
+        if self.price_is_set(variables["event_items"][variables["main_button_events"].text]):
+            send_to_screen(self, response_dict["validity"])
         else:
-            print("ERROR - validity unknown")  # this should never happen, print for debugging
+            self.goto_niet_lid_price_screen()
 
     def load_dropdown_events(self):  # load the dropdown from which the user can select the correct event
         self.dropdown_events = DropDown()
         variables["event_items"] = get_all_events(variables["token"], datetime.datetime.now())
         variables["event_items"]['Selecteer een evenement'] = ""
+
+        # set prices of events that are not in the file to -1
+        prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+        prices = dict(prices_json)  # convert the file to a dictionary
+        if prices != dict():
+            prices = prices["data"]
+
+        # check that all events have a niet-lid price
+        # if this is not the case, set the price to -1 so this can be detected later
+        for event_uuid in list(variables["event_items"].values()):
+            if event_uuid not in list(prices.keys()):
+                prices[event_uuid] = -1
+        prices[""] = 0  # set the price of the select option to 0
+        prices_json["data"] = prices  # write the dictionary to the file
 
         for item in list(variables["event_items"].keys()):
             opts_events = Button(
@@ -126,13 +120,14 @@ class ScanScreen(MDScreen):
                 height=dp(30),
                 font_name='app/assets/D-DIN.otf')
             opts_events.bind(on_release=lambda opt_events: self.dropdown_events.select(opt_events.text))
+            opts_events.bind(on_release=lambda opt_events: self.save_selected_event(opt_events.text))
             self.dropdown_events.add_widget(opts_events)
 
         variables["main_button_events"] = Button(
             text='Selecteer een evenement',
-            size_hint=(0.75, None),
+            size_hint=(0.72, None),
             height=dp(30),
-            pos_hint={'x': 0.05, 'y': 0.92},
+            pos_hint={'x': 0.14, 'y': 0.92},
             font_name='app/assets/D-DIN.otf')
         variables["main_button_events"].bind(on_release=self.dropdown_events.open)
         variables["main_button_events"].bind(on_release=lambda x: self.reset_event_empty())
@@ -144,6 +139,9 @@ class ScanScreen(MDScreen):
     def reset_event_empty(self):
         self.ids.event_empty.opacity = 0
         variables["prev_result"] = ""
+
+    def save_selected_event(self, event):
+        variables["current_selected_event"] = event
 
 
 class ScanAnalyze(Preview):  # decodes camera data and returns the scanned string when qr code is detected

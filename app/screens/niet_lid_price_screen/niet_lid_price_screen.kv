@@ -1,0 +1,79 @@
+<NietLidPriceScreen>
+    # label that shows the niet-lid price of the selected event
+    MDLabel:
+        id: niet_lid_price
+        text: ""
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.7
+        pos_hint: {"x":0.15, "y":0.82}
+		halign: 'center'
+		font_name: 'app/assets/D-DIN.otf'
+
+	# textbox to give the new price
+	TextInput:
+        size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.7
+		pos_hint: {"x":0.15, "y":0.77}
+        id: new_price
+        hint_text: "Niet-lid prijs"
+        multiline: False
+        font_name: 'app/assets/D-DIN.otf'
+        on_text_validate:
+            root.apply()
+
+    # label that shows error messages if any
+    MDLabel:
+        id: price_not_num
+        opacity: 0
+        text: "Geef een geldige prijs (zonder euro of euroteken) met een punt als decimaal teken"
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.7
+        pos_hint: {"x":0.15, "y":0.67}
+		halign: 'center'
+		color: 1,0,0,1
+		font_size: 45
+		font_name: 'app/assets/D-DIN.otf'
+
+	# button apply the changes and go to the correct screen
+    Button:
+        size_hint_x: 0.76
+        pos_hint: {"x":0.12, "y":0.56}
+        size_hint_y: 0.1
+        text: "Bevestig"
+        id: apply_button
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.apply()
+
+    # button to initiate reset price list
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0.11}
+        size_hint_y: 0.05
+        text: "Wis prijslijst"
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.show_popup_price()
+
+	# button to go back to scan screen
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0}
+        size_hint_y: 0.1
+        text: "Terug"
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.manager.transition.direction = "right"
+            root.manager.current = "scan"

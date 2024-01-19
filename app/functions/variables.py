@@ -8,6 +8,7 @@ variables = {
     "prev_screen": "",
     "prev_result": "",
     "prev_args": dict(),
+    "current_selected_event": "",
 
     "voornaam": "",
     "naam": "",
@@ -19,6 +20,7 @@ variables = {
     "id_list": dict(),
 
     "main_button_events": None,
+    "main_button_events_price": None,
     "event_items": dict(),
 
     "pc": bool}

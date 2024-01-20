@@ -71,14 +71,15 @@ def refresh_token(token: PyToken) -> PyToken:
 
     try:  # try statement to prevent crashing when unable to connect
         response = requests.post(
-            api_url + "auth/refresh", {token})
+            api_url + "auth/refresh", json={"access_token":  token.access_token,
+                                            "refresh_token": token.refresh_token, "token_type": "Bearer"})
     except requests.exceptions.ConnectionError:  # return empty token
-        return PyToken()
+        return PyToken(access_token="", refresh_token="")
 
     if response.status_code == 200:  # OK
         return PyToken(**response.json())
     else:  # return empty token
-        return PyToken()
+        return PyToken(access_token="", refresh_token="")
 
 
 def get_userdata(token: PyToken, uuid: str | None = None) -> dict:

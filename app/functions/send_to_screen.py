@@ -26,7 +26,7 @@ def send_to_screen(self, validity) -> None:
         variables["prev_result"] = ""
         variables["token"] = refresh_token(variables["token"])
         # when the token is expired, attempt to refresh the token. if this fails, bring user back to login screen
-        if variables["token"] == PyToken():
+        if variables["token"] == PyToken(access_token="", refresh_token=""):
             variables["prev_screen"] = "scan"
             self.manager.transition.direction = "right"
             self.manager.current = "login"

@@ -1,4 +1,7 @@
 import qrcode
+import io
+import PIL.Image as Image
+import base64
 
 
 """
@@ -17,3 +20,14 @@ uuid = 'c663cdfb-4987-4acf-960e-88a5de7adc75'
 ##############################
 testqr = qrcode.make(uuid)
 testqr.save(uuid+".png")
+
+# convert img to base64 string
+buffered = io.BytesIO()
+testqr.save(buffered, format="PNG")
+testqr_base64 = base64.urlsafe_b64encode(buffered.getvalue())
+
+# check that the bytearray worked by converting it back to an img
+print(testqr_base64)
+print(buffered.getvalue())
+image = Image.open(io.BytesIO(buffered.getvalue()))
+image.save("test.png", "PNG")

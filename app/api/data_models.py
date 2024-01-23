@@ -40,7 +40,7 @@ class InteractionType(IntEnum):
     """ Recommender System Specific 300->399 """
 
 
-class CheckoutStatusEnum(Enum):
+class TransactionStatusEnum(Enum):
     SUCCESSFUL = "SUCCESSFUL"  # Payment has succeeded
     CANCELLED = "CANCELLED"  # Payment was cancelled
     FAILED = "FAILED"  # Payment Failed
@@ -75,7 +75,7 @@ class PyStaffTransaction(BaseModel):
     amount: decimal.Decimal
     currency: str
 
-    status: CheckoutStatusEnum
+    status: TransactionStatusEnum
     checkout_id: str
 
     validity: ValidityEnum

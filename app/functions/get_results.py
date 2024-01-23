@@ -49,6 +49,10 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
         if transaction.validity.value == "forbidden":
             return {"validity": "UUIDError"}
 
+        # if the transaction wasn't successful, handle ticket as if it is consumed
+        if transaction.status.value != "SUCCESSFUL":
+            transaction.validity.value = "consumed"
+
         # get products in form eg "1 x event \n sub-event"
         products_str = str()
         products_str += (str(transaction.count) + " x "

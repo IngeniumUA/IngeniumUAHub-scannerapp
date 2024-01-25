@@ -356,7 +356,7 @@ class ValidInvalidUsedScreen(MDScreen):
                 send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
             variables["table_data"] = response_dict["table_data"]
             self.remove_widget(self.product_table)
-            self.load_table(True)
+            self.load_table(False)
         else:
             for i in range(len(variables["table_data"])):
                 if self.product_table.row_data[i][1] == "[size=30]invalid[/size]":
@@ -376,4 +376,4 @@ class ValidInvalidUsedScreen(MDScreen):
                 send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
             variables["table_data"] = response_dict["table_data"]
             self.remove_widget(self.product_table)
-            self.load_table(True)
+            self.load_table(False)

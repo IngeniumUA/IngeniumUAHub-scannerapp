@@ -4,7 +4,7 @@ from kivy.config import Config
 from kivymd.app import MDApp
 from kivymd.uix.screenmanager import MDScreenManager
 
-from app.screens.trivial_screens import TokenScreen, PaylessScreen
+from app.screens.trivial_screens import TokenScreen, PaylessScreen, RedirectScreen
 from app.screens.login_screen.login_screen import LoginScreen
 from app.screens.valid_invalid_used_screen.valid_invalid_used_screen import ValidInvalidUsedScreen
 from app.screens.scan_screen.scan_screen import ScanScreen
@@ -28,6 +28,7 @@ class Sm(MDScreenManager):
         self.add_widget(PaylessScreen(name='payless'))
         self.add_widget(HistoryScreen(name='history'))
         self.add_widget(NietLidPriceScreen(name='niet_lid_price'))
+        self.add_widget(RedirectScreen(name='redirect'))
 
 
 # initiate the app itself

@@ -82,6 +82,47 @@ def refresh_token(token: PyToken) -> PyToken:
         return PyToken(access_token="", refresh_token="")
 
 
+def check_new_user(token: PyToken, user_email: str) -> dict | str:
+    """
+    Check if the user is lid or not and get its uuid, return error message if user not found
+
+    Examples
+    --------
+    >>> check_new_user(token, user_email="<EMAIL>")
+    {"lid": True, "uuid": "<UUID>"} or
+    "User not found"
+
+    Parameters
+    ----------
+    :param token:
+    :param user_email:
+
+    Returns
+    -------
+    if user exists
+    :return: dict
+    else
+    :return: str
+    """
+
+    try:  # try statement to prevent crashing when unable to connect
+        response = requests.get(url=api_url + "staff/user?limit=50&offset=0&user_email="+user_email.replace("@", "%40"),
+                                headers={"authorization": "Bearer " + token.access_token})
+    except requests.exceptions.ConnectionError:  # return user does not exist
+        return "User not found"
+
+    response_dict = dict()
+    if response.status_code == 200:  # OK
+        if response.json():
+            response_dict["lid"] = response.json()[0]["roles"]["is_lid"]
+            response_dict["uuid"] = response.json()[0]["uuid"]
+            return response_dict
+        else:  # user does not exist
+            return "User not found"
+    elif response.status_code == 401:  # user not found or token expired
+        return "User not found"
+
+
 def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
     """
     gets userdata based on uuid from database
@@ -117,13 +158,15 @@ def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
 
 
-def update_validity(token: PyToken, interaction_id: int, validity: str, count: int) -> None:
+def patch_transaction(token: PyToken, interaction_id: int,
+                      validity: str | None = None, count: int | None = None,
+                      user: str | None = None, force_patch: bool = True) -> None:
     """
-    Updates the validity of the interaction with the given count
+    Updates the transaction of the interaction with the given parameters
 
     Examples
     --------
-    >>> update_validity(token, 100, "consumed", 2)
+    >>> patch_transaction(token, 100, "consumed", 2)
     None
 
     Parameters
@@ -132,15 +175,27 @@ def update_validity(token: PyToken, interaction_id: int, validity: str, count: i
     :param interaction_id:
     :param validity:
     :param count:
+    :param user:
+    :param force_patch:
 
     Returns
     -------
     :return: None
     """
 
+    # set up dict for api call using given parameters except for token
+    query_params = dict()
+    func_args = locals()
+    for non_query_var in ('token', 'query_params', 'interaction_id'):
+        func_args.pop(non_query_var)
+    func_args_for = func_args.copy()
+    for arg, value in func_args_for.items():
+        if not value:
+            func_args.pop(arg)
+
     try:  # try statement to prevent crashing when unable to connect
         requests.patch(url=api_url + "staff/transaction/" + str(interaction_id),
-                       json={"validity": validity, "count": count},
+                       json=func_args,
                        headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:  # nothing gets returned anyway so just pass
         pass

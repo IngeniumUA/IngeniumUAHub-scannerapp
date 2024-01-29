@@ -345,6 +345,7 @@ class ValidInvalidUsedScreen(MDScreen):
         self.add_widget(self.confirm_button_invalids, index=6)
 
         self.button_change_user = Button(
+            disabled=True,  # !!!!! is disabled as user change is not implemented in the api, remove when this is implemented !!!!!
             text="Pas eigenaar aan",
             size_hint=(1, 0.05),
             pos_hint={'x': 0, 'y': 0.15},

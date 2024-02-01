@@ -4,7 +4,14 @@ import datetime
 
 from app.api.data_models import PyStaffTransaction
 
-api_url = "https://hub.dev.ingeniumua.be/api/v1/"  # main api link that will be appended based on what is required
+
+# main api link that will be appended based on what is required
+# local
+# api_url = "http://127.0.0.1:8000/api/v1/"
+# dev
+# api_url = "https://hub.dev.ingeniumua.be/api/v1/"
+# production
+api_url = "https://hub.ingeniumua.be/api/v1/"
 
 
 class PyToken(BaseModel):  # the token used for verifying user

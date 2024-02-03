@@ -193,7 +193,7 @@ def patch_transaction(token: PyToken, interaction_id: int,
     # set up dict for api call using given parameters except for token
     query_params = dict()
     func_args = locals()
-    for non_query_var in ('token', 'query_params', 'interaction_id'):
+    for non_query_var in ('token', 'query_params', 'interaction_id', 'force_patch'):
         func_args.pop(non_query_var)
     func_args_for = func_args.copy()
     for arg, value in func_args_for.items():
@@ -201,7 +201,7 @@ def patch_transaction(token: PyToken, interaction_id: int,
             func_args.pop(arg)
 
     try:  # try statement to prevent crashing when unable to connect
-        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id),
+        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id) + "?force_patch=" + str(force_patch),
                        json=func_args,
                        headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:  # nothing gets returned anyway so just pass

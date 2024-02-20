@@ -232,39 +232,10 @@
         font_name: 'app/assets/D-DIN.otf'
         size_hint_y: 0.03
 
-    # (in dropdown) textbox to give amount of tickets to update
-    TextInput:
-        size_hint_y: None
-		height:'30dp'
-		size_hint_x: 0.15
-		pos_hint: {"x":0.425, "y":0.1}
-        id: count_input
-        opacity: 0
-        disabled: True
-        text: "alle"
-        multiline: False
-        font_name: 'app/assets/D-DIN.otf'
-        on_text_validate:
-            root.change_validity_button()
-
-    # (in dropdown) shows error message if textbox is filled incorrectly (not "alle" or number)
-    MDLabel:
-        id: count_error
-		size_hint_y: None
-		height:'30dp'
-		size_hint_x: 0.7
-        pos_hint: {"x":0.15, "y":0.15}
-		halign: 'center'
-		color: 1,0,0,1
-		opacity: 0
-		text: "Kon aantal niet lezen"
-		font_size: 45
-		font_name: 'app/assets/D-DIN.otf'
-
     # (in dropdown) button to execute changes
     Button:
-        size_hint: 0.425, 0.05
-        pos_hint: {"x":0.575, "y":0.1}
+        size_hint: 0.5, 0.05
+        pos_hint: {"x":0.5, "y":0.1}
         text: "Sla op"
         id: validity_button
         opacity: 0

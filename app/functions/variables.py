@@ -3,7 +3,6 @@ variables = {
     "token": None,
     "visibility": False,
     "iconpath": "",
-    "show_count_error": False,
 
     "prev_screen": "",
     "prev_result": "",
@@ -17,7 +16,7 @@ variables = {
     "table_data": "",
     "validity": "",
     "checkout_status": "",
-    "id_list": dict(),
+    "id_list": [],
 
     "main_button_events": None,
     "main_button_events_price": None,

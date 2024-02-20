@@ -21,13 +21,14 @@ from app.functions.send_to_screen import send_to_screen
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
 
-def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam: str, count: int, uuid: str) -> None:
+def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam: str,
+                   uuid: str, count: int = 1) -> None:
     """
     adds the validated ticket with the given info the history file, if the file doesn't exist, it will be created
 
     Examples
     --------
-    >>> add_to_history("All-In", "<EMAIL>", "automatic verification", "<NAME>", "<LAST NAME>", 1, "<UUID>")
+    >>> add_to_history("All-In", "<EMAIL>", "automatic verification", "<NAME>", "<LAST NAME>", "<UUID>", 1)
 
     Parameters
     ----------
@@ -96,17 +97,14 @@ def alg_make_visible(self, visibility: bool) -> None:
 
     self.product_table.disabled = not visibility
     self.ids.validity_button.disabled = not visibility
-    self.ids.count_input.disabled = not visibility
     self.main_button.disabled = not visibility
 
     # remove widgets so they can't accidentally be interacted with while in the "more info" dropdown
     if variables["iconpath"] == "app/assets/dashmark.png" and visibility:
-        self.remove_widget(self.main_button_invalids)
         self.remove_widget(self.confirm_button_invalids)
         self.remove_widget(self.button_change_user)
     # re-add widgets so they can be used again
     elif variables["iconpath"] == "app/assets/dashmark.png":
-        self.add_widget(self.main_button_invalids, index=7)
         self.add_widget(self.confirm_button_invalids, index=6)
         self.add_widget(self.button_change_user, index=5)
 
@@ -124,14 +122,10 @@ def alg_make_visible(self, visibility: bool) -> None:
             self.ids.checkout_status_drop,
             self.ids.checkout_status_text,
             self.main_button,
-            self.ids.validity_button,
-            self.ids.count_input]
+            self.ids.validity_button]
 
     for obj in objs:
         obj.opacity = int(visibility)
-
-    if variables["show_count_error"]:  # error message should only be shown outside the dropdown
-        self.ids.count_error.opacity = int(visibility)
 
 
 class ValidInvalidUsedScreen(MDScreen):
@@ -153,9 +147,9 @@ class ValidInvalidUsedScreen(MDScreen):
         if variables["iconpath"] == "app/assets/checkmark.png":
             self.add_first_nonconsumed()
             self.change_validity(True)
-            variables["id_list"] = dict()
+            variables["id_list"] = []
         if variables["iconpath"] == "app/assets/dashmark.png":
-            self.load_dropdown_invalids()
+            self.load_actions_invalids()
 
     # called when the app starts, loads the dropdown with the options for validity so this only needs to happen once
     def on_kv_post(self, obj):
@@ -164,9 +158,8 @@ class ValidInvalidUsedScreen(MDScreen):
 
     # called when the screen is left. reset all variables that may otherwise influence the next scanned item
     def on_leave(self):
-        variables["id_list"] = dict()
+        variables["id_list"] = []
         self.remove_widget(self.product_table)
-        self.ids.count_input.text = "alle"
         if variables["iconpath"] == "app/assets/dashmark.png":
             self.remove_widget(self.main_button_invalids)
             self.remove_widget(self.confirm_button_invalids)
@@ -175,18 +168,14 @@ class ValidInvalidUsedScreen(MDScreen):
             self.errortextuser.opacity = 0
 
     # change the validity of an interaction based on the given parameters
-    def change_validity(self, by_entry: bool, count: int | str = 1):
+    def change_validity(self, by_entry: bool):
         if by_entry:
             validity = "consumed"
         else:
             validity = self.main_button.text.lower()
 
-        for ids in list(variables["id_list"].keys()):
-            if count == "alle":
-                count = variables["id_list"][ids]
-            if count > variables["id_list"][ids]:
-                count = variables["id_list"][ids]
-            patch_transaction(variables["token"], ids, validity, count)
+        for ids in variables["id_list"]:
+            patch_transaction(variables["token"], ids, validity)
 
             # add the validated ticket to the history
             if by_entry:
@@ -194,7 +183,7 @@ class ValidInvalidUsedScreen(MDScreen):
             else:
                 edit_mode = "manueel aangepast"
             add_to_history(variables["main_button_events"].text, variables["email"], edit_mode, variables["voornaam"],
-                           variables["naam"], count, variables["prev_result"])
+                           variables["naam"], variables["prev_result"], 1)
 
         response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
                                     variables["prev_args"]["event_uuid"], False)
@@ -210,19 +199,8 @@ class ValidInvalidUsedScreen(MDScreen):
 
     # called when the button to change the validity is pressed, extracts data and calls change_validity
     def change_validity_button(self):
-        if self.ids.count_input.text.isdigit():
-            count = int(self.ids.count_input.text)
-            self.change_validity(False, count)
-            variables["show_count_error"] = False
-            self.ids.count_error.opacity = 0
-        elif self.ids.count_input.text.lower() == "alle":
-            self.change_validity(False, "alle")
-            variables["show_count_error"] = False
-            self.ids.count_error.opacity = 0
-        else:
-            variables["show_count_error"] = True
-            self.ids.count_error.opacity = 1
-        variables["id_list"] = dict()
+        self.change_validity(False)
+        variables["id_list"] = []
 
     def load_table(self, start_visible: bool = False):  # loads the table with the data acquired from the qr code
         self.product_table = MDDataTable(
@@ -247,17 +225,15 @@ class ValidInvalidUsedScreen(MDScreen):
 
     # adds id of the checked transaction to the id_list and removes when unchecked
     def check_press(self, instance_table, current_row):
-        if int(current_row[3].replace('[size=30]', '').replace("[/size]", "")) in list(variables["id_list"].keys()):
-            del variables["id_list"][int(current_row[3].replace('[size=30]', '').replace("[/size]", ""))]
+        if int(current_row[3].replace('[size=30]', '').replace("[/size]", "")) in variables["id_list"]:
+            variables["id_list"].remove(int(current_row[3].replace('[size=30]', '').replace("[/size]", "")))
         else:
-            variables["id_list"][int(current_row[3].replace('[size=30]', '').replace("[/size]", ""))] = (
-                int(current_row[0].replace('[size=30]', '').replace("[/size]", "").split(" x ")[0]))
+            variables["id_list"].append(int(current_row[3].replace('[size=30]', '').replace("[/size]", "")))
 
     def add_first_nonconsumed(self):  # adds first ticket with a validity other than consumed to the id_list
         for row in variables["table_data"]:
             if row[1] != '[size=30]consumed[/size]':
-                variables["id_list"][int(row[3].replace('[size=30]', '').replace("[/size]", ""))] = (
-                    int(row[0].replace('[size=30]', '').replace("[/size]", "").split(" x ")[0]))
+                variables["id_list"].append(int(row[3].replace('[size=30]', '').replace("[/size]", "")))
                 break
 
     def make_visible(self):  # changes the visibility of all dropdown elements
@@ -286,7 +262,7 @@ class ValidInvalidUsedScreen(MDScreen):
             text='Valid',
             opacity=0,
             disabled=True,
-            size_hint=(0.425, 0.05),
+            size_hint=(0.5, 0.05),
             pos_hint={'x': 0, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')
         self.main_button.bind(on_release=self.dropdown_validity.open)
@@ -294,45 +270,15 @@ class ValidInvalidUsedScreen(MDScreen):
 
         self.add_widget(self.main_button, index=8)
 
-    def load_dropdown_invalids(self):  # loads the dropdown for paying when an invalid ticket was scanned
-        self.dropdown_invalids = DropDown()
-        first = True
-        huidig = ""
-        floatalle = 0
-        self.saved_i = 0
-        for i in range(len(variables["table_data"])):
-            amount = (variables["table_data"][i][2].replace("[size=30]€", "").replace("[/size]", "")
-                      .replace("[size=30]NVT", "0"))
-            amount = float(amount)
-            if first and int(amount) != 0:
-                huidig = "%.2f" % (amount / int(variables["table_data"][i][0].split(" x ")[0].replace("[size=30]", "")))
-                self.saved_i = i
-                first = False
-            floatalle += amount
-        if huidig == "":
-            huidig = "%.2f" % 0
-        huidig = "Huidig ticket: €" + huidig
-        alle = "Alle Tickets: €" + "%.2f" % floatalle
-        self.invalids_items = [huidig, alle]
+    def load_actions_invalids(self):  # loads the actions for paying when an invalid ticket was scanned
 
-        for item in self.invalids_items:
-            opts_invalids = Button(
-                text=item,
-                size_hint_y=None,
-                height=dp(30),
-                font_name='app/assets/D-DIN.otf')
-            opts_invalids.bind(on_release=lambda opt_invalids: self.dropdown_invalids.select(opt_invalids.text))
-            self.dropdown_invalids.add_widget(opts_invalids)
-
-        self.main_button_invalids = Button(
-            text=huidig,
+        amount = (variables["table_data"][0][2].replace("[size=30]", "").replace("[/size]", "")
+                  .replace("NVT", "€0.00"))
+        self.amount_label_invalids = MDLabel(
+            text=amount,
             size_hint=(0.5, 0.05),
             pos_hint={'x': 0, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')
-        self.main_button_invalids.bind(on_release=self.dropdown_invalids.open)
-        self.dropdown_invalids.bind(on_select=lambda instance, x: setattr(self.main_button_invalids, 'text', x))
-
-        self.add_widget(self.main_button_invalids, index=7)
 
         self.confirm_button_invalids = Button(
             text="Valideer",
@@ -345,7 +291,8 @@ class ValidInvalidUsedScreen(MDScreen):
         self.add_widget(self.confirm_button_invalids, index=6)
 
         self.button_change_user = Button(
-            disabled=True,  # !!!!! is disabled as user change is not implemented in the api, remove when this is implemented !!!!!
+            disabled=True,
+            # !!!!! is disabled as user change is not implemented in the api, remove when this is implemented !!!!!
             text="Pas eigenaar aan",
             size_hint=(1, 0.05),
             pos_hint={'x': 0, 'y': 0.15},
@@ -355,42 +302,20 @@ class ValidInvalidUsedScreen(MDScreen):
         self.button_change_user.bind(on_release=lambda x: self.show_popup_user())
         self.add_widget(self.button_change_user, index=5)
 
-    def validate(self):  # validates specifically the invalid tickets according to the invalid dropdown
-        if self.main_button_invalids.text.startswith("Huidig ticket"):
-            count = 1
-            ids = int(self.product_table.row_data[self.saved_i][3].replace('[size=30]', '').replace("[/size]", ""))
-            patch_transaction(variables["token"], ids, "consumed", count)
+    def validate(self):  # validates specifically the invalid ticket
+        ids = int(self.product_table.row_data[0][3].replace('[size=30]', '').replace("[/size]", ""))
+        patch_transaction(variables["token"], ids, "consumed")
 
-            # add the validated ticket to the history
-            add_to_history(variables["main_button_events"].text, variables["email"], "enkel ongeldig ticket",
-                           variables["voornaam"], variables["naam"], count, variables["prev_result"])
-            response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
-                                        variables["prev_args"]["event_uuid"], False)
-            if response_dict["validity"] == "APITokenError":
-                send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
-            variables["table_data"] = response_dict["table_data"]
-            self.remove_widget(self.product_table)
-            self.load_table(False)
-        else:
-            for i in range(len(variables["table_data"])):
-                if self.product_table.row_data[i][1] == "[size=30]invalid[/size]":
-                    ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
-                    count = int(self.product_table.row_data[i][0]
-                                .replace('[size=30]', '').replace("[/size]", "").split(" x ")[0])
-                    patch_transaction(variables["token"], ids, "consumed", count)
-
-                    # add the validated ticket to the history
-                    add_to_history(variables["main_button_events"].text, variables["email"],
-                                   "meerdere ongeldige tickets", variables["voornaam"],
-                                   variables["naam"], count, variables["prev_result"])
-
-            response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
-                                        variables["prev_args"]["event_uuid"], False)
-            if response_dict["validity"] == "APITokenError":
-                send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
-            variables["table_data"] = response_dict["table_data"]
-            self.remove_widget(self.product_table)
-            self.load_table(False)
+        # add the validated ticket to the history
+        add_to_history(variables["main_button_events"].text, variables["email"], "valideer ongeldig ticket",
+                       variables["voornaam"], variables["naam"], variables["prev_result"])
+        response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
+                                    variables["prev_args"]["event_uuid"], False)
+        if response_dict["validity"] == "APITokenError":
+            send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
+        variables["table_data"] = response_dict["table_data"]
+        self.remove_widget(self.product_table)
+        self.load_table(False)
 
     def ask_update_user(self):  # initiate the popup elements
         # initiate the background image so if the table is underneath the popup, everything remains visible
@@ -500,7 +425,7 @@ class ValidInvalidUsedScreen(MDScreen):
             for i in range(len(variables["table_data"])):
                 if self.product_table.row_data[i][1] == "[size=30]invalid[/size]" and not invalid_fixed:
                     ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
-                    patch_transaction(variables["token"], interaction_id=ids, validity="valid", count=1,
+                    patch_transaction(variables["token"], interaction_id=ids, validity="valid",
                                       force_patch=False, user=self.inputuser.text)
                 elif not (self.product_table.row_data[i][1] == "[size=30]invalid[/size]" and not invalid_fixed):
                     ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
@@ -525,9 +450,8 @@ class ValidInvalidUsedScreen(MDScreen):
                 variables["checkout_status"] = response_dict["checkout_status"]
                 variables["table_data"] = response_dict["table_data"]
 
-            variables["id_list"] = dict()
+            variables["id_list"] = []
             self.remove_widget(self.product_table)
-            self.ids.count_input.text = "alle"
             self.remove_widget(self.main_button_invalids)
             self.remove_widget(self.confirm_button_invalids)
             self.clear_popup_user()
@@ -536,17 +460,20 @@ class ValidInvalidUsedScreen(MDScreen):
             self.clear_popup_user()
             add_to_history(variables["main_button_events"].text, old_email + " to " + variables["email"],
                            "change user", variables["voornaam"],
-                           variables["naam"], 1, variables["prev_result"])
+                           variables["naam"], variables["prev_result"])
             self.manager.current = "redirect"
         else:
-            for i in range(len(variables["table_data"])):
-                ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
-                patch_transaction(variables["token"], interaction_id=ids, force_patch=False, user=self.inputuser.text)
+            ids = int(self.product_table.row_data[0][3].replace('[size=30]', '').replace("[/size]", ""))
+            patch_transaction(variables["token"], interaction_id=ids, force_patch=False, user=self.inputuser.text)
             response_dict = get_userdata(variables["token"], lidstatus["uuid"])
+            old_email = variables["email"]  # save old email
             variables["voornaam"] = response_dict["voornaam"]
             self.ids.voornaam_drop.text = variables["voornaam"]
             variables["naam"] = response_dict["achternaam"]
             self.ids.naam_drop.text = variables["naam"]
             variables["email"] = self.inputuser.text
             self.ids.email_drop.text = variables["email"]
+            add_to_history(variables["main_button_events"].text, old_email + " to " + variables["email"],
+                           "change user", variables["voornaam"],
+                           variables["naam"], variables["prev_result"])
             self.clear_popup_user()

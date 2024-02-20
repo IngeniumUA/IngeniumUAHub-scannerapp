@@ -7,11 +7,11 @@ from app.api.data_models import PyStaffTransaction
 
 # main api link that will be appended based on what is required
 # local
-# api_url = "http://127.0.0.1:8000/api/v1/"
+api_url = "http://127.0.0.1:8000/api/v1/"
 # dev
 # api_url = "https://hub.dev.ingeniumua.be/api/v1/"
 # production
-api_url = "https://hub.ingeniumua.be/api/v1/"
+# api_url = "https://hub.ingeniumua.be/api/v1/"
 
 
 class PyToken(BaseModel):  # the token used for verifying user
@@ -166,7 +166,7 @@ def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
 
 
 def patch_transaction(token: PyToken, interaction_id: int,
-                      validity: str | None = None, count: int | None = None,
+                      validity: str | None = None, count: int | None = 1,
                       user: str | None = None, force_patch: bool = True) -> None:
     """
     Updates the transaction of the interaction with the given parameters
@@ -209,7 +209,7 @@ def patch_transaction(token: PyToken, interaction_id: int,
 
 
 def get_transactions(token: PyToken,
-                     checkout_id: str | None = None, user_id: str | None = None, item: str | None = None,
+                     interaction_uuid: str | None = None, user_id: str | None = None, item: str | None = None,
                      status: str | None = None, validity: str | int | None = None,
                      limit: int = 50, offset: int = 0, ordering: str | None = None) -> list[PyStaffTransaction] | str:
     """
@@ -226,7 +226,7 @@ def get_transactions(token: PyToken,
     ----------
     :param ordering:
     :param token:
-    :param checkout_id:
+    :param interaction_uuid:
     :param user_id:
     :param item:
     :param status:

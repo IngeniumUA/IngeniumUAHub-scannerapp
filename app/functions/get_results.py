@@ -32,7 +32,7 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
     if event_uuid == "":  # if no event is selected
         return {"validity": "emptyEvent"}
 
-    transactions: list[PyStaffTransaction] = get_transactions(token=token, checkout_id=str(uuid))
+    transactions: list[PyStaffTransaction] = get_transactions(token=token, interaction_uuid=str(uuid))
     table_data = []
     event_tickets = []
 
@@ -55,8 +55,7 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
 
         # get products in form eg "1 x event \n sub-event"
         products_str = str()
-        products_str += (str(transaction.count) + " x "
-                         + str(transaction.interaction.item_name.lower()) + ':\n'
+        products_str += (str(transaction.interaction.item_name.lower()) + ':\n'
                          + str(transaction.product["name"]))
 
         # save tickets when they are for the given event
@@ -69,7 +68,7 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
                     prices = prices["data"]
 
                 niet_lid_price = prices[event_uuid]
-                to_pay = niet_lid_price*transaction.count - float(transaction.amount)  # niet lid price - already paid
+                to_pay = niet_lid_price - float(transaction.amount)  # niet lid price - already paid
             else:
                 to_pay = 0
             to_pay = '€' + "%.2f" % to_pay  # set to pay to form "€00.00"

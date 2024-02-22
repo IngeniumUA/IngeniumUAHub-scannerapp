@@ -10,6 +10,7 @@ from kivy.storage.jsonstore import JsonStore
 
 from app.functions.variables import variables
 from app.functions.send_to_screen import send_to_screen
+from app.functions.setup_prices import set_up_prices
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
@@ -25,7 +26,7 @@ class NietLidPriceScreen(MDScreen):
             self.set_price_label(variables["current_selected_event"])
             variables["main_button_events_price"].text = variables["current_selected_event"]
 
-    def on_kv_post(self, obj):  # initiates popup when app is started
+    def on_kv_post(self, obj):  # initiates popup when app is started (create the needed elements)
         self.ask_reset_prices()
 
     def on_leave(self):  # when the screen is left, hide the popup if shown
@@ -156,3 +157,4 @@ class NietLidPriceScreen(MDScreen):
 
     def reset_prices(self):  # set the price list file to an empty dictionary
         JsonStore("app/functions/niet-lid_price_list.json").clear()
+        set_up_prices()

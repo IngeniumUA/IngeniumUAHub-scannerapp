@@ -62,3 +62,14 @@
         on_release:
             root.login()
             root.buttonpress()
+
+    Switch:
+        pos_hint: {"x": 0.85, "y": 0.03}
+        size_hint: 0.1, 0.05
+        on_active:
+            root.switch_to_dev(self, self.active)
+
+    MDLabel
+        text: "Dev API"
+        pos_hint: {"x":0.85, "y":-0.4}
+        font_name: 'app/assets/D-DIN.otf'

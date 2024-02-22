@@ -22,4 +22,5 @@ variables = {
     "main_button_events_price": None,
     "event_items": dict(),
 
-    "pc": bool}
+    "pc": bool,
+    "api_url": ""}

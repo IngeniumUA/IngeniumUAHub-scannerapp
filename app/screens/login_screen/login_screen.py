@@ -11,6 +11,9 @@ Config.set('graphics', 'resizable', True)  # make images and other elements resi
 class LoginScreen(MDScreen):
     kv = Builder.load_file('app/screens/login_screen/login_screen.kv')  # load the associated kv file
 
+    def on_pre_enter(self):
+        variables["api_url"] = "https://hub.ingeniumua.be/api/v1/"
+
     def login(self):  # try to get token with given credentials and save gotten token
         variables["token"] = authenticate(self.ids.mail.text.lower(), self.ids.passw.text)
         if variables["token"] == "login_error":  # when incorrect credentials
@@ -25,3 +28,9 @@ class LoginScreen(MDScreen):
             variables["prev_screen"] = "login"
             self.manager.transition.direction = "left"
             self.manager.current = "scan"
+
+    def switch_to_dev(self, switch_object, switch_value):
+        if switch_value:
+            variables["api_url"] = "https://hub.dev.ingeniumua.be/api/v1/"
+        else:
+            variables["api_url"] = "https://hub.ingeniumua.be/api/v1/"

@@ -3,11 +3,12 @@ from pydantic import BaseModel
 import datetime
 
 from app.api.data_models import PyStaffTransaction
+from app.functions.variables import variables
 
 
 # main api link that will be appended based on what is required
 # local
-api_url = "http://127.0.0.1:8000/api/v1/"
+# api_url = "http://127.0.0.1:8000/api/v1/"
 # dev
 # api_url = "https://hub.dev.ingeniumua.be/api/v1/"
 # production
@@ -46,7 +47,7 @@ def authenticate(username: str, password: str) -> PyToken | str:
 
     try:  # try statement to prevent crashing when unable to connect
         response = requests.post(
-            api_url + "auth/token",
+            variables["api_url"] + "auth/token",
             {'username': username, 'password': password})
     except requests.exceptions.ConnectionError:
         return "server_error"
@@ -78,7 +79,7 @@ def refresh_token(token: PyToken) -> PyToken:
 
     try:  # try statement to prevent crashing when unable to connect
         response = requests.post(
-            api_url + "auth/refresh", json={"access_token":  token.access_token,
+            variables["api_url"] + "auth/refresh", json={"access_token":  token.access_token,
                                             "refresh_token": token.refresh_token, "token_type": "Bearer"})
     except requests.exceptions.ConnectionError:  # return empty token
         return PyToken(access_token="", refresh_token="")
@@ -113,7 +114,7 @@ def check_new_user(token: PyToken, user_email: str) -> dict | str:
     """
 
     try:  # try statement to prevent crashing when unable to connect
-        response = requests.get(url=api_url + "staff/user?limit=50&offset=0&user_email="+user_email.replace("@", "%40"),
+        response = requests.get(url=variables["api_url"] + "staff/user?limit=50&offset=0&user_email="+user_email.replace("@", "%40"),
                                 headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:  # return user does not exist
         return "User not found"
@@ -150,7 +151,7 @@ def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
     """
 
     try:  # try statement to prevent crashing when unable to connect
-        response = requests.get(url=api_url + "staff/user/" + uuid,
+        response = requests.get(url=variables["api_url"] + "staff/user/" + uuid,
                                 headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:  # return empty user
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
@@ -201,7 +202,7 @@ def patch_transaction(token: PyToken, interaction_id: int,
             func_args.pop(arg)
 
     try:  # try statement to prevent crashing when unable to connect
-        requests.patch(url=api_url + "staff/transaction/" + str(interaction_id) + "?force_patch=" + str(force_patch),
+        requests.patch(url=variables["api_url"] + "staff/transaction/" + str(interaction_id) + "?force_patch=" + str(force_patch),
                        json=func_args,
                        headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:  # nothing gets returned anyway so just pass
@@ -253,7 +254,7 @@ def get_transactions(token: PyToken,
             query_params += "&" + str(arg) + "=" + str(value)
 
     try:  # try statement to prevent crashing when unable to connect
-        response = requests.get(url=api_url + "staff/transaction" + query_params,
+        response = requests.get(url=variables["api_url"] + "staff/transaction" + query_params,
                                 headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:
         return "login_invalid"
@@ -289,7 +290,7 @@ def get_all_events(token: PyToken, current_date: datetime.datetime) -> dict:
     current_date -= datetime.timedelta(days=1)  # add 1 day just in case
     moment = "&end_date_ge=" + str(current_date).replace(":", "%3A").replace(" ", "T") + "%2B00%3A00"
     try:  # try statement to prevent crashing when unable to connect
-        response = requests.get(url=api_url + "staff/event?limit=50&offset=0&available=true&disabled=false" + moment,
+        response = requests.get(url=variables["api_url"] + "staff/event?limit=50&offset=0&available=true&disabled=false" + moment,
                                 headers={"authorization": "Bearer " + token.access_token})
     except requests.exceptions.ConnectionError:  # return empty dictionary
         return dict()

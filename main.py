@@ -10,6 +10,7 @@ from app.screens.valid_invalid_used_screen.valid_invalid_used_screen import Vali
 from app.screens.scan_screen.scan_screen import ScanScreen
 from app.screens.history_screen.history_screen import HistoryScreen
 from app.screens.niet_lid_price_screen.niet_lid_price_screen import NietLidPriceScreen
+from app.screens.total_scanned_screen.total_scanned_screen import TotalScannedScreen
 from app.functions.variables import variables
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
@@ -29,6 +30,7 @@ class Sm(MDScreenManager):
         self.add_widget(HistoryScreen(name='history'))
         self.add_widget(NietLidPriceScreen(name='niet_lid_price'))
         self.add_widget(RedirectScreen(name='redirect'))
+        self.add_widget(TotalScannedScreen(name='total_scanned'))
 
 
 # initiate the app itself

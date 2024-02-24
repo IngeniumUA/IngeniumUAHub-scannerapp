@@ -20,7 +20,9 @@ variables = {
 
     "main_button_events": None,
     "main_button_events_price": None,
+    "main_button_events_totals": None,
     "event_items": dict(),
+    "history_table": [],
 
     "pc": bool,
     "api_url": ""}

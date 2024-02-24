@@ -181,7 +181,7 @@ class ValidInvalidUsedScreen(MDScreen):
             if by_entry:
                 edit_mode = "automatisch geverifieerd"
             else:
-                edit_mode = "manueel aangepast"
+                edit_mode = "manueel aangepast naar " + validity
             add_to_history(variables["main_button_events"].text, variables["email"], edit_mode, variables["voornaam"],
                            variables["naam"], variables["prev_result"], 1)
 
@@ -279,6 +279,7 @@ class ValidInvalidUsedScreen(MDScreen):
             size_hint=(0.5, 0.05),
             pos_hint={'x': 0, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')
+        self.add_widget(self.amount_label_invalids)
 
         self.confirm_button_invalids = Button(
             text="Valideer",

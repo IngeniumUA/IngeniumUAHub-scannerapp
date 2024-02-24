@@ -1,0 +1,57 @@
+<TotalScannedScreen>
+
+	# button to go back to history screen
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0}
+        size_hint_y: 0.1
+        text: "Terug"
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.manager.transition.direction = "right"
+            root.manager.current = "history"
+
+    # label that displays the global total
+    MDLabel:
+        size_hint_x: 0.4
+        pos_hint: {"x":0, "y":0.88}
+        text_size: self.size
+        halign: "right"
+        valign: "top"
+        id: total_scanned_global_text
+        text: "Totaal aantal gescande tickets: "
+        font_name: 'app/assets/D-DIN.otf'
+        size_hint_y: 0.03
+    MDLabel:
+        size_hint_x: 0.6
+        pos_hint: {"x":0.4, "y":0.88}
+        text_size: self.size
+        halign: "left"
+        valign: "top"
+        id: total_scanned_global_var
+        font_name: 'app/assets/D-DIN.otf'
+        size_hint_y: 0.03
+
+    # label that displays the local total
+    MDLabel:
+        size_hint_x: 0.4
+        pos_hint: {"x":0, "y":0.85}
+        text_size: self.size
+        halign: "right"
+        valign: "top"
+        id: total_scanned_local_text
+        text: "Aantal tickets gescand op dit apparaat: "
+        font_name: 'app/assets/D-DIN.otf'
+        size_hint_y: 0.03
+    MDLabel:
+        size_hint_x: 0.6
+        pos_hint: {"x":0.4, "y":0.85}
+        text_size: self.size
+        halign: "left"
+        valign: "top"
+        id: total_scanned_local_var
+        font_name: 'app/assets/D-DIN.otf'
+        size_hint_y: 0.03

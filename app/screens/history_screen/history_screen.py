@@ -71,6 +71,8 @@ class HistoryScreen(MDScreen):
             background_color_selected_cell=(0, 0, 1, 0))
         self.add_widget(self.info_table, index=9)
 
+        variables["history_table"] = table_data
+
     def ask_reset_history(self):  # initiate the popup elements
         # initiate the background image so if the table is underneath the popup, everything remains visible
         self.backgroundimage = Image(

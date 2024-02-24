@@ -303,3 +303,49 @@ def get_all_events(token: PyToken, current_date: datetime.datetime) -> dict:
         return return_dict
     else:  # return empty dictionary
         return dict()
+
+def get_event_stats(token: PyToken, item_id: str | None = None, validity: str | None = None, user_id: str | None = None) -> int | str:
+    """
+        Get amount of tickets for a given validity and returns the amount
+
+         Examples
+        --------
+        >>> get_event_stats(token, item_id="<UUID>", validity="consumed")
+        int
+        or str when token error
+
+         Parameters
+        ----------
+        :param token:
+        :param item_id:
+        :param user_id:
+        :param validity:
+
+        Returns
+        -------
+        if successful
+        :return: int
+
+        else
+        :return: error in string form
+        """
+
+    # set up string for api call using given parameters except for token
+    query_params = "?"
+    func_args = locals()
+    for non_query_var in ('token', 'query_params'):
+        func_args.pop(non_query_var)
+    for arg, value in func_args.items():
+        if value or value == 0:  # offset=0 is matches on None, solving edge case
+            query_params += "&" + str(arg) + "=" + str(value)
+
+    try:  # try statement to prevent crashing when unable to connect
+        response = requests.get(url=variables["api_url"] + "staff/transaction/stats" + query_params,
+                                headers={"authorization": "Bearer " + token.access_token})
+    except requests.exceptions.ConnectionError:
+        return "login_invalid"
+
+    if response.status_code == 200:  # OK
+        return response.json()["SUCCESSFUL"]
+    elif response.status_code == 401 or response.status_code == 500:  # token has expired
+        return "login_invalid"

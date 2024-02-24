@@ -32,5 +32,6 @@ class LoginScreen(MDScreen):
     def switch_to_dev(self, switch_object, switch_value):
         if switch_value:
             variables["api_url"] = "https://hub.dev.ingeniumua.be/api/v1/"
+            # variables["api_url"] = "http://127.0.0.1:8000/api/v1/"
         else:
             variables["api_url"] = "https://hub.ingeniumua.be/api/v1/"

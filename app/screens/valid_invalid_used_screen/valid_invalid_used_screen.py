@@ -427,10 +427,10 @@ class ValidInvalidUsedScreen(MDScreen):
                 if self.product_table.row_data[i][1] == "[size=30]invalid[/size]" and not invalid_fixed:
                     ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
                     patch_transaction(variables["token"], interaction_id=ids, validity="valid",
-                                      force_patch=False, user=self.inputuser.text)
+                                      force_patch=True, user=self.inputuser.text)
                 elif not (self.product_table.row_data[i][1] == "[size=30]invalid[/size]" and not invalid_fixed):
                     ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
-                    patch_transaction(variables["token"], interaction_id=ids, force_patch=False,
+                    patch_transaction(variables["token"], interaction_id=ids, force_patch=True,
                                       user=self.inputuser.text)
 
             response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
@@ -465,7 +465,7 @@ class ValidInvalidUsedScreen(MDScreen):
             self.manager.current = "redirect"
         else:
             ids = int(self.product_table.row_data[0][3].replace('[size=30]', '').replace("[/size]", ""))
-            patch_transaction(variables["token"], interaction_id=ids, force_patch=False, user=self.inputuser.text)
+            patch_transaction(variables["token"], interaction_id=ids, force_patch=True, user=self.inputuser.text)
             response_dict = get_userdata(variables["token"], lidstatus["uuid"])
             old_email = variables["email"]  # save old email
             variables["voornaam"] = response_dict["voornaam"]

@@ -101,10 +101,12 @@ def alg_make_visible(self, visibility: bool) -> None:
 
     # remove widgets so they can't accidentally be interacted with while in the "more info" dropdown
     if variables["iconpath"] == "app/assets/dashmark.png" and visibility:
+        self.amount_label_invalids.opacity = 0
         self.remove_widget(self.confirm_button_invalids)
         self.remove_widget(self.button_change_user)
     # re-add widgets so they can be used again
     elif variables["iconpath"] == "app/assets/dashmark.png":
+        self.amount_label_invalids.opacity = 1
         self.add_widget(self.confirm_button_invalids, index=6)
         self.add_widget(self.button_change_user, index=5)
 
@@ -161,6 +163,7 @@ class ValidInvalidUsedScreen(MDScreen):
         variables["id_list"] = []
         self.remove_widget(self.product_table)
         if variables["iconpath"] == "app/assets/dashmark.png":
+            self.remove_widget(self.amount_label_invalids)
             self.remove_widget(self.confirm_button_invalids)
             self.remove_widget(self.button_change_user)
             self.clear_popup_user()
@@ -276,7 +279,7 @@ class ValidInvalidUsedScreen(MDScreen):
         self.amount_label_invalids = MDLabel(
             text=amount,
             size_hint=(0.5, 0.05),
-            pos_hint={'x': 0, 'y': 0.1},
+            pos_hint={'x': 0.01, 'y': 0.1},
             font_name='app/assets/D-DIN.otf')
         self.add_widget(self.amount_label_invalids)
 
@@ -288,10 +291,10 @@ class ValidInvalidUsedScreen(MDScreen):
             background_normal='app/assets/buttonnormal.png',
             background_down='app/assets/buttondown.png')
         self.confirm_button_invalids.bind(on_release=lambda x: self.validate())
-        self.add_widget(self.confirm_button_invalids, index=6)
+        self.add_widget(self.confirm_button_invalids)
 
         self.button_change_user = Button(
-            disabled=True,
+            disabled=False,
             # !!!!! is disabled as user change is not implemented in the api, remove when this is implemented !!!!!
             text="Pas eigenaar aan",
             size_hint=(1, 0.05),
@@ -397,7 +400,6 @@ class ValidInvalidUsedScreen(MDScreen):
         self.confirmtextuser.opacity = 1
         self.backgroundimageuser.opacity = 1
         self.ids.more_info_button.disabled = True
-        self.main_button_invalids.disabled = True
         self.confirm_button_invalids.disabled = True
 
     def clear_popup_user(self):  # hides the popup
@@ -411,7 +413,6 @@ class ValidInvalidUsedScreen(MDScreen):
         self.confirmtextuser.opacity = 0
         self.backgroundimageuser.opacity = 0
         self.ids.more_info_button.disabled = False
-        self.main_button_invalids.disabled = False
         self.confirm_button_invalids.disabled = False
 
     def change_user(self):
@@ -452,7 +453,7 @@ class ValidInvalidUsedScreen(MDScreen):
 
             variables["id_list"] = []
             self.remove_widget(self.product_table)
-            self.remove_widget(self.main_button_invalids)
+            self.remove_widget(self.amount_label_invalids)
             self.remove_widget(self.confirm_button_invalids)
             self.clear_popup_user()
             self.errortextuser.opacity = 0

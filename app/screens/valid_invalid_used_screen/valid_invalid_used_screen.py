@@ -161,7 +161,6 @@ class ValidInvalidUsedScreen(MDScreen):
         variables["id_list"] = []
         self.remove_widget(self.product_table)
         if variables["iconpath"] == "app/assets/dashmark.png":
-            self.remove_widget(self.main_button_invalids)
             self.remove_widget(self.confirm_button_invalids)
             self.remove_widget(self.button_change_user)
             self.clear_popup_user()

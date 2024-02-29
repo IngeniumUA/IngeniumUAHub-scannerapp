@@ -20,6 +20,7 @@ class TotalScannedScreen(MDScreen):
         self.load_dropdown_events_totals()
         if variables["current_selected_event"] != "":
             variables["main_button_events_totals"].text = variables["current_selected_event"]
+            self.show_totals(variables["main_button_events_totals"].text)
 
     def load_dropdown_events_totals(self):
         # create dropdown to select which event totals should be displayed

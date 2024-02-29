@@ -3,7 +3,7 @@ from app.api.data_models import PyStaffTransaction
 from app.api.hub_api import get_transactions, get_userdata
 
 
-def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) -> dict:
+def get_results(token, event_uuid: str, uuid: str | None = None, ids: int | None = None, run_userdata: bool = True) -> dict:
     """
     combine the results of get_transactions and get_userdata and return them in a dictionary that the app can use
                                                                                 or an error with the "validity" key
@@ -20,8 +20,9 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
     Parameters
     ----------
     :param token:
-    :param uuid:
     :param event_uuid:
+    :param uuid:
+    :param ids:
     :param run_userdata:
 
     Returns
@@ -32,7 +33,9 @@ def get_results(token, uuid: str, event_uuid: str, run_userdata: bool = True) ->
     if event_uuid == "":  # if no event is selected
         return {"validity": "emptyEvent"}
 
-    transactions: list[PyStaffTransaction] = get_transactions(token=token, interaction_uuid=str(uuid))
+    if uuid is not None:
+        uuid = str(uuid)
+    transactions: list[PyStaffTransaction] = get_transactions(token=token, interaction_uuid=uuid, interaction_id=ids)
     table_data = []
     event_tickets = []
 

@@ -157,9 +157,19 @@ def get_userdata(token: PyToken, uuid: str | None = None) -> dict:
         return {"lidstatus": False, "voornaam": "", "achternaam": ""}
 
     if response.status_code == 200:  # OK
+        try:
+            if response.json()["user_detail"]["voornaam"] is not None:
+                voornaam = response.json()["user_detail"]["voornaam"]
+        except TypeError:
+            voornaam = ""
+        try:
+            if response.json()["user_detail"]["achternaam"] is not None:
+                achternaam = response.json()["user_detail"]["achternaam"]
+        except TypeError:
+            achternaam = ""
         return {"lidstatus": response.json()["roles"]["is_lid"],
-                "voornaam": response.json()["user_detail"]["voornaam"],
-                "achternaam": response.json()["user_detail"]["achternaam"]}
+                "voornaam": voornaam,
+                "achternaam": achternaam}
     elif response.status_code == 401:  # token expired
         return {"error": "expired token"}
     else:  # return empty user
@@ -210,8 +220,8 @@ def patch_transaction(token: PyToken, interaction_id: int,
 
 
 def get_transactions(token: PyToken,
-                     interaction_uuid: str | None = None, user_id: str | None = None, item: str | None = None,
-                     status: str | None = None, validity: str | int | None = None,
+                     interaction_uuid: str | None = None, interaction_id: int | None = None, user_id: str | None = None,
+                     item: str | None = None, status: str | None = None, validity: str | int | None = None,
                      limit: int = 50, offset: int = 0, ordering: str | None = None) -> list[PyStaffTransaction] | str:
     """
     Get list of PyTransaction models by filter parameters, limit and offset, first degree ordering allowed
@@ -228,6 +238,7 @@ def get_transactions(token: PyToken,
     :param ordering:
     :param token:
     :param interaction_uuid:
+    :param interaction_id:
     :param user_id:
     :param item:
     :param status:

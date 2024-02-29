@@ -70,9 +70,9 @@ class ScanScreen(MDScreen):
         variables["prev_result"] = result
 
         # get data from the qr code and store used data for the api call in variables for access on other screens
-        response_dict = get_results(variables["token"], result,
-                                    variables["event_items"][variables["main_button_events"].text])
-        variables["prev_args"] = {"token": variables["token"], "uuid": result,
+        response_dict = get_results(variables["token"],
+                                    variables["event_items"][variables["main_button_events"].text], uuid=result)
+        variables["prev_args"] = {"token": variables["token"], "uuid": result, "id": None,
                                   "event_uuid": variables["event_items"][variables["main_button_events"].text]}
 
         # when there is data to be gained from the qr code, save them in variables for access on other screens

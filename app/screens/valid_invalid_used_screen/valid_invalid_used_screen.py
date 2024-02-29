@@ -187,8 +187,8 @@ class ValidInvalidUsedScreen(MDScreen):
             add_to_history(variables["main_button_events"].text, variables["email"], edit_mode, variables["voornaam"],
                            variables["naam"], variables["prev_result"], 1)
 
-        response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
-                                    variables["prev_args"]["event_uuid"], False)
+        response_dict = get_results(variables["prev_args"]["token"],
+                                    variables["prev_args"]["event_uuid"], uuid=variables["prev_args"]["uuid"], ids=variables["prev_args"]["id"], run_userdata=False)
         if response_dict["validity"] == "APITokenError":
             send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
         variables["table_data"] = response_dict["table_data"]
@@ -312,8 +312,8 @@ class ValidInvalidUsedScreen(MDScreen):
         # add the validated ticket to the history
         add_to_history(variables["main_button_events"].text, variables["email"], "valideer ongeldig ticket",
                        variables["voornaam"], variables["naam"], variables["prev_result"])
-        response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
-                                    variables["prev_args"]["event_uuid"], False)
+        response_dict = get_results(variables["prev_args"]["token"],
+                                    variables["prev_args"]["event_uuid"], uuid=variables["prev_args"]["uuid"], run_userdata=False)
         if response_dict["validity"] == "APITokenError":
             send_to_screen(self, "APITokenError")  # send user to token refresh screen if token is expired
         variables["table_data"] = response_dict["table_data"]
@@ -422,19 +422,19 @@ class ValidInvalidUsedScreen(MDScreen):
             return
 
         if lidstatus["lid"]:
-            invalid_fixed = False
-            for i in range(len(variables["table_data"])):
-                if self.product_table.row_data[i][1] == "[size=30]invalid[/size]" and not invalid_fixed:
-                    ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
-                    patch_transaction(variables["token"], interaction_id=ids, validity="valid",
-                                      force_patch=True, user=self.inputuser.text)
-                elif not (self.product_table.row_data[i][1] == "[size=30]invalid[/size]" and not invalid_fixed):
-                    ids = int(self.product_table.row_data[i][3].replace('[size=30]', '').replace("[/size]", ""))
-                    patch_transaction(variables["token"], interaction_id=ids, force_patch=True,
-                                      user=self.inputuser.text)
+            if self.product_table.row_data[0][1] == "[size=30]invalid[/size]":
+                ids = int(self.product_table.row_data[0][3].replace('[size=30]', '').replace("[/size]", ""))
+                patch_transaction(variables["token"], interaction_id=ids, validity="valid",
+                                  force_patch=True, user=self.inputuser.text)
+            else:
+                ids = int(self.product_table.row_data[0][3].replace('[size=30]', '').replace("[/size]", ""))
+                patch_transaction(variables["token"], interaction_id=ids, force_patch=True,
+                                  user=self.inputuser.text)
 
-            response_dict = get_results(variables["prev_args"]["token"], variables["prev_args"]["uuid"],
-                                        variables["prev_args"]["event_uuid"])
+            response_dict = get_results(variables["prev_args"]["token"],
+                                        variables["prev_args"]["event_uuid"], ids=ids)
+            variables["prev_args"]["uuid"] = None
+            variables["prev_args"]["id"] = ids
 
             # when there is data to be gained, save them in variables for access on other screens
             old_email = variables["email"]  # save old email

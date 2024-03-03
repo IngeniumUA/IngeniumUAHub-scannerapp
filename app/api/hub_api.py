@@ -307,6 +307,7 @@ def get_all_events(token: PyToken, current_date: datetime.datetime) -> dict:
         return dict()
 
     if response.status_code == 200:  # OK
+        print(response.json())
         return_dict: dict = dict()
         for event in response.json():
             if event["event_item"] is not None:

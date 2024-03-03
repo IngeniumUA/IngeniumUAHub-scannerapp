@@ -99,6 +99,7 @@ class ScanScreen(MDScreen):
         self.dropdown_events = DropDown()
         variables["event_items"] = get_all_events(variables["token"], datetime.datetime.now())
         variables["event_items"]['Selecteer een evenement'] = ""
+        variables["event_items"]['Alle evenementen'] = "alle"
 
         set_up_prices()
 

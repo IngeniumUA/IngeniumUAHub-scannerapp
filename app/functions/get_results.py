@@ -62,7 +62,7 @@ def get_results(token, event_uuid: str, uuid: str | None = None, ids: int | None
                          + str(transaction.product["name"]))
 
         # save tickets when they are for the given event
-        if transaction.interaction.item_id == event_uuid:
+        if transaction.interaction.item_id == event_uuid or event_uuid == "alle":
             event_tickets.append(transaction)
             if transaction.validity.value == "invalid":  # if invalid, the "to pay" price has to be calculated
                 prices_json = JsonStore("app/functions/niet-lid_price_list.json")

@@ -134,13 +134,16 @@ def alg_make_visible(self, visibility: bool) -> None:
 def play_scan_sound(validity: str):
     if validity == "valid":
         sound = SoundLoader.load("app/assets/scansound_two_beeps.mp3")
-        sound.play()
+        if sound:
+            sound.play()
     elif validity == "invalid":
         sound = SoundLoader.load("app/assets/scansound_one_beep.mp3")
-        sound.play()
+        if sound:
+            sound.play()
     else:
         sound = SoundLoader.load("app/assets/scansound_long_beep.mp3")
-        sound.play()
+        if sound:
+            sound.play()
 
 
 class ValidInvalidUsedScreen(MDScreen):

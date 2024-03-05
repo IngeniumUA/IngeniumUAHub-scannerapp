@@ -3,7 +3,6 @@ from kivymd.uix.label import MDLabel
 from kivy.lang import Builder
 from kivymd.uix.datatables import MDDataTable
 from kivy.core.window import Window
-from kivy.core.audio import SoundLoader
 from kivy.metrics import dp
 from kivy.uix.button import Button
 from kivy.uix.image import Image
@@ -131,21 +130,6 @@ def alg_make_visible(self, visibility: bool) -> None:
         obj.opacity = int(visibility)
 
 
-def play_scan_sound(validity: str):
-    if validity == "valid":
-        sound = SoundLoader.load("app/assets/scansound_two_beeps.wav")
-        if sound:
-            sound.play()
-    elif validity == "invalid":
-        sound = SoundLoader.load("app/assets/scansound_one_beep.wav")
-        if sound:
-            sound.play()
-    else:
-        sound = SoundLoader.load("app/assets/scansound_long_beep.wav")
-        if sound:
-            sound.play()
-
-
 class ValidInvalidUsedScreen(MDScreen):
     # load the associated kv file
     kv = Builder.load_file('app/screens/valid_invalid_used_screen/valid_invalid_used_screen.kv')
@@ -166,12 +150,8 @@ class ValidInvalidUsedScreen(MDScreen):
             self.add_first_nonconsumed()
             self.change_validity(True)
             variables["id_list"] = []
-            play_scan_sound("valid")
         elif variables["iconpath"] == "app/assets/dashmark.png":
             self.load_actions_invalids()
-            play_scan_sound("invalid")
-        else:
-            play_scan_sound("consumed_or_other")
 
     # called when the app starts, loads the dropdown with the options for validity so this only needs to happen once
     def on_kv_post(self, obj):

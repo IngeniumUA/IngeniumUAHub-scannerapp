@@ -117,7 +117,7 @@ class ScanScreen(MDScreen):
             text='Selecteer een evenement',
             size_hint=(0.72, None),
             height=dp(30),
-            pos_hint={'x': 0.14, 'y': 0.92},
+            pos_hint={'x': 0.14, 'y': 0.82},
             font_name='app/assets/D-DIN.otf')
         variables["main_button_events"].bind(on_release=self.dropdown_events.open)
         variables["main_button_events"].bind(on_release=lambda x: self.reset_event_empty())

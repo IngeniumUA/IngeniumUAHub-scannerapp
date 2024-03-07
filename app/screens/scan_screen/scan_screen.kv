@@ -6,7 +6,7 @@
         size_hint_y: None
         height: '30dp'
         size_hint_x: 0.1
-        pos_hint: {"x":0.88, "y":0.92}
+        pos_hint: {"x":0.88, "y":0.82}
         source: 'app/assets/history_icon.png'
         fit_mode: "contain"
         on_touch_down: if self.collide_point(*args[1].pos): root.goto_history_screen()
@@ -16,7 +16,7 @@
         size_hint_y: None
         height: '30dp'
         size_hint_x: 0.1
-        pos_hint: {"x":0.02, "y":0.92}
+        pos_hint: {"x":0.02, "y":0.82}
         source: 'app/assets/euro_icon.png'
         fit_mode: "contain"
         on_touch_down: if self.collide_point(*args[1].pos): root.goto_niet_lid_price_screen()
@@ -25,7 +25,7 @@
     ScanAnalyze:
         size_hint_y: 0.8
         size_hint_x: 0.98
-        pos_hint: {"x":0.01, "y":0.1}
+        pos_hint: {"x":0.01, "y":0}
         id:preview
         extracted_data: root.got_result
 
@@ -35,7 +35,7 @@
 		size_hint_y: None
 		height:'30dp'
 		size_hint_x: 0.7
-        pos_hint: {"x":0.15, "y":0.5}
+        pos_hint: {"x":0.15, "y":0.4}
 		halign: 'center'
 		color: 1,0,0,1
 		text: "Selecteer eerst een evenement"
@@ -47,7 +47,7 @@
     Button:
         size_hint_y: 0.08
         size_hint_x: 0.98
-        pos_hint: {"x":0.01, "y":0}
+        pos_hint: {"x":0.01, "y":0.9}
         text: "Terug"
         font_name: 'app/assets/D-DIN.otf'
         color: 1,1,1,1

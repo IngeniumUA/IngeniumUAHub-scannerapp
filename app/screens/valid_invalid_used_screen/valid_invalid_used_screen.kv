@@ -258,9 +258,7 @@
         background_normal: 'app/assets/buttonnormal.png'
         background_down: 'app/assets/buttondown.png'
         on_release:
-            root.set_invisible()
-            root.manager.transition.direction = "right"
-            root.manager.current = "scan"
+            root.go_back()
 
 
 # change how the datatable in the dropdown looks

@@ -1,0 +1,53 @@
+<SettingsScreen>:
+    # button to go to the niet-lid_price screen
+    Button:
+        size_hint_x: 0.8
+        pos_hint: {"x":0.1, "y":0.83}
+        size_hint_y: 0.05
+        text: "Niet-lid prijzen"
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.goto_niet_lid_price_screen()
+
+    MDLabel:
+        text: "activeer foto nemen"
+        pos_hint: {"x": 0.1, "y": 0.75}
+        size_hint: 0.5, 0.05
+        font_name: 'app/assets/D-DIN.otf'
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+    Switch:
+        pos_hint: {"x": 0.78, "y": 0.75}
+        size_hint: 0.1, 0.05
+        on_active:
+            root.turn_on_camera_capture(self, self.active)
+
+    MDLabel:
+        text: "activeer automatisch terugkeren"
+        pos_hint: {"x": 0.1, "y": 0.68}
+        size_hint: 0.5, 0.05
+        font_name: 'app/assets/D-DIN.otf'
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+    Switch:
+        pos_hint: {"x": 0.78, "y": 0.68}
+        size_hint: 0.1, 0.05
+        on_active:
+            root.enable_auto_return(self, self.active)
+
+	# button to go back to scan screen
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0}
+        size_hint_y: 0.1
+        text: "Terug"
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.manager.transition.direction = "right"
+            root.manager.current = "scan"

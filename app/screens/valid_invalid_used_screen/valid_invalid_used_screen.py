@@ -4,6 +4,7 @@ from kivy.lang import Builder
 from kivymd.uix.datatables import MDDataTable
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
+from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.uix.button import Button
 from kivy.uix.image import Image
@@ -167,11 +168,15 @@ class ValidInvalidUsedScreen(MDScreen):
             self.change_validity(True)
             variables["id_list"] = []
             play_scan_sound("valid")
+            if variables["options"]["auto_return"]:
+                Clock.schedule_once(self.go_back(), 3)
         elif variables["iconpath"] == "app/assets/dashmark.png":
             self.load_actions_invalids()
             play_scan_sound("invalid")
         else:
             play_scan_sound("other")
+            if variables["options"]["auto_return"]:
+                Clock.schedule_once(self.go_back(), 3)
 
     # called when the app starts, loads the dropdown with the options for validity so this only needs to happen once
     def on_kv_post(self, obj):
@@ -188,6 +193,11 @@ class ValidInvalidUsedScreen(MDScreen):
             self.remove_widget(self.button_change_user)
             self.clear_popup_user()
             self.errortextuser.opacity = 0
+
+    def go_back(self):
+        self.set_invisible()
+        self.manager.transition.direction = "right"
+        self.manager.current = "scan"
 
     # change the validity of an interaction based on the given parameters
     def change_validity(self, by_entry: bool):

@@ -29,8 +29,18 @@ class ScanScreen(MDScreen):
     # when coming from the login screen, the current active events should be loaded into a dropdown
     def on_pre_enter(self):
         variables["prev_result"] = ""
+        if variables["options"]["enable_image_capture"]:
+            self.ids.take_picture.opacity = 1
+            self.ids.take_picture.disabled = 0
+            self.dropdown_width = 0.62
+        else:
+            self.ids.take_picture.opacity = 0
+            self.ids.take_picture.disabled = 1
+            self.dropdown_width = 0.72
         if variables["prev_screen"] == "login":
             self.load_dropdown_events()
+        else:
+            variables["main_button_events"].size_hint = (self.dropdown_width, None)
 
     def on_kv_post(self, obj):  # called when the app is started, opens the camera when permission is given
         self.ids.preview.connect_camera(enable_analyze_pixels=True, default_zoom=0.0)
@@ -43,10 +53,10 @@ class ScanScreen(MDScreen):
         self.manager.transition.direction = "left"
         self.manager.current = "history"
 
-    def goto_niet_lid_price_screen(self):  # when icon is clicked, the user is sent to the niet_lid_price screen
+    def goto_settings_screen(self):  # when icon is clicked, the user is sent to the history screen
         variables["prev_screen"] = "scan"
         self.manager.transition.direction = "left"
-        self.manager.current = "niet_lid_price"
+        self.manager.current = "settings"
 
     def price_is_set(self, event_uuid: str) -> bool:  # returns whether the price of an event is set
         prices_json = JsonStore("app/functions/niet-lid_price_list.json")
@@ -115,7 +125,7 @@ class ScanScreen(MDScreen):
 
         variables["main_button_events"] = Button(
             text='Selecteer een evenement',
-            size_hint=(0.72, None),
+            size_hint=(self.dropdown_width, None),
             height=dp(30),
             pos_hint={'x': 0.14, 'y': 0.82},
             font_name='app/assets/D-DIN.otf')
@@ -134,6 +144,7 @@ class ScanScreen(MDScreen):
         variables["current_selected_event"] = event
 
 
+@mainthread
 class ScanAnalyze(Preview):  # decodes camera data and returns the scanned string when qr code is detected
     extracted_data = ObjectProperty(None)
 

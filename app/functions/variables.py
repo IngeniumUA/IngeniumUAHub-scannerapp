@@ -25,4 +25,8 @@ variables = {
     "history_table": [],
 
     "pc": bool,
-    "api_url": ""}
+    "api_url": "",
+
+    "options": {"auto_return": False,
+                "enable_image_capture": False}
+}

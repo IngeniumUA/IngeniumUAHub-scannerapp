@@ -2,24 +2,30 @@
 
 <ScanScreen>:
     # button to go to history screen
-    Image:
-        size_hint_y: None
-        height: '30dp'
-        size_hint_x: 0.1
-        pos_hint: {"x":0.88, "y":0.82}
-        source: 'app/assets/history_icon.png'
-        fit_mode: "contain"
-        on_touch_down: if self.collide_point(*args[1].pos): root.goto_history_screen()
+    MDIconButton:
+        icon: "history"
+        pos_hint: {"center_x":0.93, "center_y":0.85}
+        size_hint: 0.05, 0.05
+        on_release:
+            root.goto_history_screen()
 
-    # button to go to the niet-lid_price screen
-    Image:
-        size_hint_y: None
-        height: '30dp'
-        size_hint_x: 0.1
-        pos_hint: {"x":0.02, "y":0.82}
-        source: 'app/assets/euro_icon.png'
-        fit_mode: "contain"
-        on_touch_down: if self.collide_point(*args[1].pos): root.goto_niet_lid_price_screen()
+    # button to go to settings_screen
+    MDIconButton:
+        icon: "cog"
+        id: goto_settings
+        pos_hint: {"center_x":0.07, "y":0.83}
+        size_hint: 0.04, 0.04
+        on_release:
+            root.goto_settings_screen()
+
+    # button to go to take picture if enabled
+    MDIconButton:
+        icon: "camera-outline"
+        id: take_picture
+        pos_hint: {"x":0.8, "y":0.83}
+        size_hint: 0.04, 0.04
+        on_release:
+            root.ids.preview.capture_photo()
 
     # call class to decipher qr code and show camera
     ScanAnalyze:

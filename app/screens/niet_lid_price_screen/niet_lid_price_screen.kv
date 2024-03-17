@@ -64,7 +64,7 @@
         on_release:
             root.show_popup_price()
 
-	# button to go back to settings screen
+	# button to go back to previous screen
     Button:
         size_hint_x: 1
         pos_hint: {"x":0, "y":0}
@@ -75,5 +75,4 @@
         background_normal: 'app/assets/buttonnormal.png'
         background_down: 'app/assets/buttondown.png'
         on_release:
-            root.manager.transition.direction = "right"
-            root.manager.current = "settings"
+            root.go_back()

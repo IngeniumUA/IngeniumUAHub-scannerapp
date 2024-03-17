@@ -32,6 +32,10 @@ class NietLidPriceScreen(MDScreen):
     def on_leave(self):  # when the screen is left, hide the popup if shown
         self.clear_popup_price()
 
+    def go_back(self):
+        self.manager.transition.direction = "right"
+        self.manager.current = variables["prev_screen"]
+
     def load_dropdown_events_price(self):
         # create dropdown to select which event price should be changed
         self.dropdown_events_price = DropDown()

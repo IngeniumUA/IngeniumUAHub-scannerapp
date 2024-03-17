@@ -106,6 +106,11 @@ class ScanScreen(MDScreen):
         else:
             self.goto_niet_lid_price_screen()
 
+    def goto_niet_lid_price_screen(self):  # when icon is clicked, the user is sent to the niet_lid_price screen
+        variables["prev_screen"] = "scan"
+        self.manager.transition.direction = "left"
+        self.manager.current = "niet_lid_price"
+
     def load_dropdown_events(self):  # load the dropdown from which the user can select the correct event
         self.dropdown_events = DropDown()
         variables["event_items"] = get_all_events(variables["token"], datetime.datetime.now())

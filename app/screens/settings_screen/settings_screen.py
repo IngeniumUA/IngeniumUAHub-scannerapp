@@ -11,7 +11,7 @@ class SettingsScreen(MDScreen):
     kv = Builder.load_file('app/screens/settings_screen/settings_screen.kv')  # load the associated kv file
 
     def goto_niet_lid_price_screen(self):  # when icon is clicked, the user is sent to the niet_lid_price screen
-        variables["prev_screen"] = "scan"
+        variables["prev_screen"] = "settings"
         self.manager.transition.direction = "left"
         self.manager.current = "niet_lid_price"
 

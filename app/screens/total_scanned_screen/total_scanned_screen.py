@@ -61,7 +61,7 @@ class TotalScannedScreen(MDScreen):
             self.ids.total_scanned_global_var.text = str(global_total)
             local_total = 0
             for action in variables["history_table"]:  # check in history all actions that would lead to a consumed ticket
-                if action[0] == event or event == "Alle evenementen":
+                if action[0] == "[size=30]"+event+"[/size]" or event == "Alle evenementen":
                     if (action[5] == "[size=30]manueel aangepast naar consumed[/size]"
                             or action[5] == "[size=30]automatisch geverifieerd[/size]"):
                         local_total += int(action[4].replace("[size=30]", "").replace("[/size]", ""))

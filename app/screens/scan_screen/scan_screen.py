@@ -97,6 +97,7 @@ class ScanScreen(MDScreen):
             variables["validity"] = response_dict["validity"]
             variables["lidstatus"] = response_dict["lidstatus"]
             variables["checkout_status"] = response_dict["checkout_status"]
+            variables["notes"] = response_dict["notes"]
             variables["table_data"] = response_dict["table_data"]
 
         # if the event price is set, send user to the right screen, else send user to niet_lid_price page

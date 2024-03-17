@@ -106,7 +106,8 @@ def get_results(token, event_uuid: str, uuid: str | None = None, ids: int | None
                 "checkout_status": event_tickets[i].status.value,
                 "voornaam": userdata["voornaam"],
                 "naam": userdata["achternaam"],
-                "lidstatus": str(userdata["lidstatus"])}
+                "lidstatus": str(userdata["lidstatus"]),
+                "notes": event_tickets[i].note}
     else:
         # the scanned UUID was valid but no tickets for the given event were found, return all acquired data
         return {"validity": "eventError",
@@ -115,4 +116,5 @@ def get_results(token, event_uuid: str, uuid: str | None = None, ids: int | None
                 "checkout_status": transactions[0].status.value,
                 "voornaam": userdata["voornaam"],
                 "naam": userdata["achternaam"],
-                "lidstatus": str(userdata["lidstatus"])}
+                "lidstatus": str(userdata["lidstatus"]),
+                "notes": transactions[0].note}

@@ -46,6 +46,8 @@ class TransactionStatusEnum(Enum):
     FAILED = "FAILED"  # Payment Failed
     PENDING = "PENDING"  # Awaiting confirmation
     PROCESSING = "PROCESSING"  # Not quite succeeded, but we won't cancel the checkout anymore
+    REFUNDED = "REFUNDED"
+    REFUND_PENDING = "REFUND_PENDING"
 
 
 class ValidityEnum(Enum):
@@ -82,3 +84,5 @@ class PyStaffTransaction(BaseModel):
 
     date_created: datetime.datetime
     date_completed: datetime.datetime | None
+
+    note: str | None = None

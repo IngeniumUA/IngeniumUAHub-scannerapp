@@ -1,5 +1,7 @@
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.label import MDLabel
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 from kivy.lang import Builder
 from kivymd.uix.datatables import MDDataTable
 from kivy.core.window import Window
@@ -177,6 +179,8 @@ class ValidInvalidUsedScreen(MDScreen):
             play_scan_sound("other")
             if variables["options"]["auto_return"]:
                 Clock.schedule_once(self.go_back(), 3)
+        if variables["notes"] is not None:
+            self.show_notes()
 
     # called when the app starts, loads the dropdown with the options for validity so this only needs to happen once
     def on_kv_post(self, obj):
@@ -198,6 +202,20 @@ class ValidInvalidUsedScreen(MDScreen):
         self.set_invisible()
         self.manager.transition.direction = "right"
         self.manager.current = "scan"
+
+    def show_notes(self):
+        self.notes = MDDialog(
+            title=variables["notes"],
+            buttons=[
+                MDFlatButton(
+                    text="Sluiten",
+                    on_release=lambda x:self.close_notes()
+                )
+            ],
+        )
+        self.notes.open()
+    def close_notes(self):
+        self.notes.dismiss()
 
     # change the validity of an interaction based on the given parameters
     def change_validity(self, by_entry: bool):
@@ -486,6 +504,7 @@ class ValidInvalidUsedScreen(MDScreen):
                 variables["validity"] = response_dict["validity"]
                 variables["lidstatus"] = response_dict["lidstatus"]
                 variables["checkout_status"] = response_dict["checkout_status"]
+                variables["notes"] = response_dict["notes"]
                 variables["table_data"] = response_dict["table_data"]
 
             variables["id_list"] = []

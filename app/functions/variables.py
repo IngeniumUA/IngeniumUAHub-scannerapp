@@ -16,6 +16,7 @@ variables = {
     "table_data": "",
     "validity": "",
     "checkout_status": "",
+    "notes": "",
     "id_list": [],
 
     "main_button_events": None,

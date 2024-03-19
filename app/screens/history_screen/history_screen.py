@@ -1,13 +1,12 @@
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.label import MDLabel
 from kivymd.uix.datatables import MDDataTable
 from kivy.lang import Builder
 from kivy.config import Config
-from kivy.uix.image import Image
-from kivy.uix.button import Button
 from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.storage.jsonstore import JsonStore
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 
 from app.functions.variables import variables
 
@@ -20,12 +19,12 @@ class HistoryScreen(MDScreen):
     def on_pre_enter(self):  # when the screen is entered, load the history table
         self.load_history()
 
-    def on_kv_post(self, obj):  # initiates popup when app is started
-        self.ask_reset_history()
-
     def on_leave(self):  # when the screen is left, remove the history table for safety and hide the popup if shown
         self.remove_widget(self.info_table)
-        self.clear_popup()
+        try:
+            self.popup_reset_history.dismiss()
+        except AttributeError:
+            pass
 
     def load_history(self):  # load the history table
         history_json = JsonStore("app/functions/scan_history"+variables["api_suffix"]+".json")
@@ -73,70 +72,28 @@ class HistoryScreen(MDScreen):
 
         variables["history_table"] = table_data
 
-    def ask_reset_history(self):  # initiate the popup elements
-        # initiate the background image so if the table is underneath the popup, everything remains visible
-        self.backgroundimage = Image(
-            source='app/assets/background.png',
-            opacity=0,
-            size_hint=(0.9, 0.4),
-            pos_hint={"x": 0.05, "y": 0.3},
-            fit_mode="fill"
-        )
-        self.add_widget(self.backgroundimage, index=4)
-
-        self.confirmtext = MDLabel(
+    def show_reset_history(self):
+        self.popup_reset_history = MDDialog(
+            title="Geschiedenis verwijderen",
             text="Ben je zeker dat je de geschiedenis wilt wissen? Dit kan niet ongedaan gemaakt worden!",
-            size_hint=(0.86, 0.3),
-            pos_hint={"x": 0.07, "y": 0.4},
-            font_name='app/assets/D-DIN.otf',
-            opacity=0
+            buttons=[
+                MDFlatButton(
+                    text="Annuleer",
+                    font_name='app/assets/D-DIN.otf',
+                    on_release=lambda x:self.close_reset_history()
+                ),
+                MDFlatButton(
+                    text="Ga verder",
+                    font_name='app/assets/D-DIN.otf',
+                    on_release=lambda x: self.reset_history()
+                )
+            ],
         )
-        self.add_widget(self.confirmtext, index=2)
-
-        self.cancel_button = Button(
-            size_hint=(0.45, 0.1),
-            pos_hint={"x": 0.05, "y": 0.3},
-            background_normal='app/assets/buttonnormal.png',
-            background_down='app/assets/buttondown.png',
-            text="annuleer",
-            font_name='app/assets/D-DIN.otf',
-            opacity=0,
-            disabled=True
-        )
-        self.cancel_button.bind(on_release=lambda x: self.clear_popup())
-        self.add_widget(self.cancel_button, index=3)
-
-        self.continue_button = Button(
-            size_hint=(0.45, 0.1),
-            pos_hint={"x": 0.5, "y": 0.3},
-            background_normal='app/assets/buttonnormal.png',
-            background_down='app/assets/buttondown.png',
-            text="Ga verder",
-            font_name='app/assets/D-DIN.otf',
-            opacity=0,
-            disabled=True
-        )
-        self.continue_button.bind(on_release=lambda x: self.reset_history())
-        self.continue_button.bind(on_press=lambda x: self.clear_popup())
-        # set the row data to empty
-        self.continue_button.bind(on_release=lambda x: setattr(self.info_table, "row_data", []))
-        self.add_widget(self.continue_button, index=1)
-
-    def show_popup(self):  # shows the popup
-        self.cancel_button.opacity = 1
-        self.cancel_button.disabled = False
-        self.continue_button.opacity = 1
-        self.continue_button.disabled = False
-        self.confirmtext.opacity = 1
-        self.backgroundimage.opacity = 1
-
-    def clear_popup(self):  # hides the popup
-        self.cancel_button.opacity = 0
-        self.cancel_button.disabled = True
-        self.continue_button.opacity = 0
-        self.continue_button.disabled = True
-        self.confirmtext.opacity = 0
-        self.backgroundimage.opacity = 0
+        self.popup_reset_history.open()
+    def close_reset_history(self):
+        self.popup_reset_history.dismiss()
 
     def reset_history(self):  # set the history file to an empty dictionary
         JsonStore("app/functions/scan_history"+variables["api_suffix"]+".json").clear()
+        setattr(self.info_table, "row_data", [])
+        self.popup_reset_history.dismiss()

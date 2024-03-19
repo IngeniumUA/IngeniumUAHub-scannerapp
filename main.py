@@ -17,7 +17,7 @@ from app.functions.variables import variables
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 
 
 # initiate screen manager, this will allow the app to switch between screens

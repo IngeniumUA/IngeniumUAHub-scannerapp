@@ -49,7 +49,7 @@ def add_to_history(event: str, mail: str, edit_mode: str, naam: str, achternaam:
     :return: None
     """
 
-    history_json = JsonStore("app/functions/scan_history.json")
+    history_json = JsonStore("app/functions/scan_history"+variables["api_suffix"]+".json")
     history = dict(history_json)  # convert the file to a dictionary
     if history != dict():
         history = history["data"]

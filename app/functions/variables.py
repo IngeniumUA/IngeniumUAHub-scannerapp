@@ -27,6 +27,7 @@ variables = {
 
     "pc": bool,
     "api_url": "",
+    "api_suffix": "",
 
     "options": {"auto_return": False,
                 "enable_image_capture": False}

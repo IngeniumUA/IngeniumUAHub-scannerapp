@@ -2,6 +2,8 @@ from kivy.storage.jsonstore import JsonStore
 from app.api.data_models import PyStaffTransaction
 from app.api.hub_api import get_transactions, get_userdata
 
+from app.functions.variables import variables
+
 
 def get_results(token, event_uuid: str, uuid: str | None = None, ids: int | None = None, run_userdata: bool = True) -> dict:
     """
@@ -65,7 +67,7 @@ def get_results(token, event_uuid: str, uuid: str | None = None, ids: int | None
         if transaction.interaction.item_id == event_uuid or event_uuid == "alle":
             event_tickets.append(transaction)
             if transaction.validity.value == "invalid":  # if invalid, the "to pay" price has to be calculated
-                prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+                prices_json = JsonStore("app/functions/niet-lid_price_list"+variables["api_suffix"]+".json")
                 prices = dict(prices_json)  # convert the file to a dictionary
                 if prices != dict():
                     prices = prices["data"]

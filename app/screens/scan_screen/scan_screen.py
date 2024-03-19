@@ -59,7 +59,7 @@ class ScanScreen(MDScreen):
         self.manager.current = "settings"
 
     def price_is_set(self, event_uuid: str) -> bool:  # returns whether the price of an event is set
-        prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+        prices_json = JsonStore("app/functions/niet-lid_price_list"+variables["api_suffix"]+".json")
         prices = dict(prices_json)  # convert the file to a dictionary
         if prices != dict():
             prices = prices["data"]

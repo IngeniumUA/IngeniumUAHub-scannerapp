@@ -5,7 +5,7 @@ from app.functions.variables import variables
 
 def set_up_prices():
     # set prices of events that are not in the file to -1
-    prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+    prices_json = JsonStore("app/functions/niet-lid_price_list"+variables["api_suffix"]+".json")
     prices = dict(prices_json)  # convert the file to a dictionary
     if prices != dict():
         prices = prices["data"]

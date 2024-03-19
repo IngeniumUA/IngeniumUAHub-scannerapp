@@ -28,7 +28,7 @@ class HistoryScreen(MDScreen):
         self.clear_popup()
 
     def load_history(self):  # load the history table
-        history_json = JsonStore("app/functions/scan_history.json")
+        history_json = JsonStore("app/functions/scan_history"+variables["api_suffix"]+".json")
         history = dict(history_json)  # convert the file to a dictionary
         if history != dict():
             history = history["data"]
@@ -139,4 +139,4 @@ class HistoryScreen(MDScreen):
         self.backgroundimage.opacity = 0
 
     def reset_history(self):  # set the history file to an empty dictionary
-        JsonStore("app/functions/scan_history.json").clear()
+        JsonStore("app/functions/scan_history"+variables["api_suffix"]+".json").clear()

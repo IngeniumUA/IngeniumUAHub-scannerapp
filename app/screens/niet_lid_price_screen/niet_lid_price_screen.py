@@ -62,7 +62,7 @@ class NietLidPriceScreen(MDScreen):
         self.add_widget(variables["main_button_events_price"], index=1)
 
     def set_price_label(self, event):  # set the text of the label to the curren price of the selected event
-        prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+        prices_json = JsonStore("app/functions/niet-lid_price_list"+variables["api_suffix"]+".json")
         prices = dict(prices_json)  # convert the file to a dictionary
         if prices != dict():
             prices = prices["data"]
@@ -73,7 +73,7 @@ class NietLidPriceScreen(MDScreen):
             self.ids.niet_lid_price.text = 'Niet lid prijs: Niet ingesteld'
 
     def apply(self):  # apply the made changes
-        prices_json = JsonStore("app/functions/niet-lid_price_list.json")
+        prices_json = JsonStore("app/functions/niet-lid_price_list"+variables["api_suffix"]+".json")
         prices = dict(prices_json)  # convert the file to a dictionary
         if prices != dict():
             prices = prices["data"]
@@ -160,5 +160,5 @@ class NietLidPriceScreen(MDScreen):
         self.backgroundimage_price.opacity = 0
 
     def reset_prices(self):  # set the price list file to an empty dictionary
-        JsonStore("app/functions/niet-lid_price_list.json").clear()
+        JsonStore("app/functions/niet-lid_price_list"+variables["api_suffix"]+".json").clear()
         set_up_prices()

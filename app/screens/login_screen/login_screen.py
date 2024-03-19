@@ -13,6 +13,7 @@ class LoginScreen(MDScreen):
 
     def on_pre_enter(self):
         variables["api_url"] = "https://hub.ingeniumua.be/api/v1/"
+        variables["api_suffix"] = "_prod"
 
     def login(self):  # try to get token with given credentials and save gotten token
         variables["token"] = authenticate(self.ids.mail.text.lower(), self.ids.passw.text)
@@ -33,5 +34,7 @@ class LoginScreen(MDScreen):
         if switch_value:
             variables["api_url"] = "https://hub.dev.ingeniumua.be/api/v1/"
             # variables["api_url"] = "http://127.0.0.1:8000/api/v1/"
+            variables["api_suffix"] = "_dev"
         else:
             variables["api_url"] = "https://hub.ingeniumua.be/api/v1/"
+            variables["api_suffix"] = "_prod"

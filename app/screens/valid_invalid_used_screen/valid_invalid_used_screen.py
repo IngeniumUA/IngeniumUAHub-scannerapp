@@ -178,7 +178,7 @@ class ValidInvalidUsedScreen(MDScreen):
         else:
             play_scan_sound("other")
             if variables["options"]["auto_return"]:
-                Clock.schedule_once(self.go_back(), 3)
+                Clock.schedule_once(lambda x:self.go_back(), 3)
         if variables["notes"] is not None:
             self.show_notes()
 
@@ -201,7 +201,7 @@ class ValidInvalidUsedScreen(MDScreen):
     def go_back(self):
         self.set_invisible()
         self.manager.transition.direction = "right"
-        self.manager.current = "scan"
+        self.manager.current = variables["prev_screen"]
 
     def show_notes(self):
         self.notes = MDDialog(

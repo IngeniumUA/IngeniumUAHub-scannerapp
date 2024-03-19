@@ -15,6 +15,11 @@ class SettingsScreen(MDScreen):
         self.manager.transition.direction = "left"
         self.manager.current = "niet_lid_price"
 
+    def goto_handscanner_screen(self):  # when icon is clicked, the user is sent to the niet_lid_price screen
+        variables["prev_screen"] = "settings"
+        self.manager.transition.direction = "left"
+        self.manager.current = "handscanner"
+
     def turn_on_camera_capture(self, switch_object, switch_value):
             variables["options"]["enable_image_capture"] = switch_value
 

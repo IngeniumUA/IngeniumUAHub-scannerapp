@@ -12,21 +12,20 @@
         on_release:
             root.goto_niet_lid_price_screen()
 
-    MDLabel:
-        text: "activeer foto nemen"
-        pos_hint: {"x": 0.1, "y": 0.75}
-        size_hint: 0.5, 0.05
+    Button:
+        size_hint_x: 0.8
+        pos_hint: {"x":0.1, "y":0.75}
+        size_hint_y: 0.05
+        text: "Handscanner"
         font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
         background_normal: 'app/assets/buttonnormal.png'
         background_down: 'app/assets/buttondown.png'
-    Switch:
-        pos_hint: {"x": 0.78, "y": 0.75}
-        size_hint: 0.1, 0.05
-        on_active:
-            root.turn_on_camera_capture(self, self.active)
+        on_release:
+            root.goto_handscanner_screen()
 
     MDLabel:
-        text: "activeer automatisch terugkeren"
+        text: "activeer foto nemen"
         pos_hint: {"x": 0.1, "y": 0.68}
         size_hint: 0.5, 0.05
         font_name: 'app/assets/D-DIN.otf'
@@ -34,6 +33,19 @@
         background_down: 'app/assets/buttondown.png'
     Switch:
         pos_hint: {"x": 0.78, "y": 0.68}
+        size_hint: 0.1, 0.05
+        on_active:
+            root.turn_on_camera_capture(self, self.active)
+
+    MDLabel:
+        text: "activeer automatisch terugkeren"
+        pos_hint: {"x": 0.1, "y": 0.61}
+        size_hint: 0.5, 0.05
+        font_name: 'app/assets/D-DIN.otf'
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+    Switch:
+        pos_hint: {"x": 0.78, "y": 0.61}
         size_hint: 0.1, 0.05
         on_active:
             root.enable_auto_return(self, self.active)

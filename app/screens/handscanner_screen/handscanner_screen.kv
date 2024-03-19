@@ -1,0 +1,42 @@
+<HandscannerScreen>
+    # label that shows error message if no event is selected
+    MDLabel:
+        id: event_empty
+		size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.7
+        pos_hint: {"x":0.15, "y":0.4}
+		halign: 'center'
+		color: 1,0,0,1
+		text: "Selecteer eerst een evenement"
+		opacity: 1
+		font_size: 100
+		font_name: 'app/assets/D-DIN.otf'
+
+	# transaction uuid textbox
+    TextInput:
+        size_hint_y: None
+		height:'30dp'
+		size_hint_x: 0.72
+		pos_hint: {"x":0.14, "y":0.7}
+        id: response
+        hint_text: "transaction uuid"
+        multiline: False
+        font_name: 'app/assets/D-DIN.otf'
+        on_text_validate:
+            root.got_result()
+
+
+	# button to go back to settings screen
+    Button:
+        size_hint_x: 1
+        pos_hint: {"x":0, "y":0}
+        size_hint_y: 0.1
+        text: "Terug"
+        font_name: 'app/assets/D-DIN.otf'
+        color: 1,1,1,1
+        background_normal: 'app/assets/buttonnormal.png'
+        background_down: 'app/assets/buttondown.png'
+        on_release:
+            root.manager.transition.direction = "right"
+            root.manager.current = "settings"

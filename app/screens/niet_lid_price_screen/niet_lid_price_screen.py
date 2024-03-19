@@ -92,7 +92,8 @@ class NietLidPriceScreen(MDScreen):
         prices[variables["event_items"][variables["main_button_events_price"].text]] = float(self.ids.new_price.text)
         prices_json["data"] = prices  # write the dictionary to the file
 
-        send_to_screen(self, "scan_screen")  # send user back to scan screen
+        self.manager.transition.direction = "right"
+        self.manager.current = variables["prev_screen"]
 
     def ask_reset_prices(self):  # initiate the popup elements
         # initiate the background image so if the table is underneath the popup, everything remains visible

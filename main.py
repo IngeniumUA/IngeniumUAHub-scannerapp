@@ -12,6 +12,7 @@ from app.screens.history_screen.history_screen import HistoryScreen
 from app.screens.niet_lid_price_screen.niet_lid_price_screen import NietLidPriceScreen
 from app.screens.total_scanned_screen.total_scanned_screen import TotalScannedScreen
 from app.screens.settings_screen.settings_screen import SettingsScreen
+from app.screens.handscanner_screen.handscanner_screen import HandscannerScreen
 from app.functions.variables import variables
 
 Config.set('graphics', 'resizable', True)  # make images and other elements resize when not the right dimensions
@@ -35,6 +36,7 @@ class Sm(MDScreenManager):
         self.add_widget(RedirectScreen(name='redirect'))
         self.add_widget(TotalScannedScreen(name='total_scanned'))
         self.add_widget(SettingsScreen(name='settings'))
+        self.add_widget(HandscannerScreen(name='handscanner'))
 
 
 # initiate the app itself

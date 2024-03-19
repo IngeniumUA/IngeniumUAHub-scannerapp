@@ -36,26 +36,22 @@ def send_to_screen(self, validity) -> None:
 
     elif validity == "valid":
         variables["iconpath"] = "app/assets/checkmark.png"  # set icon to green checkmark
-        variables["prev_screen"] = "scan"
         self.manager.transition.direction = "left"
         self.manager.current = "valid_invalid_used"
 
     elif validity == "invalid":
         variables["iconpath"] = "app/assets/dashmark.png"  # set icon to orange "stop sign"
-        variables["prev_screen"] = "scan"
         self.manager.transition.direction = "left"
         self.manager.current = "valid_invalid_used"
 
     # when ticket is invalid but data was still acquired
     elif (validity == "consumed" or validity == "eventError"
           or validity == "manually_verified"):
-        variables["prev_screen"] = "scan"
         variables["iconpath"] = "app/assets/xmark.png"  # set icon to red cross
         self.manager.transition.direction = "left"
         self.manager.current = "valid_invalid_used"
 
     elif validity == "UUIDError":
-        variables["prev_screen"] = "scan"
         self.manager.transition.direction = "left"
         self.manager.current = "payless"
 

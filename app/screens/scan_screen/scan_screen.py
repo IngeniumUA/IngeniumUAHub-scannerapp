@@ -102,6 +102,7 @@ class ScanScreen(MDScreen):
 
         # if the event price is set, send user to the right screen, else send user to niet_lid_price page
         if self.price_is_set(variables["event_items"][variables["main_button_events"].text]):
+            variables["prev_screen"] = "scan"
             send_to_screen(self, response_dict["validity"])
         else:
             self.goto_niet_lid_price_screen()
